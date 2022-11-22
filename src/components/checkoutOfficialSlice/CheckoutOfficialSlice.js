@@ -25,7 +25,6 @@ const CheckoutOfficialSlice = createSlice({
   reducers: {},
   extraReducers: {
     [fetchAsyncMeliCode.fulfilled]: (state, { payload }) => {
-      console.log(initialState.user);
       return { ...state, user: payload };
     },
   },

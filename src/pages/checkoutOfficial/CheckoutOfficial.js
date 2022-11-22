@@ -19,6 +19,90 @@ const CheckoutOfficial = (props) => {
     meliCode: false,
     personalCode: false,
   });
+  const [userName, setUserName] = useState("");
+  const [personalCode, setPersonalCode] = useState("");
+  const [meliCode, setMeliCode] = useState("");
+
+  const [users, setUsers] = useState([]);
+  const [formError, setFormError] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const handleGetAllUsers = async () => {
+    try {
+      const usersRes = await getAllUsersByPersonalCode(
+        userData.company.CompanyCode,
+        userData.location
+      );
+      console.log(usersRes.data);
+      setUsers(usersRes.data);
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  const [test, setTest] = useState({});
+  const handleGetUser = async () => {
+    try {
+      const values = {
+        meliCode: meliCode,
+        personelCode: personalCode,
+        id: userName,
+      };
+      console.log(values);
+      const userRes = await getUser(values);
+      console.log(userRes.data);
+      if (userRes.data.length !== 0) {
+        console.log(userRes.data[0]);
+        setTest(userRes.data[0]);
+        setUserName("");
+        setPersonalCode("");
+        setMeliCode("");
+      }
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  useEffect(() => {
+    if (Object.keys(userName).length === 0 && isSubmit) {
+    }
+  }, [userName]);
+
+  const validationForm = (value) => {
+    const errors = {};
+    const regex = /^[^\s@]+[^\s@]+\.[^\s@]{2,}$/i;
+    if (!value.userName) {
+      if (!value.meliCode) {
+        errors.email = "ایمیل علط است";
+      } else if (!regex.test(value.email)) {
+        errors.email = "این ایمیل صحیح نمباشد";
+      }
+      return errors;
+    }
+  };
+
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    setFormError(
+      validationForm({
+        userName,
+        personalCode,
+        meliCode,
+      })
+    );
+    setIsSubmit(true);
+    const enteredUserName = userNameInputRef.current.value;
+    const enteredMeliCode = meliCodeInputRef.current.value;
+    const enteredPersonalCode = personalCodeInputRef.current.value;
+
+    const checkoutData = {
+      userName: enteredUserName,
+      meliCode: enteredMeliCode,
+      personalCode: enteredPersonalCode,
+    };
+
+    props.addCheckout(checkoutData);
+  };
 
   const meliCodeHandler = (e) => {
     if (e.target.value.length > 0) {
@@ -67,19 +151,14 @@ const CheckoutOfficial = (props) => {
 
   useEffect(() => {
     handleGetAllUsers();
-    // handleGetUser();
+    handleGetUser();
   }, [userData]);
 
   return (
     <div className="container">
       <div className="row">
         <DateComponent className="form-control" />
-        {Object.keys(userName).length === 0 && isSubmit ? (
-          <div> Sussesfully </div>
-        ) : (
-          console.log("Error in sub")
-        )}
-        <Form className="form-group" onSubmit={SubmitHandler}>
+        <Form className="form-group">
           <div className="col-3">
             <label htmlFor=""> نام و نام خانوادگی : </label>
             <Select
@@ -119,6 +198,21 @@ const CheckoutOfficial = (props) => {
             userName={userNameHandler}
             handleGetUser={handleGetUser}
           />
+
+          <div className="col-12">
+            <span>نام و نام خانوادگی: </span>
+            <span>
+              {test.first_name !== undefined
+                ? test.first_name + " " + test.last_name
+                : ""}
+            </span>
+            <span>کد ملی: </span>
+            <span>{test.user_name !== undefined ? test.user_name : ""}</span>
+            <span>کد پرسنلی: </span>
+            <span>
+              {test.personelCode !== undefined ? test.personelCode : ""}
+            </span>
+          </div>
           <div className="col-6">
             <label htmlFor="">علت خروج : </label>
             <Select placeholder="جستوجو . . ." />
