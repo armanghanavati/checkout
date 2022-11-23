@@ -14,12 +14,7 @@ const CheckoutOfficial = (props) => {
   const meliCodeInputRef = useRef();
   const personalCodeInputRef = useRef();
 
-  const [onDisabled, setOnDisabled] = useState({
-    userName: false,
-    meliCode: false,
-    personalCode: false,
-  });
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState({});
   const [personalCode, setPersonalCode] = useState("");
   const [meliCode, setMeliCode] = useState("");
 
@@ -33,7 +28,6 @@ const CheckoutOfficial = (props) => {
         userData.company.CompanyCode,
         userData.location
       );
-      console.log(usersRes.data);
       setUsers(usersRes.data);
     } catch (ex) {
       console.log(ex);
@@ -41,22 +35,34 @@ const CheckoutOfficial = (props) => {
   };
 
   const [test, setTest] = useState({});
+
   const handleGetUser = async () => {
     try {
       const values = {
         meliCode: meliCode,
         personelCode: personalCode,
-        id: userName,
+        id: userName.value,
       };
+      // console.log(userRes.data[values]);
       console.log(values);
       const userRes = await getUser(values);
       console.log(userRes.data);
-      if (userRes.data.length !== 0) {
-        console.log(userRes.data[0]);
+
+      console.log(values);
+      console.log(userRes.data.length);
+      console.log(Object.keys(userRes.data));
+      console.log(users);
+
+      if (Object.keys(userRes.data) !== 0) {
         setTest(userRes.data[0]);
-        setUserName("");
-        setPersonalCode("");
-        setMeliCode("");
+        setUserName({
+          value: userRes.data[0]._id,
+          label: userRes.data[0].first_name + " " + userRes.data[0].last_name,
+        });
+        setPersonalCode(userRes.data[0].personelCode);
+        setMeliCode(userRes.data[0].user_name);
+      } else {
+        alert("کاربر یافت نشد!");
       }
     } catch (ex) {
       console.log(ex);
@@ -104,78 +110,35 @@ const CheckoutOfficial = (props) => {
     props.addCheckout(checkoutData);
   };
 
-  const meliCodeHandler = (e) => {
-    if (e.target.value.length > 0) {
-      setOnDisabled({
-        userName: true,
-        personalCode: true,
-      });
-    } else {
-      setOnDisabled({
-        userName: false,
-        personalCode: false,
-      });
-    }
-    setMeliCode(e.target.value);
-  };
-  const personalCodeHandler = (e) => {
-    if (e.target.value.length > 0) {
-      setOnDisabled({
-        userName: true,
-        meliCode: true,
-      });
-    } else {
-      setOnDisabled({
-        userName: false,
-        meliCode: false,
-      });
-    }
-    setPersonalCode(e.target.value);
-  };
-  const userNameHandler = (event) => {
-    setUserName(event.value);
-    if (event) {
-      setOnDisabled({
-        personalCode: true,
-        meliCode: true,
-      });
-    } else {
-      setOnDisabled({
-        personalCode: false,
-        meliCode: false,
-      });
-      setUserName({ userName: event.value });
-    }
-    return event;
-  };
-
   useEffect(() => {
     handleGetAllUsers();
-    handleGetUser();
   }, [userData]);
 
   return (
     <div className="container">
-      <div className="row">
-        <DateComponent className="form-control" />
-        <Form className="form-group">
+      <DateComponent className="form-control" />
+      <Form className="form-group">
+        <div className="row">
           <div className="col-3">
             <label htmlFor=""> نام و نام خانوادگی : </label>
             <Select
+              value={userName}
               placeholder="جستوجو . . ."
               options={users}
-              isDisabled={onDisabled.userName}
-              onChange={userNameHandler}
+              onChange={(e) => {
+                setUserName(e);
+                setMeliCode("");
+                setPersonalCode("");
+              }}
             />
           </div>
           <div className="col-3">
             <label htmlFor=""> کد ملی : </label>
             <NumberFormat
               className="form-control"
-              disabled={onDisabled.meliCode}
               ref={meliCodeInputRef}
               value={meliCode}
-              onChange={meliCodeHandler}
+              onChange={(e) => setMeliCode(e.target.value)}
               name="meliCode"
               format="##########"
             />
@@ -184,20 +147,14 @@ const CheckoutOfficial = (props) => {
             <label htmlFor=""> کد برسنلی : </label>
             <NumberFormat
               className="form-control col-3"
-              disabled={onDisabled.personalCode}
               ref={personalCodeInputRef}
               name="personalCode"
               value={personalCode}
-              onChange={personalCodeHandler}
+              onChange={(e) => setPersonalCode(e.target.value)}
               format="#######"
             />
           </div>
-          <SearchBtn
-            personalCode={personalCodeHandler}
-            meliCode={meliCodeHandler}
-            userName={userNameHandler}
-            handleGetUser={handleGetUser}
-          />
+          <SearchBtn handleGetUser={handleGetUser} />
 
           <div className="col-12">
             <span>نام و نام خانوادگی: </span>
@@ -230,11 +187,11 @@ const CheckoutOfficial = (props) => {
           <div className=" col-6 col-md-1 d-flex align-items-end">
             <button className="btn btn-primary text-center my-5">تایید</button>
           </div>
-        </Form>
-        <div className=" col-6 col-md-1 d-flex align-items-end">
-          <Button className="btn btn-danger text-center my-5">انصراف</Button>
+          <div className=" col-6 col-md-1 d-flex align-items-end">
+            <Button className="btn btn-danger text-center my-5">انصراف</Button>
+          </div>
         </div>
-      </div>
+      </Form>
     </div>
   );
 };
