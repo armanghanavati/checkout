@@ -9,14 +9,19 @@ export default class DateComponent extends Component {
       value: momentJalaali("1396/7/6", "jYYYY/jM/jD"),
     };
   }
+
   render() {
+    const dateHandler = (value) => {
+      console.log(this.setState({ value }));
+    };
+
     return (
       <div className="col-2">
         <DatePicker
           className="form-control"
           isGregorian={false}
           value={this.state.value}
-          onChange={(value) => this.setState({ value })}
+          onChange={dateHandler}
         />
       </div>
     );

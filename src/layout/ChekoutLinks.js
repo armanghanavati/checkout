@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 const ChekoutLinks = () => {
   return (
     <>
-      <nav>
-        <Link to="/"> خانه </Link>
-        <Link to="/checkout"> فرم تسویه </Link>
+      <nav className="py-2" >
+        <Link to="/checkout"> </Link>
       </nav>
     </>
   );

@@ -6,6 +6,7 @@ import "./index.css";
 import { store } from "./feauters/store";
 import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
 
 render(
   <Provider store={store}>

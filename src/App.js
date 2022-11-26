@@ -10,7 +10,6 @@ function App() {
       <header>
         <Header />
       </header>
-
       <Switch>
         <Router>
           <main>

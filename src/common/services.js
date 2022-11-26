@@ -19,12 +19,6 @@ export const getUser = (values) => {
   });
 };
 
-export const postAllUsersByPersonalCode = (companyCode, location) => {
-  return axios.post(
-    `${config.localapi}/user/findInCompany/personelCode/${companyCode}/${location}`
-  );
-};
-
 // findInCompany / personelCode / { company } / { location };
 
 //ip/user/fill/searchFields {params: meliCode: "", personelCode: "", name: ""}
