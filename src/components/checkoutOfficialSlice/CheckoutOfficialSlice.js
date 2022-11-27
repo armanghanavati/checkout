@@ -3,24 +3,13 @@ import { userInfo } from "../../common/services";
 import { getAllUsersByPersonalCode } from "../../common/services";
 import { useDispatch, useSelector } from "react-redux";
 
-const userData = useSelector(userInfo);
-
 export const fetchAsyncMeliCode = createAsyncThunk(
   "checkout/fetchAsyncMeliCode",
   async () => {
     const resUserInfo = await userInfo();
+    console.log(resUserInfo.data);
+    localStorage.setItem("id", resUserInfo.data._id);
     return resUserInfo.data;
-  }
-);
-
-export const fetchGetAllUsers = createAsyncThunk(
-  "checkout/fetchGetAllUsers",
-  async () => {
-    const resAllUser = await getAllUsersByPersonalCode(
-      userData.company.CompanyCode,
-      userData.location
-    );
-    useDispatch(setUsers(resAllUser.data));
   }
 );
 
@@ -34,23 +23,23 @@ const initialState = {
   isSubmit: false,
 };
 
-// onChange={()=> setTitle(e.target.value)}
-// onChange={()=> dispatch(addUserTitle())}
-
 const CheckoutOfficialSlice = createSlice({
   name: "checkout",
   initialState,
   reducers: {
-    setUserName: (state, { payload }) => {
-      return {
-        value: userRes.data[0]._id,
-        label: userRes.data[0].first_name + " " + userRes.data[0].last_name,
-      };
-    },
+    AddMeliCode:()=>{
+      
+    }
   },
   extraReducers: {
     [fetchAsyncMeliCode.fulfilled]: (state, { payload }) => {
       return { ...state, user: payload };
+    },
+    [fetchAsyncMeliCode.pending]: (state, { payload }) => {
+      console.log("pending");
+    },
+    [fetchAsyncMeliCode.rejected]: (state, { payload }) => {
+      console.log("rejected");
     },
   },
 });

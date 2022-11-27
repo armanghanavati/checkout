@@ -3,13 +3,15 @@ import React, { useEffect } from "react";
 import CheckoutOfficial from "../checkoutOfficial/CheckoutOfficial";
 import { fetchAsyncMeliCode } from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
 import { useDispatch } from "react-redux";
+import Header from "../../layout/Header/Header";
 
 const Home = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(fetchAsyncMeliCode());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchAsyncMeliCode());
+  //   console.log(fetchAsyncMeliCode());
+  // }, [dispatch]);
 
   return (
     <div>

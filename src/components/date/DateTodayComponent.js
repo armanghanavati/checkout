@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker2";
 
-function DateTodayComponent() {
+function DateTodayComponent({}) {
   const [time, setTime] = useState(null);
 
   const timerHandler = (e) => {
@@ -10,7 +10,7 @@ function DateTodayComponent() {
   };
 
   return (
-    <div className="col-6">
+    <div className="col-12 col-md-6">
       <DatePicker
         className="form-control"
         persianDigits={true}
