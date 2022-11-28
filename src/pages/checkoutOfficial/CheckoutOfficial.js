@@ -30,23 +30,13 @@ const CheckoutOfficial = (props) => {
   const [personalCode, setPersonalCode] = useState("");
   const [meliCode, setMeliCode] = useState("");
   const [description, setDescription] = useState("");
-  const [userData, setUserData] = useState({});
+  // const [userData, setUserData] = useState({});
   const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
   const [getApi, setGetApi] = useState({});
 
-  // const userData = useSelector(loginInfo);
-
-  const fetchAsyncMeliCode = async () => {
-    try {
-      const resUserInfo = await userInfo();
-      console.log(resUserInfo.data);
-      localStorage.setItem("id", resUserInfo.data._id);
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
+  const userData = useSelector(loginInfo);
 
   const handleGetAllUsers = async () => {
     try {
@@ -54,7 +44,6 @@ const CheckoutOfficial = (props) => {
         userData.company.CompanyCode,
         userData.location
       );
-      console.log(getAllUsersByPersonalCode());
       setUsers(usersRes.data);
     } catch (ex) {
       console.log(ex);
@@ -64,14 +53,13 @@ const CheckoutOfficial = (props) => {
   const handleGetReasonLeavingWork = async () => {
     try {
       const reasonLeavingRes = await getReasonLeavingWork();
-      console.log(reasonLeavingRes);
       setReasonData(reasonLeavingRes.data);
     } catch (ex) {
       console.log(ex);
     }
   };
+  const [officeUser, setOfficeUser] = useState("");
 
-  const [test, setTest] = useState({});
   const handleGetUser = async () => {
     try {
       const values = {
@@ -80,10 +68,9 @@ const CheckoutOfficial = (props) => {
         id: userName.value !== undefined ? userName.value : "",
       };
       const userRes = await getUser(values);
-      console.log(userRes);
-
+      console.log(userRes.data);
       if (userRes.length !== 0) {
-        setTest(userRes.data[0].manager);
+        setOfficeUser(userRes.data[0].manager);
         setUserName({
           value: userRes.data[0]._id,
           label: userRes.data[0].first_name + " " + userRes.data[0].last_name,
@@ -133,24 +120,27 @@ const CheckoutOfficial = (props) => {
         const userPostReasonLeavingRes = await postUserDataCheckout(
           checkoutValues
         );
-        console.log(userPostReasonLeavingRes.data);
         if (userPostReasonLeavingRes.data.code === 415) {
-          const ActionValues = {
-            action_id: userPostReasonLeavingRes.data.id,
-            action_code: 0,
-            user_id: localStorage.getItem("id"),
-            toPerson: test,
-            type: 10,
-          };
-          console.log(ActionValues);
-          const actionRes = await postAction(ActionValues);
-          if (actionRes.data.code === 415) {
-            setMeliCode("");
-            setPersonalCode("");
-            setDescription("");
-            setReasonLeavingWork("");
-            setUserName("");
-            toast("درخواست با موفقیت ثبت شد!");
+          if (officeUser !== undefined) {
+            const ActionValues = {
+              action_id: userPostReasonLeavingRes.data.id,
+              action_code: 0,
+              user_id: localStorage.getItem("id"),
+              toPerson: officeUser,
+              type: 10,
+            };
+            console.log(ActionValues);
+            const actionRes = await postAction(ActionValues);
+            if (actionRes.data.code === 415) {
+              setMeliCode("");
+              setPersonalCode("");
+              setDescription("");
+              setReasonLeavingWork("");
+              setUserName("");
+              toast("درخواست با موفقیت ثبت شد!");
+            }
+          } else {
+            toast(". مدیر کاربرمورد نظر یافت نشد");
           }
         }
       } catch (ex) {
@@ -163,18 +153,20 @@ const CheckoutOfficial = (props) => {
   };
 
   useEffect(() => {
-    handleGetReasonLeavingWork();
-    handleGetAllUsers();
-    fetchAsyncMeliCode();
-    console.log(handleGetAllUsers());
-  }, []);
+    dispatch(fetchAsyncMeliCode());
+  }, [dispatch]);
 
   useEffect(() => {
     reasonLeavingInputRef.current.focus();
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-      console.log(personalCode, meliCode, userName);
+    handleGetReasonLeavingWork();
+    if (userData.first_name !== undefined) {
+      handleGetAllUsers();
+      console.log(handleGetAllUsers());
     }
-  }, [formErrors]);
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+      return personalCode, meliCode, userName;
+    }
+  }, [formErrors, userData]);
 
   const meliCodeHandler = (e) => {
     setMeliCode(e.target.value);
