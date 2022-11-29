@@ -15,7 +15,7 @@ const Home = () => {
 
   return (
     <div>
-      <CheckoutOfficial  />
+      <CheckoutOfficial />
     </div>
   );
 };

@@ -45,7 +45,6 @@ export default [
   },
   {
     id: 6,
-    label: "جستجو لحظه ای",
     name: "searchingOnMoment",
     type: "checkbox",
   },

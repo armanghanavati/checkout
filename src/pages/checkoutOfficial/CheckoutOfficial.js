@@ -16,12 +16,19 @@ import {
   postAction,
   userInfo,
 } from "../../common/services";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "./style.css";
 import DatePicker from "react-datepicker2";
 
-const CheckoutOfficial = (props) => {
+const CheckoutOfficial = () => {
   const reasonLeavingInputRef = useRef();
+  const meliCodeInputRef = useRef();
+  const personalCodeInputRef = useRef();
+  const searchingInputRef = useRef();
+  const userNameInputRef = useRef();
+  const descriptionInputRef = useRef();
+  const dateLeavingInputRef = useRef();
+
   const dispatch = useDispatch();
   const [time, setTime] = useState(null);
   const [userName, setUserName] = useState({});
@@ -86,16 +93,28 @@ const CheckoutOfficial = (props) => {
     }
   };
 
-  const validationForm = ({ personalCode, meliCode, userName }) => {
+  const validationForm = ({
+    personalCode,
+    meliCode,
+    userName,
+    reasonLeavingWork,
+    time,
+  }) => {
     const errors = {};
-    if (!meliCode) {
-      errors.meliCode = "لطفا فیلد را بر کنید!";
-    }
     if (!personalCode) {
-      errors.personalCode = "لطفا فیلد را بر کنید!";
+      errors.personalCode = "لطفا کد پرسنلی را مشخص کنید!";
+    }
+    if (!meliCode) {
+      errors.meliCode = "لطفا کد ملی را مشخص کنید!";
     }
     if (!userName) {
-      errors.userName = "لطفا فیلد را بر کنید!";
+      errors.userName = "لطفا نام و نام خانوادگی را مشخص کنید!";
+    }
+    if (!reasonLeavingWork) {
+      errors.reasonLeavingWork = "لطفا علت ترک خدمت را مشخص کنید!";
+    }
+    if (!time) {
+      errors.time = "لطفا تاریخ ترک خدمت را مشخص کنید!";
     }
     return errors;
   };
@@ -108,7 +127,7 @@ const CheckoutOfficial = (props) => {
   const handlePostReasonLeaving = async (e) => {
     e.preventDefault();
     setIsSubmit(true);
-    if (userName && personalCode && meliCode) {
+    if (userName && personalCode && meliCode && time && reasonLeavingWork) {
       try {
         const checkoutValues = {
           user_id: userName.value,
@@ -137,6 +156,8 @@ const CheckoutOfficial = (props) => {
               setDescription("");
               setReasonLeavingWork("");
               setUserName("");
+              setTime("");
+              setFormErrors("");
               toast("درخواست با موفقیت ثبت شد!");
             }
           } else {
@@ -147,10 +168,29 @@ const CheckoutOfficial = (props) => {
         console.log(ex);
       }
     } else {
-      setFormErrors(validationForm(personalCode, meliCode, userName));
+      setFormErrors(
+        validationForm({
+          personalCode: personalCode,
+          meliCode: meliCode,
+          userName: userName.value,
+          reasonLeavingWork: reasonLeavingWork.value,
+          time: time,
+        })
+      );
       toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
     }
   };
+
+  // useEffect(() => {
+  //   document.addEventListener("keydown", function (event) {
+  //     if (event.target.nodeName === "INPUT") {
+  //       var form = event.target.form;
+  //       var index = Array.prototype.indexOf.call(form, event.target);
+  //       form.elements[index + 2].focus();
+  //       event.preventDefault();
+  //     }
+  //   });
+  // }, []);
 
   useEffect(() => {
     dispatch(fetchAsyncMeliCode());
@@ -166,11 +206,12 @@ const CheckoutOfficial = (props) => {
     if (Object.keys(formErrors).length === 0 && isSubmit) {
       return personalCode, meliCode, userName;
     }
+    console.log(Object.keys(formErrors).length);
   }, [formErrors, userData]);
 
   const meliCodeHandler = (e) => {
     setMeliCode(e.target.value);
-    if (e.target.value > 0) {
+    if (e.target.value >= 0) {
       setPersonalCode("");
       setUserName("");
     }
@@ -178,11 +219,61 @@ const CheckoutOfficial = (props) => {
 
   const personalCodeHandler = (e) => {
     setPersonalCode(e.target.value);
-    if (e.target.value > 0) {
+    if (e.target.value >= 0) {
       setMeliCode("");
       setUserName("");
     }
   };
+
+  const userNameHandler = (e) => {
+    setUserName(e);
+    if (e.value >= 0) {
+      setMeliCode("");
+      setPersonalCode("");
+    }
+  };
+
+  // const handleEnter = (e) => {
+  //   console.log(e);
+  //   e.which = e.which || e.keyCode;
+  //   if (e.which === 13) {
+  //     switch (e.target.id) {
+  //       case "item1":
+  //         userNameInputRef.current.focus();
+  //         break;
+  //       case "item2":
+  //         meliCodeInputRef.current.focus();
+  //         break;
+  //       case "item3":
+  //         personalCodeInputRef.current.focus();
+  //         break;
+  //       case "item4":
+  //         searchingInputRef.current.focus();
+  //         break;
+  //       case "item5":
+  //         reasonLeavingInputRef.current.focus();
+  //         break;
+  //       case "item6":
+  //         dateLeavingInputRef.current.focus();
+  //         break;
+  //       case "item7":
+  //         descriptionInputRef.current.focus();
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     e.preventDefault();
+  //   }
+  // };
+
+  document.addEventListener("keydown", function (event) {
+    if (event.keyCode === 13 && event.target.nodeName === "INPUT") {
+      var form = event.target.form;
+      var index = Array.prototype.indexOf.call(form, event.target);
+      form.elements[index + 1].focus();
+      event.preventDefault();
+    }
+  });
 
   return (
     <div className="container">
@@ -193,24 +284,27 @@ const CheckoutOfficial = (props) => {
               نام و نام خانوادگی:{" "}
             </label>
             <Select
+              id="item1"
+              // onKeyDown={handleEnter}
+              ref={userNameInputRef}
               value={userName}
               options={users}
-              placeholder="جستوجو . . ."
-              onChange={(e) => {
-                console.log(e.value);
-                setUserName(e);
-                setMeliCode("");
-                setPersonalCode("");
-              }}
+              placeholder="جستجو . . ."
+              onBlur={() => handleGetUser()}
+              onChange={userNameHandler}
             />
             <p className="font12 text-danger mb-0"> {formErrors.userName} </p>
           </div>
           <div className="mb-4 col-12 col-sm-12  col-md-6  col-lg-3  col-xl-3">
             <label className="mb-1 required-field form-label"> کد ملی: </label>
             <NumberFormat
+              id="item2"
+              // onKeyDown={handleEnter}
+              ref={meliCodeInputRef}
               className="form-control"
               value={meliCode}
               onChange={meliCodeHandler}
+              onBlur={() => handleGetUser()}
               name="meliCode"
               format="##########"
             />
@@ -221,29 +315,46 @@ const CheckoutOfficial = (props) => {
               کد پرسنلی:{" "}
             </label>
             <NumberFormat
+              id="item3"
+              // onKeyDown={() => handleEnter()}
+              ref={personalCodeInputRef}
               className="form-control "
               name="personalCode"
               value={personalCode}
               onChange={personalCodeHandler}
+              onBlur={() => handleGetUser()}
               format="#######"
             />
             <p className="font12 text-danger mb-0">{formErrors.personalCode}</p>
           </div>
-          <SearchBtn handleGetUser={handleGetUser} />
-          <div className="mb-4 col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
-            <label htmlFor="">علت ترک کار : </label>
+          <SearchBtn
+            id="item4"
+            // handleEnter={() => handleEnter()}
+            refrence={searchingInputRef}
+            handleGetUser={handleGetUser}
+          />
+          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
+            <label className="required-field">علت ترک خدمت : </label>
             <Select
+              id="item5"
+              // onKeyDown={() => handleEnter()}
               ref={reasonLeavingInputRef}
               value={reasonLeavingWork}
               options={reasonData}
               onChange={(e) => setReasonLeavingWork(e)}
-              placeholder="جستوجو . . ."
+              placeholder="جستجو . . ."
             />
+            <p className="font12 text-danger mb-0">
+              {formErrors.reasonLeavingWork}
+            </p>
           </div>
           <div className="mb-4 col-12 col-sm-12 col-md-12  col-lg-6  col-xl-6">
-            <label>تاریخ خروج : </label>
+            <label className="required-field">تاریخ ترک خدمت : </label>
             <div className="col-12 col-md-6">
               <DatePicker
+                id="item6"
+                // onKeyDown={() => handleEnter()}
+                ref={dateLeavingInputRef}
                 className="form-control"
                 persianDigits={true}
                 value={time}
@@ -253,6 +364,7 @@ const CheckoutOfficial = (props) => {
                 inputFormat="YYYY-M-D"
                 inputJalaaliFormat="jYYYY-jM-jD"
               />
+              <p className="font12 text-danger mb-0">{formErrors.time}</p>
             </div>
           </div>
           <div className="col-sm-12 col-md-12  col-lg-12  col-xl-12">
@@ -260,10 +372,12 @@ const CheckoutOfficial = (props) => {
               توضیحات :
             </label>
             <textarea
+              id="item7"
+              // onKeyDown={() => handleEnter()}
+              ref={descriptionInputRef}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="form-control"
-              id="CheckoutTextarea"
               rows="5"
             />
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Row, Container } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import Select from "react-select";
 import NumberFormat from "react-number-format";
@@ -12,30 +12,33 @@ const Fields = ({ type, lable, key, ...allProps }) => {
 
   const test = () => {
     if (type === "numb") {
-      return <NumberFormat className="form-control" {...allProps} />;
+      return (
+        <NumberFormat
+          className=" mb-xl-0 col-12 col-sm-12 col-md-12 col-xxl-2 col-xl-2 form-control"
+          {...allProps}
+        />
+      );
     } else if (type === "select") {
-      return <Select {...allProps} />;
+      return (
+        <Select
+          {...allProps}
+          className="mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4 w-100"
+        />
+      );
     } else if (type === "date") {
       return (
         <DatePicker
-          className="form-control"
+          className="form-control mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4"
           value={time}
           onChange={timerHandler}
           {...allProps}
         />
       );
-    } else if (type === "number") {
-    } else if (type === "checkbox") {
-      return (
-        <Form.Group className="" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Check me out" />
-        </Form.Group>
-      );
     }
   };
   return (
-    <div className="p-3">
-      {lable}
+    <div>
+      <Form.Label className=" mb-1 form-label">{lable}</Form.Label>
       {test()}
     </div>
   );

@@ -1,0 +1,8 @@
+.w-45{
+    width: 45% !important;
+}
+
+.required-field::after{
+    content: "*";
+    color: red;
+}
