@@ -1,9 +1,8 @@
 import React from "react";
 import inputs from "../../tableData/FieldValues";
 import Fields from "./fields/Fields";
-import { Form, Button, Row } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 import "./style.css";
-import TableChackoutLists from "../tableChackoutLists/TableChackoutLists";
 
 const FieldsTableCheckout = () => {
   const submitHandler = (e) => {
@@ -12,36 +11,37 @@ const FieldsTableCheckout = () => {
   };
 
   return (
-    <div className="align-items-center mb-5 ">
-      <Form className="p-4" onSubmit={submitHandler}>
+    <Form className="" onSubmit={submitHandler}>
+      <Row>
         {inputs.map((input) => {
           return (
-            <div key={input.id} className="mx-2">
+            <Form.Group
+              as={Col}
+              md={input.md}
+              lg={input.lg}
+              xxl={input.xxl}
+              key={input.id}
+            >
               <Fields type={input.type} {...input} lable={input.label} />
-            </div>
+            </Form.Group>
           );
         })}
-        <div className="">
-          <label className="">
+        <Col md="4" lg="3" xxl="2">
+          <label className="d-flex justify-content-end">
             <input className="mx-2" type="checkbox" />
             جستجو لحظه ای
           </label>
-          <div className="d-flex justify-content-between mt-2 col-xl-4 col-md-5">
-            <Button
-              className=" text-center mx-1"
-              variant="success"
-              type="submit"
-            >
+          <div className="d-flex justify-content-end mt-2">
+            <Button className="text-center" variant="success" type="submit">
               اعمال فیلتر
             </Button>
-            <Button className=" text-center mx-1" variant="secondary">
+            <Button className="text-center ms-1" variant="secondary">
               لغو فیلتر
             </Button>
           </div>
-        </div>
-      </Form>
-      <TableChackoutLists />
-    </div>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 

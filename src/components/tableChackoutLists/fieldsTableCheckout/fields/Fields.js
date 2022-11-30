@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Form, Button, Row, Container } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import Select from "react-select";
@@ -14,7 +14,7 @@ const Fields = ({ type, lable, key, ...allProps }) => {
     if (type === "numb") {
       return (
         <NumberFormat
-          className=" mb-xl-0 col-12 col-sm-12 col-md-12 col-xxl-2 col-xl-2 form-control"
+          className=" mb-xl-4 col-12 col-sm-12 col-md-12 col-xl-2 col-xxl-2 form-control"
           {...allProps}
         />
       );
@@ -37,10 +37,10 @@ const Fields = ({ type, lable, key, ...allProps }) => {
     }
   };
   return (
-    <div>
+    <Fragment>
       <Form.Label className=" mb-1 form-label">{lable}</Form.Label>
       {test()}
-    </div>
+    </Fragment>
   );
 };
 

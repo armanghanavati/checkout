@@ -37,7 +37,6 @@ const CheckoutOfficial = () => {
   const [personalCode, setPersonalCode] = useState("");
   const [meliCode, setMeliCode] = useState("");
   const [description, setDescription] = useState("");
-  // const [userData, setUserData] = useState({});
   const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
@@ -68,19 +67,21 @@ const CheckoutOfficial = () => {
   const [officeUser, setOfficeUser] = useState("");
 
   const handleGetUser = async () => {
+    console.log(userName);
     try {
       const values = {
         meliCode: meliCode,
         personelCode: personalCode,
         id: userName.value !== undefined ? userName.value : "",
       };
+      console.log(values);
       const userRes = await getUser(values);
       console.log(userRes.data);
       if (userRes.length !== 0) {
         setOfficeUser(userRes.data[0].manager);
         setUserName({
           value: userRes.data[0]._id,
-          label: userRes.data[0].first_name + " " + userRes.data[0].last_name,
+          label: `${userRes.data[0].first_name} ${userRes.data[0].last_name}`,
         });
         setPersonalCode(userRes.data[0].personelCode);
         setMeliCode(userRes.data[0].user_name);
@@ -211,7 +212,7 @@ const CheckoutOfficial = () => {
 
   const meliCodeHandler = (e) => {
     setMeliCode(e.target.value);
-    if (e.target.value >= 0) {
+    if (e.target.value !== "") {
       setPersonalCode("");
       setUserName("");
     }
@@ -219,7 +220,8 @@ const CheckoutOfficial = () => {
 
   const personalCodeHandler = (e) => {
     setPersonalCode(e.target.value);
-    if (e.target.value >= 0) {
+    console.log(e.target.value);
+    if (e.target.value !== "") {
       setMeliCode("");
       setUserName("");
     }
@@ -227,10 +229,8 @@ const CheckoutOfficial = () => {
 
   const userNameHandler = (e) => {
     setUserName(e);
-    if (e.value >= 0) {
-      setMeliCode("");
-      setPersonalCode("");
-    }
+    setMeliCode("");
+    setPersonalCode("");
   };
 
   // const handleEnter = (e) => {
