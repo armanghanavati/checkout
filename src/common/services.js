@@ -12,7 +12,6 @@ export const getAllUsersByPersonalCode = (companyCode, location) => {
     `${config.localapi}/user/findInCompany/personelCode/${companyCode}/${location}`
   );
 };
-console.log(getAllUsersByPersonalCode());
 
 export const getUser = (values) => {
   return axios.get(`${config.localapi}/user/fill/searchFields`, {
@@ -31,6 +30,8 @@ export const getReasonLeavingWork = () => {
 export const postAction = (ActionValues) => {
   return axios.post(`${config.localapi}/action`, ActionValues);
 };
+
+//ip/settlement/list/{user id}, params: {}
 
 // findInCompany / personelCode / { company } / { location };
 

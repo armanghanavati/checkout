@@ -7,6 +7,11 @@ import SearchBtn from "./searchBtn/SearchBtn";
 import {
   loginInfo,
   fetchAsyncMeliCode,
+  AddPersonalCode,
+  getPersonalCode,
+  clearCode,
+  addSubbmit,
+  selectSubmit,
 } from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
 import {
   getAllUsersByPersonalCode,
@@ -42,6 +47,7 @@ const CheckoutOfficial = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const [getApi, setGetApi] = useState({});
 
+  const personalityCode = useSelector(getPersonalCode);
   const userData = useSelector(loginInfo);
 
   const handleGetAllUsers = async () => {
@@ -109,10 +115,10 @@ const CheckoutOfficial = () => {
       errors.meliCode = "لطفا کد ملی را مشخص کنید!";
     }
     if (!userName) {
-      errors.userName = "لطفا نام و نام خانوادگی را مشخص کنید!";
+      errors.userName = "لطفا نام و نام خانوادگی را انتخاب نمایید!";
     }
     if (!reasonLeavingWork) {
-      errors.reasonLeavingWork = "لطفا علت ترک خدمت را مشخص کنید!";
+      errors.reasonLeavingWork = "لطفا علت ترک خدمت را انتخاب نمایید!";
     }
     if (!time) {
       errors.time = "لطفا تاریخ ترک خدمت را مشخص کنید!";
@@ -127,11 +133,10 @@ const CheckoutOfficial = () => {
 
   const handlePostReasonLeaving = async (e) => {
     e.preventDefault();
-    setIsSubmit(true);
     if (userName && personalCode && meliCode && time && reasonLeavingWork) {
       try {
         const checkoutValues = {
-          user_id: userName.value,
+          leaver: userName.value,
           description: description,
           leavingWorkCause: reasonLeavingWork.value,
           leavingWorkDate: time,
@@ -202,12 +207,10 @@ const CheckoutOfficial = () => {
     handleGetReasonLeavingWork();
     if (userData.first_name !== undefined) {
       handleGetAllUsers();
-      console.log(handleGetAllUsers());
     }
     if (Object.keys(formErrors).length === 0 && isSubmit) {
       return personalCode, meliCode, userName;
     }
-    console.log(Object.keys(formErrors).length);
   }, [formErrors, userData]);
 
   const meliCodeHandler = (e) => {
@@ -220,14 +223,14 @@ const CheckoutOfficial = () => {
 
   const personalCodeHandler = (e) => {
     setPersonalCode(e.target.value);
-    console.log(e.target.value);
     if (e.target.value !== "") {
-      setMeliCode("");
+      dispatch(clearCode());
       setUserName("");
     }
   };
 
   const userNameHandler = (e) => {
+    console.log(e);
     setUserName(e);
     setMeliCode("");
     setPersonalCode("");
@@ -335,6 +338,21 @@ const CheckoutOfficial = () => {
           />
           <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
             <label className="required-field">علت ترک خدمت : </label>
+            <Select
+              id="item5"
+              // onKeyDown={() => handleEnter()}
+              ref={reasonLeavingInputRef}
+              value={reasonLeavingWork}
+              options={reasonData}
+              onChange={(e) => setReasonLeavingWork(e)}
+              placeholder="جستجو . . ."
+            />
+            <p className="font12 text-danger mb-0">
+              {formErrors.reasonLeavingWork}
+            </p>
+          </div>
+          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
+            <label className="required-field">شرکت مربوطه : </label>
             <Select
               id="item5"
               // onKeyDown={() => handleEnter()}

@@ -22,7 +22,12 @@ const FieldsTableCheckout = () => {
               xxl={input.xxl}
               key={input.id}
             >
-              <Fields type={input.type} {...input} lable={input.label} />
+              <Fields
+                type={input.type}
+                name={input.name}
+                {...input}
+                lable={input.label}
+              />
             </Form.Group>
           );
         })}

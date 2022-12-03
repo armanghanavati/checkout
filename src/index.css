@@ -1,8 +1,17 @@
 body{
+    font-family: parastoo;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     direction: rtl;
+}
+
+@font-face {
+    font-family: "parastoo";
+    src: url("assets/fonts/Parastoo-Bold.eot") format("eot");
+    src: url("assets/fonts/Parastoo-Bold.ttf") format("ttf");
+    src: url("assets/fonts/Parastoo-Bold.woff") format("woff");
+    src: url("assets/fonts/Parastoo-Bold.woff2") format("woff2");
 }
 
 /* :root {

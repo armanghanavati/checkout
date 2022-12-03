@@ -2,3 +2,11 @@
     background-color: #F2F2F2;
   
 }
+
+@font-face {
+    font-family: "parastoo";
+    src: url(assets/fonts/Parastoo-Bold.eot) format("eot");
+    src: url(assets/fonts/Parastoo-Bold.ttf) format("ttf");
+    src: url(assets/fonts/Parastoo-Bold.woff) format("woff");
+    src: url(assets/fonts/Parastoo-Bold.woff2) format("woff2");
+}

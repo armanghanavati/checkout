@@ -3,42 +3,57 @@ import TableCheckOutItems from "./TableCheckOutItems";
 import { Button, Container } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUserMembers,
+  selectUserTableList,
+  setAcceptCheckoutModal,
+} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+import DatePicker from "react-datepicker2";
+import moment from "moment-jalaali";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
+import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
 
 const CheckoutList = () => {
-    
+  const dispatch = useDispatch();
+  const [time, setTiem] = useState(null);
   const [data, setData] = useState([]);
   const [load, setload] = useState(false);
+  const [showModel, setShowModel] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const fetchIdRef = useRef(0);
   const sortIdRef = useRef(0);
+  const userCheckoutList = useSelector(selectUserTableList);
+  // const userMembers = useSelector(selectUserMembers);
   const columns = useMemo(() => [
     {
-      Header: "ستون اول",
+      Header: " سریال درخواست",
       accessor: "col1",
       sortType: "basic",
     },
     {
-      Header: "ستون دوم",
+      Header: "تاریخ ثبت درخواست",
       accessor: "col2",
       sortType: "basic",
     },
     {
-      Header: "ستون سوم",
+      Header: "درخواست کننده ",
       accessor: "col3",
       sortType: "basic",
     },
     {
-      Header: "ستون چهارم",
+      Header: "علت ترک خدمت",
       accessor: "col4",
       sortType: "basic",
     },
     {
-      Header: "ستون پنجم",
+      Header: "وضعیت درخواست",
       accessor: "col5",
       sortType: "basic",
     },
     {
-      Header: "ستون ششم",
+      Header: "عملیات",
       accessor: "col6",
       sortType: "basic",
     },
@@ -46,22 +61,30 @@ const CheckoutList = () => {
   const buttons = () => {
     return (
       <Fragment>
-        <button>hi</button>
-        <button>hi2</button>
+        <Button onClick={() => dispatch(setAcceptCheckoutModal(true))}>
+          <FontAwesomeIcon icon={faPenToSquare} />
+        </Button>
       </Fragment>
     );
   };
 
+  const timerHandler = (e) => {
+    setTiem(e);
+  };
+
   const fetchData = useCallback(({ pageSize, pageIndex, requests }) => {
+    console.log(requests);
     var tableItems = [];
     if (requests.length !== 0) {
       for (var i = 0; i < requests.length; i++) {
         var tableItem = {
-          col1: "",
-          col2: "",
-          col3: "",
-          col4: "",
-          col5: "",
+          col1: requests[i].reqInfo.serial_number,
+          col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
+            .locale("fa")
+            .format("jYYYY/jMM/jDD"),
+          col3: `${requests[i].process[0].userInfo.first_name} ${requests[i].process[0].userInfo.last_name}`,
+          col4: requests[i].reqInfo.leavingWorkCause,
+          col5: requests[i].status.name,
           col6: buttons(),
         };
         tableItems.push(tableItem);
@@ -84,11 +107,13 @@ const CheckoutList = () => {
       if (requests.length !== 0) {
         for (var i = 0; i < requests.length; i++) {
           var tableItem = {
-            col1: "",
-            col2: "",
-            col3: "",
-            col4: "",
-            col5: "",
+            col1: requests[i].reqInfo.serial_number,
+            col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
+              .locale("fa")
+              .format("jYYYY/jMM/jDD"),
+            col3: `${requests[i].process[0].userInfo.first_name} ${requests[i].process[0].userInfo.last_name}`,
+            col4: requests[i].reqInfo.leavingWorkCause,
+            col5: requests[i].status.name,
             col6: buttons(),
           };
           tableItems.push(tableItem);
@@ -132,7 +157,7 @@ const CheckoutList = () => {
       </Button>
       <section>
         <TableCheckOutItems
-          requests="reqs drom api"
+          requests={userCheckoutList}
           columns={columns}
           data={data}
           onSort={handleSort}
@@ -140,6 +165,7 @@ const CheckoutList = () => {
           loading={load}
           pageCount={pageCount}
         />
+        <AcceptCheckoutModal />
       </section>
     </div>
   );

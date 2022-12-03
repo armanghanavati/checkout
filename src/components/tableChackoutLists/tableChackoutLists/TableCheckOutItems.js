@@ -1,8 +1,13 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { Table, Button, Row, Col } from "react-bootstrap";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleRight, faAngleRight, faAngleLeft, faAngleDoubleLeft } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleDoubleRight,
+  faAngleRight,
+  faAngleLeft,
+  faAngleDoubleLeft,
+} from "@fortawesome/free-solid-svg-icons";
 const TableCheckOutItems = ({
   requests,
   columns,
@@ -45,7 +50,7 @@ const TableCheckOutItems = ({
   }, [onSort, sortBy, fetchData, pageIndex, pageSize, requests]);
   return (
     <section>
-      <Table bordered hover responsive size='sm' {...getTableProps()}>
+      <Table bordered hover responsive size="sm" {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -68,29 +73,26 @@ const TableCheckOutItems = ({
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-                    {page.map((row, i) => {
-                        prepareRow(row);
-                        return (
-                            <tr {...row.getRowProps()}  key={i}>
-                                {row.cells.map((cell, index) => {
-                                    return (
-                                        <td key={index}>{cell.render("Cell")}</td>
-                                    );
-                                })}
-                            </tr>
-                        );
-                    })}
-                    <tr>
-                        {loading ? (
-                            <td colSpan="10000">Loading...</td>
-                        ) : (
-                            <td colSpan="10000">
-                                نمایش {page.length} از ~{controlledPageCount * pageSize}{" "}
-                                نتیجه
-                            </td>
-                        )}
-                    </tr>
-                </tbody>
+          {page.map((row, i) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()} key={i}>
+                {row.cells.map((cell, index) => {
+                  return <td key={index}>{cell.render("Cell")}</td>;
+                })}
+              </tr>
+            );
+          })}
+          <tr>
+            {loading ? (
+              <td colSpan="10000">Loading...</td>
+            ) : (
+              <td colSpan="10000">
+                نمایش {page.length} از ~{controlledPageCount * pageSize} نتیجه
+              </td>
+            )}
+          </tr>
+        </tbody>
       </Table>
       <Row>
         <Col lg="9" xl="8" className="mx-auto">

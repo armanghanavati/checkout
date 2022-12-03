@@ -3,9 +3,20 @@ import { Form, Button, Row, Container } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import Select from "react-select";
 import NumberFormat from "react-number-format";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addUserMemb,
+  selectUserMemb,
+  selectUserMembers,
+} from "../../../checkoutOfficialSlice/TableCheckoutSlice";
 
-const Fields = ({ type, lable, key, ...allProps }) => {
+const Fields = ({ name, type, lable, key, ...allProps }) => {
+  const dispatch = useDispatch();
+  const userMembers = useSelector(selectUserMembers);
+  const userMemb = useSelector(selectUserMemb);
   const [time, setTime] = useState(null);
+  
+
   const timerHandler = (e) => {
     setTime(e);
   };
@@ -18,7 +29,17 @@ const Fields = ({ type, lable, key, ...allProps }) => {
           {...allProps}
         />
       );
-    } else if (type === "select") {
+    } else if (name === "applicant") {
+      return (
+        <Select
+          value={userMemb}
+          onChange={(e) => dispatch(addUserMemb(e))}
+          options={userMembers}
+          {...allProps}
+          className="mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4 w-100"
+        />
+      );
+    } else if (name === "status") {
       return (
         <Select
           {...allProps}

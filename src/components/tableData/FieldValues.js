@@ -6,19 +6,19 @@ export default [
     placeholder: "سریال",
     type: "numb",
     format: "######",
-    md:'4',
-    lg:'3',
-    xxl: '2'
+    md: "4",
+    lg: "3",
+    xxl: "2",
   },
   {
     id: 2,
     label: "درخواست کننده: ",
-    name: "userLogin",
+    name: "applicant",
     placeholder: "درخواست کننده",
     type: "select",
-    md:'4',
-    lg: '3',
-    xxl: '2'
+    md: "4",
+    lg: "3",
+    xxl: "2",
   },
   {
     id: 3,
@@ -26,9 +26,9 @@ export default [
     name: "status",
     placeholder: "وضعیت درخواست",
     type: "select",
-    md:'4',
-    lg: '3',
-    xxl: '2'
+    md: "4",
+    lg: "3",
+    xxl: "2",
   },
   {
     id: 4,
@@ -40,9 +40,9 @@ export default [
     persianDigits: true,
     isGregorian: false,
     timePicker: false,
-    md:'4',
-    lg: '3',
-    xxl:'2'
+    md: "4",
+    lg: "3",
+    xxl: "2",
   },
   {
     id: 5,
@@ -54,8 +54,8 @@ export default [
     persianDigits: true,
     isGregorian: false,
     timePicker: false,
-    md:'4',
-    lg: '3',
-    xxl:'2'
+    md: "4",
+    lg: "3",
+    xxl: "2",
   },
 ];
