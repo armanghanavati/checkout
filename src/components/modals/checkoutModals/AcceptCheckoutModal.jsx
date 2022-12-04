@@ -9,7 +9,6 @@ import {
 const AcceptCheckoutModal = () => {
   const dispatch = useDispatch();
   const AcceptCheckoutModal = useSelector(selectAcceptCheckoutModal);
-  console.log(AcceptCheckoutModal);
 
   return (
     <Modal
@@ -17,21 +16,26 @@ const AcceptCheckoutModal = () => {
       onHide={() => dispatch(setAcceptCheckoutModal(false))}
       backdrop="static"
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Modal title</Modal.Title>
-      </Modal.Header>
+      <Modal.Title className="bg-primary text-white p-2 d-flex justify-content-between">
+        <span className=""> تایید درخواست: </span>
+        <span className=""> شماره سریال: </span>
+      </Modal.Title>
       <Modal.Body>
-        I will not close if you click outside me. Don't even try to press escape
-        key.
+        <p>نام و نام خانوادگی:</p>
+        <p>واحد سازمانی:</p>
+        <p>شرکت:</p>
+        <p>علت ترک خدمت: </p>
+        <p>تاریخ ترک خدمت:</p>
+        <p>توضیحات:</p>
       </Modal.Body>
       <Modal.Footer>
+        <Button variant="primary">تایید</Button>
         <Button
           variant="secondary"
           onClick={() => dispatch(setAcceptCheckoutModal(false))}
         >
-          Close
+          بستن
         </Button>
-        <Button variant="primary">Understood</Button>
       </Modal.Footer>
     </Modal>
   );

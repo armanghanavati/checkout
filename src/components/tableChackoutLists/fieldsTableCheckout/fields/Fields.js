@@ -9,13 +9,21 @@ import {
   selectUserMemb,
   selectUserMembers,
 } from "../../../checkoutOfficialSlice/TableCheckoutSlice";
+import {
+  fetchHandleGetReasonLeavingWork,
+  selectReasonLeaving,
+  selectReasonLeavingData,
+  setReasonLeavingHandler,
+} from "../../../checkoutOfficialSlice/CheckoutOfficialSlice";
 
 const Fields = ({ name, type, lable, key, ...allProps }) => {
   const dispatch = useDispatch();
   const userMembers = useSelector(selectUserMembers);
+  const reasonLeavingData = useSelector(selectReasonLeavingData);
   const userMemb = useSelector(selectUserMemb);
+  const reasonLeaving = useSelector(selectReasonLeaving);
+
   const [time, setTime] = useState(null);
-  
 
   const timerHandler = (e) => {
     setTime(e);
@@ -37,6 +45,16 @@ const Fields = ({ name, type, lable, key, ...allProps }) => {
           options={userMembers}
           {...allProps}
           className="mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4 w-100"
+        />
+      );
+    } else if (name === "reasonLeavingCase") {
+      return (
+        <Select
+          {...allProps}
+          className=""
+          value={reasonLeaving}
+          options={reasonLeavingData}
+          onChange={(e) => dispatch(setReasonLeavingHandler(e))}
         />
       );
     } else if (name === "status") {

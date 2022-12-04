@@ -25,7 +25,7 @@ const CheckoutList = () => {
   useEffect(() => {
     // handleGetUsersTable();
     dispatch(handleGetUsersTable());
-  }, []);
+  }, [dispatch]);
 
   return (
     <main>

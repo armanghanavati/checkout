@@ -5,9 +5,16 @@ export const handleGetUsersTable = createAsyncThunk(
   "tableCheckoutList/handleGetUsersTable",
   async () => {
     try {
-      const checkoutListRes = await getUserListTable();
-      console.log(checkoutListRes.data);
-      localStorage.getItem("id");
+      const values = {
+        memberId: "",
+        status: "",
+        fromDate: "null",
+        toDate: "null",
+        leavingWorkCause: "",
+      };
+      console.log(values);
+      const checkoutListRes = await getUserListTable(values);
+      console.log(checkoutListRes);
       return checkoutListRes.data;
     } catch (ex) {
       console.log(ex);
@@ -21,6 +28,9 @@ const initialState = {
   userCheckoutTableList: [],
   filterUsers: [],
   acceptCheckoutModal: false,
+  editCheckoutModal: false,
+  viewCheckoutModal: false,
+  cancelCheckoutModal: false,
 };
 
 const CheckoutList = createSlice({
@@ -28,11 +38,18 @@ const CheckoutList = createSlice({
   initialState,
   reducers: {
     addUserMemb: (state, { payload }) => {
-      console.log(payload);
       return { ...state, userMemb: payload };
     },
+    setEditCheckoutModal: (state, { payload }) => {
+      return { ...state, editCheckoutModal: payload };
+    },
+    setViewCheckoutModal: (state, { payload }) => {
+      return { ...state, viewCheckoutModal: payload };
+    },
+    setCancelCheckoutModal: (state, { payload }) => {
+      return { ...state, cancelCheckoutModal: payload };
+    },
     setAcceptCheckoutModal: (state, { payload }) => {
-      console.log({ acceptCheckoutModal: payload });
       return { ...state, acceptCheckoutModal: payload };
     },
   },
@@ -47,11 +64,23 @@ const CheckoutList = createSlice({
   },
 });
 
-export const { addUserMemb, setAcceptCheckoutModal } = CheckoutList.actions;
+export const {
+  addUserMemb,
+  setAcceptCheckoutModal,
+  setCancelCheckoutModal,
+  setViewCheckoutModal,
+  setEditCheckoutModal,
+} = CheckoutList.actions;
 export const selectUserTableList = (state) =>
   state.tableCheckoutList.userCheckoutTableList;
 export const selectUserMembers = (state) => state.tableCheckoutList.userMembers;
 export const selectUserMemb = (state) => state.tableCheckoutList.userMemb;
 export const selectAcceptCheckoutModal = (state) =>
   state.tableCheckoutList.acceptCheckoutModal;
+export const selectEditCheckoutModal = (state) =>
+  state.tableCheckoutList.editCheckoutModal;
+export const selectCancelCheckoutModal = (state) =>
+  state.tableCheckoutList.cancelCheckoutModal;
+export const selectViewCheckoutModal = (state) =>
+  state.tableCheckoutList.viewCheckoutModal;
 export default CheckoutList.reducer;

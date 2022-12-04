@@ -1,28 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectCancelCheckoutModal,
+  setCancelCheckoutModal,
+} from "../../checkoutOfficialSlice/TableCheckoutSlice";
 
 const CancelCheckoutModal = () => {
-  const [show, setShow] = useState(false);
+  const dispatch = useDispatch();
+  const cancelCheckoutModal = useSelector(selectCancelCheckoutModal);
 
   return (
     <Modal
-      show={show}
-      onHide={() => setShow(false)}
+      show={cancelCheckoutModal}
+      onHide={() => dispatch(setCancelCheckoutModal(false))}
       backdrop="static"
-      keyboard={false}
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Modal title</Modal.Title>
-      </Modal.Header>
+      <Modal.Title className="bg-danger text-white p-2 d-flex justify-content-between">
+        <span className=""> تایید درخواست: </span>
+        <span className=""> شماره سریال: </span>
+      </Modal.Title>
       <Modal.Body>
-        I will not close if you click outside me. Don't even try to press escape
-        key.
+        <p>نام و نام خانوادگی:</p>
+        <p>واحد سازمانی:</p>
+        <p>شرکت:</p>
+        <p>علت ترک خدمت: </p>
+        <p>تاریخ ترک خدمت:</p>
+        <p>توضیحات:</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
+        <Button variant="primary">تایید</Button>
+        <Button
+          variant="secondary"
+          onClick={() => dispatch(setCancelCheckoutModal(false))}
+        >
+          بستن
         </Button>
-        <Button variant="primary">Understood</Button>
       </Modal.Footer>
     </Modal>
   );

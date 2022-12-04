@@ -9,8 +9,8 @@ const Home = () => {
   const dispatch = useDispatch();
 
   // useEffect(() => {
-  //   dispatch(fetchAsyncMeliCode());
-  //   console.log(fetchAsyncMeliCode());
+  //   dispatch(());
+  //   console.log();
   // }, [dispatch]);
 
   return (

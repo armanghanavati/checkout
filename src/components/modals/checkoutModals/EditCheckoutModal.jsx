@@ -2,21 +2,21 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  selectViewCheckoutModal,
-  setViewCheckoutModal,
+  selectEditCheckoutModal,
+  setEditCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 
-const ViewCheckoutModal = () => {
+const EditCheckoutModal = () => {
   const dispatch = useDispatch();
-  const viewCheckoutModal = useSelector(selectViewCheckoutModal);
+  const editCheckoutModal = useSelector(selectEditCheckoutModal);
 
   return (
     <Modal
-      show={viewCheckoutModal}
-      onHide={() => dispatch(setViewCheckoutModal(false))}
+      show={editCheckoutModal}
+      onHide={() => dispatch(setEditCheckoutModal(false))}
       backdrop="static"
     >
-      <Modal.Title className="bg-warning text-white p-2 d-flex justify-content-between">
+      <Modal.Title className="bg-success text-white p-2 d-flex justify-content-between">
         <span className=""> تایید درخواست: </span>
         <span className=""> شماره سریال: </span>
       </Modal.Title>
@@ -32,7 +32,7 @@ const ViewCheckoutModal = () => {
         <Button variant="primary">تایید</Button>
         <Button
           variant="secondary"
-          onClick={() => dispatch(setViewCheckoutModal(false))}
+          onClick={() => dispatch(setEditCheckoutModal(false))}
         >
           بستن
         </Button>
@@ -41,4 +41,4 @@ const ViewCheckoutModal = () => {
   );
 };
 
-export default ViewCheckoutModal;
+export default EditCheckoutModal;

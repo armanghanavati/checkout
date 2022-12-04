@@ -2,18 +2,28 @@ import React, { Fragment, useCallback, useMemo, useState, useRef } from "react";
 import TableCheckOutItems from "./TableCheckOutItems";
 import { Button, Container } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowsRotate,
+  faPenToSquare,
+  faCheck,
+  faBan,
+  faEye,
+} from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectUserMembers,
   selectUserTableList,
   setAcceptCheckoutModal,
+  setCancelCheckoutModal,
+  setEditCheckoutModal,
+  setViewCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import DatePicker from "react-datepicker2";
 import moment from "moment-jalaali";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
 import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
+import CancelCheckoutModal from "../../modals/checkoutModals/CancelCheckoutModal";
+import EditCheckoutModal from "../../modals/checkoutModals/EditCheckoutModal";
 
 const CheckoutList = () => {
   const dispatch = useDispatch();
@@ -61,8 +71,33 @@ const CheckoutList = () => {
   const buttons = () => {
     return (
       <Fragment>
-        <Button onClick={() => dispatch(setAcceptCheckoutModal(true))}>
+        <Button
+          className="m-1"
+          variant="primary"
+          onClick={() => dispatch(setAcceptCheckoutModal(true))}
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </Button>
+        <Button
+          className="m-1"
+          variant="success"
+          onClick={() => dispatch(setEditCheckoutModal(true))}
+        >
           <FontAwesomeIcon icon={faPenToSquare} />
+        </Button>
+        <Button
+          className="m-1"
+          variant="danger"
+          onClick={() => dispatch(setCancelCheckoutModal(true))}
+        >
+          <FontAwesomeIcon icon={faBan} />
+        </Button>
+        <Button
+          className="m-1"
+          variant="warning"
+          onClick={() => dispatch(setViewCheckoutModal(true))}
+        >
+          <FontAwesomeIcon icon={faEye} />
         </Button>
       </Fragment>
     );
@@ -166,6 +201,9 @@ const CheckoutList = () => {
           pageCount={pageCount}
         />
         <AcceptCheckoutModal />
+        <EditCheckoutModal />
+        <CancelCheckoutModal />
+        <ViewCheckoutModal />
       </section>
     </div>
   );
