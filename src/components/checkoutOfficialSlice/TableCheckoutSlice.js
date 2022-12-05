@@ -1,30 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getUserListTable } from "../../common/tableListServices";
 
-export const handleGetUsersTable = createAsyncThunk(
-  "tableCheckoutList/handleGetUsersTable",
-  async () => {
-    try {
-      const values = {
-        memberId: "",
-        status: "",
-        fromDate: "null",
-        toDate: "null",
-        leavingWorkCause: "",
-      };
-      console.log(values);
-      const checkoutListRes = await getUserListTable(values);
-      console.log(checkoutListRes);
-      return checkoutListRes.data;
-    } catch (ex) {
-      console.log(ex);
-    }
-  }
-);
-
 const initialState = {
   userMembers: [],
-  userMemb: {},
+  memberId: "",
+  status: "",
+  leaver: "",
+  userMemb: "",
+  fromDate: "null",
+  toDate: "null",
+  leavingWorkCause: "",
   userCheckoutTableList: [],
   filterUsers: [],
   acceptCheckoutModal: false,
@@ -33,12 +18,36 @@ const initialState = {
   cancelCheckoutModal: false,
 };
 
+export const handleGetUsersTable = createAsyncThunk(
+  "tableCheckoutList/handleGetUsersTable",
+  async () => {
+    try {
+      const values = {
+        leaver: initialState.leaver,
+        // initialState.userCheckoutTableList.value !== undefined
+        //   ? initialState.userCheckoutTableList.value
+        //   : "",
+        status: initialState.status,
+        fromDate: initialState.fromDate,
+        toDate: initialState.toDate,
+        leavingWorkCause: initialState.leavingWorkCause,
+      };
+      console.log(values);
+      const checkoutListRes = await getUserListTable(values);
+      console.log(checkoutListRes.data);
+      return checkoutListRes.data;
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+);
+
 const CheckoutList = createSlice({
   name: "tableCheckoutList",
   initialState,
   reducers: {
     addUserMemb: (state, { payload }) => {
-      return { ...state, userMemb: payload };
+      return { ...state, leaver: payload };
     },
     setEditCheckoutModal: (state, { payload }) => {
       return { ...state, editCheckoutModal: payload };
@@ -51,6 +60,13 @@ const CheckoutList = createSlice({
     },
     setAcceptCheckoutModal: (state, { payload }) => {
       return { ...state, acceptCheckoutModal: payload };
+    },
+    addMemberId: (state, { payload }) => {
+      console.log({ ...state, memberId: payload });
+      return { ...state, memberId: payload };
+    },
+    addStatus: (state, { payload }) => {
+      return { ...state, status: payload };
     },
   },
   extraReducers: {
@@ -66,6 +82,8 @@ const CheckoutList = createSlice({
 
 export const {
   addUserMemb,
+  addStatus,
+  addMemberId,
   setAcceptCheckoutModal,
   setCancelCheckoutModal,
   setViewCheckoutModal,
@@ -74,7 +92,8 @@ export const {
 export const selectUserTableList = (state) =>
   state.tableCheckoutList.userCheckoutTableList;
 export const selectUserMembers = (state) => state.tableCheckoutList.userMembers;
-export const selectUserMemb = (state) => state.tableCheckoutList.userMemb;
+
+export const selectUserMemb = (state) => state.tableCheckoutList.leaver;
 export const selectAcceptCheckoutModal = (state) =>
   state.tableCheckoutList.acceptCheckoutModal;
 export const selectEditCheckoutModal = (state) =>

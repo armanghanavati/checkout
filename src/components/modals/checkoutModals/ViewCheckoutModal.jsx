@@ -17,7 +17,7 @@ const ViewCheckoutModal = () => {
       backdrop="static"
     >
       <Modal.Title className="bg-warning text-white p-2 d-flex justify-content-between">
-        <span className=""> تایید درخواست: </span>
+        <span className=""> تایید درخواست </span>
         <span className=""> شماره سریال: </span>
       </Modal.Title>
       <Modal.Body>

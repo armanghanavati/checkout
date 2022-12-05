@@ -11,6 +11,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addMemberId,
+  addStatus,
   selectUserMembers,
   selectUserTableList,
   setAcceptCheckoutModal,
@@ -24,8 +26,10 @@ import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
 import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
 import CancelCheckoutModal from "../../modals/checkoutModals/CancelCheckoutModal";
 import EditCheckoutModal from "../../modals/checkoutModals/EditCheckoutModal";
+import { handleGetUsersTable } from "../../checkoutOfficialSlice/TableCheckoutSlice";
+import FieldsTableCheckout from "../fieldsTableCheckout/FieldsTableCheckout";
 
-const CheckoutList = () => {
+const CheckoutList = ({ isSubmit }) => {
   const dispatch = useDispatch();
   const [time, setTiem] = useState(null);
   const [data, setData] = useState([]);
@@ -48,7 +52,7 @@ const CheckoutList = () => {
       sortType: "basic",
     },
     {
-      Header: "درخواست کننده ",
+      Header: "پرسنل مستعفی",
       accessor: "col3",
       sortType: "basic",
     },
@@ -106,6 +110,42 @@ const CheckoutList = () => {
   const timerHandler = (e) => {
     setTiem(e);
   };
+
+  // const handlerCheckoutTable = () => {
+  //   console.log("click handler");
+  //   if (handleGetUsersTable.length !== 0) {
+  //     dispatch(addMemberId());
+  //     dispatch(addStatus());
+  //     dispatch();
+  //   }
+  // };
+  // const handleGetUser = async () => {
+  //   try {
+  //     const values = {
+  //       meliCode: meliCode,
+  //       personelCode: personalCode,
+  //       id: userName.value !== undefined ? userName.value : "",
+  //     };
+  //     const userRes = await getUser(values);
+  //     console.log(userRes.data);
+  //     if (userRes.length !== 0) {
+  //       setOfficeUser(userRes.data[0].manager);
+  //       dispatch(
+  //         addUserName({
+  //           value: userRes.data[0]._id,
+  //           label: `${userRes.data[0].first_name} ${userRes.data[0].last_name}`,
+  //         })
+  //       );
+  //       dispatch(addPersonalCode(userRes.data[0].personelCode));
+  //       dispatch(addMeliCode(userRes.data[0].user_name));
+  //     } else {
+  //       alert("user alert");
+  //       toast("کاربر یافت نشد");
+  //     }
+  //   } catch (ex) {
+  //     console.log(ex);
+  //   }
+  // };
 
   const fetchData = useCallback(({ pageSize, pageIndex, requests }) => {
     console.log(requests);
@@ -178,6 +218,7 @@ const CheckoutList = () => {
 
   return (
     <div className="my-4">
+      <FieldsTableCheckout isSubmit={isSubmit} />
       <Button className="my-2">
         <span>
           <FontAwesomeIcon

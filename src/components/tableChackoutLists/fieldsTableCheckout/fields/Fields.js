@@ -10,18 +10,17 @@ import {
   selectUserMembers,
 } from "../../../checkoutOfficialSlice/TableCheckoutSlice";
 import {
-  fetchHandleGetReasonLeavingWork,
-  selectReasonLeaving,
   selectReasonLeavingData,
+  selectReasonLeavingTable,
   setReasonLeavingHandler,
 } from "../../../checkoutOfficialSlice/CheckoutOfficialSlice";
 
 const Fields = ({ name, type, lable, key, ...allProps }) => {
   const dispatch = useDispatch();
   const userMembers = useSelector(selectUserMembers);
-  const reasonLeavingData = useSelector(selectReasonLeavingData);
   const userMemb = useSelector(selectUserMemb);
-  const reasonLeaving = useSelector(selectReasonLeaving);
+  const reasonLeavingData = useSelector(selectReasonLeavingData);
+  const reasonLeavingTable = useSelector(selectReasonLeavingTable);
 
   const [time, setTime] = useState(null);
 
@@ -30,21 +29,14 @@ const Fields = ({ name, type, lable, key, ...allProps }) => {
   };
 
   const test = () => {
-    if (type === "numb") {
-      return (
-        <NumberFormat
-          className=" mb-xl-4 col-12 col-sm-12 col-md-12 col-xl-2 col-xxl-2 form-control"
-          {...allProps}
-        />
-      );
-    } else if (name === "applicant") {
+    if (name === "applicant") {
       return (
         <Select
           value={userMemb}
           onChange={(e) => dispatch(addUserMemb(e))}
           options={userMembers}
           {...allProps}
-          className="mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4 w-100"
+          className="mb-4 mb-xl-4 col-12 col-sm-12 col-md-12 col-md-4 w-100"
         />
       );
     } else if (name === "reasonLeavingCase") {
@@ -52,7 +44,7 @@ const Fields = ({ name, type, lable, key, ...allProps }) => {
         <Select
           {...allProps}
           className=""
-          value={reasonLeaving}
+          value={reasonLeavingTable}
           options={reasonLeavingData}
           onChange={(e) => dispatch(setReasonLeavingHandler(e))}
         />

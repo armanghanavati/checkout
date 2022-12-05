@@ -44,6 +44,7 @@ const CheckoutOfficial = () => {
   const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
+  const [officeUser, setOfficeUser] = useState("");
 
   const reasonLeavingInputRef = useRef();
   const meliCodeInputRef = useRef();
@@ -61,6 +62,7 @@ const CheckoutOfficial = () => {
   const meliCode = useSelector(selectMeliCode);
   const reasonLeaving = useSelector(selectReasonLeaving);
   const reasonLeavingData = useSelector(selectReasonLeavingData);
+
   const handleGetAllUsers = async () => {
     try {
       const usersRes = await getAllUsersByPersonalCode(
@@ -72,7 +74,6 @@ const CheckoutOfficial = () => {
       console.log(ex);
     }
   };
-  const [officeUser, setOfficeUser] = useState("");
 
   const handleGetUser = async () => {
     try {
@@ -81,10 +82,8 @@ const CheckoutOfficial = () => {
         personelCode: personalCode,
         id: userName.value !== undefined ? userName.value : "",
       };
-      console.log(values);
       const userRes = await getUser(values);
-      console.log(userRes.data);
-      if (userRes.length !== 0) {
+      if (Object.keys(userRes) !== 0) {
         setOfficeUser(userRes.data[0].manager);
         dispatch(
           addUserName({
@@ -95,7 +94,6 @@ const CheckoutOfficial = () => {
         dispatch(addPersonalCode(userRes.data[0].personelCode));
         dispatch(addMeliCode(userRes.data[0].user_name));
       } else {
-        alert("user alert");
         toast("کاربر یافت نشد");
       }
     } catch (ex) {
@@ -345,8 +343,6 @@ const CheckoutOfficial = () => {
             <label className="required-field">علت ترک خدمت : </label>
             <Select
               id="item5"
-              // onKeyDown={() => handleEnter()}
-              // ref={reasonLeavingInputRef}
               value={reasonLeaving}
               options={reasonLeavingData}
               onChange={(e) => dispatch(setReasonLeavingHandler(e))}
@@ -356,21 +352,21 @@ const CheckoutOfficial = () => {
               {formErrors.reasonLeavingWork}
             </p>
           </div>
-          {/* <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
+          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
             <label className="required-field">شرکت مربوطه : </label>
             <Select
               id="item5"
               // onKeyDown={() => handleEnter()}
-              ref={reasonLeavingInputRef}
-              value={reasonLeavingWork}
+              // ref={reasonLeavingInputRef}
+              // value={reasonLeavingWork}
               // options={reasonData}
-              onChange={(e) => setReasonLeavingWork(e)}
+              // onChange={(e) => setReasonLeavingWork(e)}
               placeholder="جستجو . . ."
             />
             <p className="font12 text-danger mb-0">
               {formErrors.reasonLeavingWork}
             </p>
-          </div> */}
+          </div>
           <div className="mb-4 col-12 col-sm-12 col-md-12  col-lg-6  col-xl-6">
             <label className="required-field">تاریخ ترک خدمت : </label>
             <div className="col-12 col-md-6">

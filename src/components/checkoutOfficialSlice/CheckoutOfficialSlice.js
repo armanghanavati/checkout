@@ -7,7 +7,8 @@ import {
 
 const initialState = {
   reasonLeavingData: [],
-  reasonLeavingUsers: [],
+  reasonLeavingOffice: {},
+  reasonLeavingTable: {},
   user: {},
   userName: [],
   personalCode: "",
@@ -74,7 +75,7 @@ const CheckoutOfficialSlice = createSlice({
     },
     setReasonLeavingHandler: (state, { payload }) => {
       console.log(payload);
-      return { ...state, reasonLeaving: payload };
+      return { ...state, reasonLeavingOffice: payload };
     },
     addMeliCode: (state, { payload }) => {
       return { ...state, meliCode: payload };
@@ -97,7 +98,10 @@ const CheckoutOfficialSlice = createSlice({
       return { ...state, user: payload };
     },
     [fetchHandleGetReasonLeavingWork.fulfilled]: (state, { payload }) => {
-      return { ...state, reasonLeavingData: payload };
+      return {
+        ...state,
+        reasonLeavingData: payload,
+      };
     },
     [fetchGetAllUsers.fulfilled]: (state, { payload }) => {
       return { ...state, users: payload };
@@ -118,11 +122,18 @@ export const selectUserName = (state) => state.checkout.userName;
 export const selectSubmit = (state) => state.checkout.isSubmit;
 export const loginInfo = (state) => state.checkout.user;
 export const selectAllUserNames = (state) => state.checkout.allUserNames;
-export const getAllUsersLeaving = (state) => state.checkout.reasonLeavingUsers;
+
 export const selectPersonalCode = (state) => state.checkout.personalCode;
+
 export const selectReasonLeavingData = (state) =>
   state.checkout.reasonLeavingData;
-export const selectReasonLeaving = (state) => state.checkout.reasonLeaving;
+
+export const selectReasonLeaving = (state) =>
+  state.checkout.reasonLeavingOffice;
+
+export const selectReasonLeavingTable = (state) =>
+  state.checkout.reasonLeavingDataTable;
+
 export const selectDescreption = (state) => state.checkout.descreption;
 export const selectMeliCode = (state) => state.checkout.meliCode;
 export default CheckoutOfficialSlice.reducer;
