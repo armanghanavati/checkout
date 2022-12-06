@@ -7,8 +7,8 @@ const initialState = {
   status: "",
   leaver: "",
   userMemb: "",
-  fromDate: "null",
-  toDate: "null",
+  fromDate: null,
+  toDate: null,
   leavingWorkCause: "",
   userCheckoutTableList: [],
   filterUsers: [],
@@ -20,17 +20,19 @@ const initialState = {
 
 export const handleGetUsersTable = createAsyncThunk(
   "tableCheckoutList/handleGetUsersTable",
-  async () => {
+
+  async (obj, { dispatch, getState }) => {
+    const { leaver, status, leavingWorkCause, fromDate, toDate } =
+      getState().tableCheckoutList;
     try {
+      console.log(fromDate, typeof toDate);
       const values = {
-        leaver: initialState.leaver,
-        // initialState.userCheckoutTableList.value !== undefined
-        //   ? initialState.userCheckoutTableList.value
-        //   : "",
-        status: initialState.status,
-        fromDate: initialState.fromDate,
-        toDate: initialState.toDate,
-        leavingWorkCause: initialState.leavingWorkCause,
+        leaver: leaver !== "" ? leaver.value : leaver,
+        status: status !== "" ? status.value : status,
+        fromDate: fromDate !== null ? fromDate : "null",
+        toDate: toDate !== null ? toDate : "null",
+        leavingWorkCause:
+          leavingWorkCause !== "" ? leavingWorkCause.value : leavingWorkCause,
       };
       console.log(values);
       const checkoutListRes = await getUserListTable(values);
@@ -46,6 +48,9 @@ const CheckoutList = createSlice({
   name: "tableCheckoutList",
   initialState,
   reducers: {
+    addLeavingWorkCause: (state, { payload }) => {
+      return { ...state, leavingWorkCause: payload };
+    },
     addUserMemb: (state, { payload }) => {
       return { ...state, leaver: payload };
     },
@@ -68,6 +73,10 @@ const CheckoutList = createSlice({
     addStatus: (state, { payload }) => {
       return { ...state, status: payload };
     },
+    addDate: (state, { payload }) => {
+      console.log(state.fromDate, payload);
+      return { ...state };
+    },
   },
   extraReducers: {
     [handleGetUsersTable.fulfilled]: (state, { payload }) => {
@@ -81,6 +90,8 @@ const CheckoutList = createSlice({
 });
 
 export const {
+  addLeavingWorkCause,
+  addDate,
   addUserMemb,
   addStatus,
   addMemberId,
@@ -88,12 +99,18 @@ export const {
   setCancelCheckoutModal,
   setViewCheckoutModal,
   setEditCheckoutModal,
+  middleware,
 } = CheckoutList.actions;
 export const selectUserTableList = (state) =>
   state.tableCheckoutList.userCheckoutTableList;
 export const selectUserMembers = (state) => state.tableCheckoutList.userMembers;
-
 export const selectUserMemb = (state) => state.tableCheckoutList.leaver;
+export const selectStatus = (state) => state.tableCheckoutList.status;
+export const selectFromDate = (state) => state.tableCheckoutList.fromDate;
+export const selectToDate = (state) => state.tableCheckoutList.toDate;
+export const selectLeavingWorkCause = (state) =>
+  state.tableCheckoutList.leavingWorkCause;
+
 export const selectAcceptCheckoutModal = (state) =>
   state.tableCheckoutList.acceptCheckoutModal;
 export const selectEditCheckoutModal = (state) =>

@@ -6,12 +6,18 @@ import "./index.css";
 import { store } from "./feauters/store";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import Test from "./components/tableChackoutLists/tableChackoutLists/TableChackoutLists";
+import { persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { PersistGate } from "redux-persist/integration/react";
+
+let persistor = persistStore(store);
 
 render(
   <Provider store={store}>
-    <App />
-    <ToastContainer />
+    {/* <PersistGate loading={null} persistor={persistor}> */}
+      <App />
+      <ToastContainer />
+    {/* </PersistGate> */}
   </Provider>,
   document.getElementById("root")
 );

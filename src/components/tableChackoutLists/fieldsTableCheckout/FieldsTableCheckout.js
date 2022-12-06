@@ -8,20 +8,40 @@ import {
   addStatus,
   addUserMemb,
   handleGetUsersTable,
+  selectStatus,
   selectUserMemb,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const FieldsTableCheckout = () => {
+  const leaver = useSelector(selectUserMemb);
+  const status = useSelector(selectStatus);
+  const fromDate = useSelector(selectUserMemb);
+  const toDate = useSelector(selectUserMemb);
+  const leavingWorkCause = useSelector(selectUserMemb);
+
   const [isSubmit, setIsSubmit] = useState(false);
   const dispatch = useDispatch();
   const userMemb = useSelector(selectUserMemb);
 
+  // const submitHandler = (e) => {
+  //   e.preventDefault();
+  //   // setIsSubmit(true);
+  //   const values = {
+  //     leaver: leaver,
+  //     status: status,
+  //     fromDate: fromDate,
+  //     toDate: toDate,
+  //     leavingWorkCause: leavingWorkCause,
+  //   };
+  //   console.log(values);
+  //   console.log(dispatch(handleGetUsersTable(values)));
+  // };
+
   const submitHandler = (e) => {
     e.preventDefault();
-    setIsSubmit(true);
-    dispatch(handleGetUsersTable());
-    dispatch(addUserMemb());
+    // setIsSubmit(true);
+    console.log(dispatch(handleGetUsersTable()));
   };
 
   useEffect(() => {

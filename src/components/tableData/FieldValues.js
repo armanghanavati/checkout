@@ -46,7 +46,7 @@ export default [
   {
     id: 5,
     label: "تا تاریخ :",
-    name: "untilDate",
+    name: "toDate",
     type: "date",
     inputFormat: "YYYY-M-D",
     inputJalaaliFormat: "jYYYY-jM-jD",
