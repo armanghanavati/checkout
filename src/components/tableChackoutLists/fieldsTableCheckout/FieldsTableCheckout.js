@@ -4,9 +4,6 @@ import Fields from "./fields/Fields";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import "./style.css";
 import {
-  addMemberId,
-  addStatus,
-  addUserMemb,
   handleGetUsersTable,
   selectStatus,
   selectUserMemb,
@@ -14,44 +11,17 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 const FieldsTableCheckout = () => {
-  const leaver = useSelector(selectUserMemb);
-  const status = useSelector(selectStatus);
-  const fromDate = useSelector(selectUserMemb);
-  const toDate = useSelector(selectUserMemb);
-  const leavingWorkCause = useSelector(selectUserMemb);
-
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const dispatch = useDispatch();
-  const userMemb = useSelector(selectUserMemb);
-
-  // const submitHandler = (e) => {
-  //   e.preventDefault();
-  //   // setIsSubmit(true);
-  //   const values = {
-  //     leaver: leaver,
-  //     status: status,
-  //     fromDate: fromDate,
-  //     toDate: toDate,
-  //     leavingWorkCause: leavingWorkCause,
-  //   };
-  //   console.log(values);
-  //   console.log(dispatch(handleGetUsersTable(values)));
-  // };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    // setIsSubmit(true);
-    console.log(dispatch(handleGetUsersTable()));
-  };
-
-  useEffect(() => {
     dispatch(handleGetUsersTable());
-    setIsSubmit(false);
-  }, [isSubmit, dispatch]);
+  };
 
   return (
     <>
-      <Form className="" onSubmit={submitHandler}>
+      <Form onSubmit={submitHandler}>
         <Row>
           {inputs.map((input) => {
             return (
@@ -63,6 +33,7 @@ const FieldsTableCheckout = () => {
                 key={input.id}
               >
                 <Fields
+                  onchecked={isChecked}
                   type={input.type}
                   name={input.name}
                   {...input}
@@ -73,7 +44,12 @@ const FieldsTableCheckout = () => {
           })}
           <Col md="4" lg="3" xxl="2">
             <label className="d-flex justify-content-end">
-              <input className="mx-2" type="checkbox" />
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="mx-2"
+              />
               جستجو لحظه ای
             </label>
             <div className="d-flex justify-content-end mt-2">

@@ -45,6 +45,8 @@ const CheckoutOfficial = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
   const [officeUser, setOfficeUser] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [unit, setUnit] = useState("");
 
   const reasonLeavingInputRef = useRef();
   const meliCodeInputRef = useRef();
@@ -83,8 +85,10 @@ const CheckoutOfficial = () => {
         id: userName.value !== undefined ? userName.value : "",
       };
       const userRes = await getUser(values);
+      console.log(userRes.data);
       if (Object.keys(userRes) !== 0) {
         setOfficeUser(userRes.data[0].manager);
+        setCompanyName(userRes.data[0].company);
         dispatch(
           addUserName({
             value: userRes.data[0]._id,
@@ -129,7 +133,6 @@ const CheckoutOfficial = () => {
 
   const timerHandler = (e) => {
     setTime(e);
-    console.log(e);
   };
 
   const handlePostReasonLeaving = async (e) => {
@@ -353,19 +356,15 @@ const CheckoutOfficial = () => {
             </p>
           </div>
           <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
-            <label className="required-field">شرکت مربوطه : </label>
-            <Select
-              id="item5"
-              // onKeyDown={() => handleEnter()}
-              // ref={reasonLeavingInputRef}
-              // value={reasonLeavingWork}
-              // options={reasonData}
-              // onChange={(e) => setReasonLeavingWork(e)}
-              placeholder="جستجو . . ."
-            />
+            <label className="">شرکت : </label>
+            <Form.Control disabled value={companyName} />
             <p className="font12 text-danger mb-0">
               {formErrors.reasonLeavingWork}
             </p>
+          </div>
+          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
+            <label className="">واحد : </label>
+            <Form.Control disabled value={unit} />
           </div>
           <div className="mb-4 col-12 col-sm-12 col-md-12  col-lg-6  col-xl-6">
             <label className="required-field">تاریخ ترک خدمت : </label>

@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getUserListTable } from "../../common/tableListServices";
+import {
+  getAllStatuses,
+  getUserListTable,
+} from "../../common/tableListServices";
 
 const initialState = {
   userMembers: [],
@@ -16,21 +19,28 @@ const initialState = {
   editCheckoutModal: false,
   viewCheckoutModal: false,
   cancelCheckoutModal: false,
+  allStatus: [],
 };
+
+export const fetchGetAllStatuses = createAsyncThunk(
+  "tableCheckoutList/fetchGetAllStatuses",
+  async () => {
+    const statusRes = await getAllStatuses();
+    return statusRes.data;
+  }
+);
 
 export const handleGetUsersTable = createAsyncThunk(
   "tableCheckoutList/handleGetUsersTable",
-
   async (obj, { dispatch, getState }) => {
     const { leaver, status, leavingWorkCause, fromDate, toDate } =
       getState().tableCheckoutList;
     try {
-      console.log(fromDate, typeof toDate);
       const values = {
         leaver: leaver !== "" ? leaver.value : leaver,
         status: status !== "" ? status.value : status,
-        fromDate: fromDate !== null ? fromDate : "null",
-        toDate: toDate !== null ? toDate : "null",
+        fromDate: fromDate !== null ? fromDate.format('YYYY/MM/DD') : "null",
+        toDate: toDate !== null ? toDate.format('YYYY/MM/DD') : "null",
         leavingWorkCause:
           leavingWorkCause !== "" ? leavingWorkCause.value : leavingWorkCause,
       };
@@ -73,9 +83,11 @@ const CheckoutList = createSlice({
     addStatus: (state, { payload }) => {
       return { ...state, status: payload };
     },
-    addDate: (state, { payload }) => {
-      console.log(state.fromDate, payload);
-      return { ...state };
+    addFromDate: (state, { payload }) => {
+      return { ...state, fromDate: payload };
+    },
+    addToDate: (state, { payload }) => {
+      return { ...state, toDate: payload };
     },
   },
   extraReducers: {
@@ -86,12 +98,16 @@ const CheckoutList = createSlice({
         userMembers: payload.members,
       };
     },
+    [fetchGetAllStatuses.fulfilled]: (state, { payload }) => {
+      console.log(payload);
+      return { ...state, allStatus: payload };
+    },
   },
 });
 
 export const {
   addLeavingWorkCause,
-  addDate,
+  addFromDate,
   addUserMemb,
   addStatus,
   addMemberId,
@@ -100,6 +116,7 @@ export const {
   setViewCheckoutModal,
   setEditCheckoutModal,
   middleware,
+  addToDate,
 } = CheckoutList.actions;
 export const selectUserTableList = (state) =>
   state.tableCheckoutList.userCheckoutTableList;
@@ -110,6 +127,9 @@ export const selectFromDate = (state) => state.tableCheckoutList.fromDate;
 export const selectToDate = (state) => state.tableCheckoutList.toDate;
 export const selectLeavingWorkCause = (state) =>
   state.tableCheckoutList.leavingWorkCause;
+
+export const selectAllStatus = (state) => state.tableCheckoutList.allStatus;
+export const selectValueStatus = (state) => state.tableCheckoutList.status;
 
 export const selectAcceptCheckoutModal = (state) =>
   state.tableCheckoutList.acceptCheckoutModal;

@@ -77,14 +77,14 @@ const CheckoutList = ({ isSubmit }) => {
       <Fragment>
         <Button
           className="m-1"
-          variant="primary"
+          variant="success"
           onClick={() => dispatch(setAcceptCheckoutModal(true))}
         >
           <FontAwesomeIcon icon={faCheck} />
         </Button>
         <Button
           className="m-1"
-          variant="success"
+          variant="primary"
           onClick={() => dispatch(setEditCheckoutModal(true))}
         >
           <FontAwesomeIcon icon={faPenToSquare} />
@@ -148,7 +148,6 @@ const CheckoutList = ({ isSubmit }) => {
   // };
 
   const fetchData = useCallback(({ pageSize, pageIndex, requests }) => {
-    console.log(requests);
     var tableItems = [];
     if (requests.length !== 0) {
       for (var i = 0; i < requests.length; i++) {
@@ -157,8 +156,8 @@ const CheckoutList = ({ isSubmit }) => {
           col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
             .locale("fa")
             .format("jYYYY/jMM/jDD"),
-          col3: `${requests[i].process[0].userInfo.first_name} ${requests[i].process[0].userInfo.last_name}`,
-          col4: requests[i].reqInfo.leavingWorkCause,
+          col3: `${requests[i].reqInfo.leaver.first_name} ${requests[i].reqInfo.leaver.last_name}`,
+          col4: requests[i].reqInfo.leavingWorkCause.name,
           col5: requests[i].status.name,
           col6: buttons(),
         };
@@ -186,8 +185,8 @@ const CheckoutList = ({ isSubmit }) => {
             col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
               .locale("fa")
               .format("jYYYY/jMM/jDD"),
-            col3: `${requests[i].process[0].userInfo.first_name} ${requests[i].process[0].userInfo.last_name}`,
-            col4: requests[i].reqInfo.leavingWorkCause,
+            col3: `${requests[i].reqInfo.leaver.first_name} ${requests[i].reqInfo.leaver.last_name}`,
+            col4: requests[i].reqInfo.leavingWorkCause.name,
             col5: requests[i].status.name,
             col6: buttons(),
           };
