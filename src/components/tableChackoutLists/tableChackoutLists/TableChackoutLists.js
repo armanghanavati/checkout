@@ -13,14 +13,19 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addMemberId,
   addStatus,
+  fetchCurrentReqInfo,
+  selectAcceptCheckoutModal,
+  selectCancelCheckoutModal,
+  selectDetailes,
+  selectEditCheckoutModal,
   selectUserMembers,
   selectUserTableList,
+  selectViewCheckoutModal,
   setAcceptCheckoutModal,
   setCancelCheckoutModal,
   setEditCheckoutModal,
   setViewCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
-import DatePicker from "react-datepicker2";
 import moment from "moment-jalaali";
 import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
 import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
@@ -39,7 +44,11 @@ const CheckoutList = ({ isSubmit }) => {
   const fetchIdRef = useRef(0);
   const sortIdRef = useRef(0);
   const userCheckoutList = useSelector(selectUserTableList);
-  // const userMembers = useSelector(selectUserMembers);
+  const acceptModal = useSelector(selectAcceptCheckoutModal);
+  const viewModal = useSelector(selectViewCheckoutModal);
+  const cancelModal = useSelector(selectCancelCheckoutModal);
+  const editModal = useSelector(selectEditCheckoutModal);
+  const details = useSelector(selectDetailes);
   const columns = useMemo(() => [
     {
       Header: " سریال درخواست",
@@ -57,95 +66,107 @@ const CheckoutList = ({ isSubmit }) => {
       sortType: "basic",
     },
     {
-      Header: "علت ترک خدمت",
+      Header: "شرکت",
       accessor: "col4",
       sortType: "basic",
     },
     {
-      Header: "وضعیت درخواست",
+      Header: "واحد",
       accessor: "col5",
       sortType: "basic",
     },
     {
-      Header: "عملیات",
+      Header: "علت ترک خدمت",
       accessor: "col6",
       sortType: "basic",
     },
+    {
+      Header: "وضعیت درخواست",
+      accessor: "col7",
+      sortType: "basic",
+    },
+    {
+      Header: "عملیات",
+      accessor: "col8",
+      sortType: "basic",
+    },
   ]);
-  const buttons = () => {
+  const buttons = (request) => {
     return (
       <Fragment>
-        <Button
-          className="m-1"
-          variant="success"
-          onClick={() => dispatch(setAcceptCheckoutModal(true))}
-        >
-          <FontAwesomeIcon icon={faCheck} />
-        </Button>
-        <Button
-          className="m-1"
-          variant="primary"
-          onClick={() => dispatch(setEditCheckoutModal(true))}
-        >
-          <FontAwesomeIcon icon={faPenToSquare} />
-        </Button>
-        <Button
-          className="m-1"
-          variant="danger"
-          onClick={() => dispatch(setCancelCheckoutModal(true))}
-        >
-          <FontAwesomeIcon icon={faBan} />
-        </Button>
-        <Button
-          className="m-1"
-          variant="warning"
-          onClick={() => dispatch(setViewCheckoutModal(true))}
-        >
-          <FontAwesomeIcon icon={faEye} />
-        </Button>
+        <div className="d-flex flex-wrap justify-content-between">
+          <Button
+            className="d-flex align-items-center btn-sm"
+            variant="success"
+            onClick={() => {
+              dispatch(
+                fetchCurrentReqInfo({
+                  reqId: request._id,
+                  reqType: request.type,
+                  company: request.company,
+                  department: request.department.name,
+                })
+              );
+              dispatch(setAcceptCheckoutModal(true));
+            }}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+          </Button>
+          <Button
+            className="d-flex align-items-center btn-sm"
+            variant="primary"
+            onClick={() => {
+              dispatch(
+                fetchCurrentReqInfo({
+                  reqId: request._id,
+                  reqType: request.type,
+                  company: request.company,
+                  department: request.department.name,
+                })
+              );
+              dispatch(setEditCheckoutModal(true));
+            }}
+          >
+            <FontAwesomeIcon icon={faPenToSquare} />
+          </Button>
+          <Button
+            className="d-flex align-items-center btn-sm"
+            variant="danger"
+            onClick={() => {
+              dispatch(
+                fetchCurrentReqInfo({
+                  reqId: request._id,
+                  reqType: request.type,
+                  company: request.company,
+                  department: request.department.name,
+                })
+              );
+              dispatch(setCancelCheckoutModal(true));
+            }}
+          >
+            <FontAwesomeIcon icon={faBan} />
+          </Button>
+          <Button
+            className="d-flex align-items-center btn-sm"
+            variant="warning"
+            onClick={() => {
+              dispatch(
+                fetchCurrentReqInfo({
+                  reqId: request._id,
+                  reqType: request.type,
+                  company: request.company,
+                  department: request.department.name,
+                })
+              );
+              dispatch(setViewCheckoutModal(true));
+            }}
+          >
+            <FontAwesomeIcon icon={faEye} />
+          </Button>
+        </div>
       </Fragment>
     );
   };
-
-  const timerHandler = (e) => {
-    setTiem(e);
-  };
-
-  // const handlerCheckoutTable = () => {
-  //   console.log("click handler");
-  //   if (handleGetUsersTable.length !== 0) {
-  //     dispatch(addMemberId());
-  //     dispatch(addStatus());
-  //     dispatch();
-  //   }
-  // };
-  // const handleGetUser = async () => {
-  //   try {
-  //     const values = {
-  //       meliCode: meliCode,
-  //       personelCode: personalCode,
-  //       id: userName.value !== undefined ? userName.value : "",
-  //     };
-  //     const userRes = await getUser(values);
-  //     console.log(userRes.data);
-  //     if (userRes.length !== 0) {
-  //       setOfficeUser(userRes.data[0].manager);
-  //       dispatch(
-  //         addUserName({
-  //           value: userRes.data[0]._id,
-  //           label: `${userRes.data[0].first_name} ${userRes.data[0].last_name}`,
-  //         })
-  //       );
-  //       dispatch(addPersonalCode(userRes.data[0].personelCode));
-  //       dispatch(addMeliCode(userRes.data[0].user_name));
-  //     } else {
-  //       alert("user alert");
-  //       toast("کاربر یافت نشد");
-  //     }
-  //   } catch (ex) {
-  //     console.log(ex);
-  //   }
-  // };
 
   const fetchData = useCallback(({ pageSize, pageIndex, requests }) => {
     var tableItems = [];
@@ -157,9 +178,11 @@ const CheckoutList = ({ isSubmit }) => {
             .locale("fa")
             .format("jYYYY/jMM/jDD"),
           col3: `${requests[i].reqInfo.leaver.first_name} ${requests[i].reqInfo.leaver.last_name}`,
-          col4: requests[i].reqInfo.leavingWorkCause.name,
-          col5: requests[i].status.name,
-          col6: buttons(),
+          col4: requests[i].company,
+          col5: requests[i].department.name,
+          col6: requests[i].reqInfo.leavingWorkCause.name,
+          col7: requests[i].status.name,
+          col8: buttons(requests[i]),
         };
         tableItems.push(tableItem);
       }
@@ -186,9 +209,11 @@ const CheckoutList = ({ isSubmit }) => {
               .locale("fa")
               .format("jYYYY/jMM/jDD"),
             col3: `${requests[i].reqInfo.leaver.first_name} ${requests[i].reqInfo.leaver.last_name}`,
-            col4: requests[i].reqInfo.leavingWorkCause.name,
-            col5: requests[i].status.name,
-            col6: buttons(),
+            col4: requests[i].company,
+            col5: requests[i].department.name,
+            col6: requests[i].reqInfo.leavingWorkCause.name,
+            col7: requests[i].status.name,
+            col8: buttons(requests[i]),
           };
           tableItems.push(tableItem);
         }
@@ -240,10 +265,10 @@ const CheckoutList = ({ isSubmit }) => {
           loading={load}
           pageCount={pageCount}
         />
-        <AcceptCheckoutModal />
-        <EditCheckoutModal />
-        <CancelCheckoutModal />
-        <ViewCheckoutModal />
+        {acceptModal && <AcceptCheckoutModal />}
+        {editModal && <EditCheckoutModal />}
+        {cancelModal && <CancelCheckoutModal />}
+        {viewModal && <ViewCheckoutModal />}
       </section>
     </div>
   );

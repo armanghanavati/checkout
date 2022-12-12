@@ -56,7 +56,7 @@ const TableCheckOutItems = ({
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th
-                  className="col-2 bg-secondary text-white fw-normal"
+                  className="col-1 bg-secondary text-white fw-normal"
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
                   {column.render("Header")}

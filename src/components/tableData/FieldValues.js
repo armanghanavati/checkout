@@ -42,7 +42,7 @@ export default [
   {
     id: 3.78,
     label: "واحد: ",
-    name: "unit",
+    name: "department",
     placeholder: "جستجو . . .",
     type: "select",
     md: "4",

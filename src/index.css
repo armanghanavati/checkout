@@ -1,9 +1,10 @@
-body{
+body *{
     font-family: iranSans;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     direction: rtl;
+    font-size: 14px !important;
 }
 
 @font-face {
@@ -11,6 +12,10 @@ body{
     src: url("assets/fonts/iranSans.eot") format("eot");
     src: url("assets/fonts/iranSans.ttf") format("ttf");
     src: url("assets/fonts/iranSans.woff") format("woff");
+}
+
+.tether-element{
+    z-index: 10000;
 }
 
 /* :root {

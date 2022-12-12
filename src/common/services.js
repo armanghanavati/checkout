@@ -2,6 +2,7 @@ import axios from "axios";
 import config from "./urlConfig.json";
 
 export const userInfo = () => {
+  
   return axios.get(`${config.localapi}/user/login`, {
     params: { username: "1742026362", password: "Armangh26362" },
   });

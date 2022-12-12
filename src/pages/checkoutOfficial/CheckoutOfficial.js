@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import NumberFormat from "react-number-format";
 import Select from "react-select";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Col, Row } from "react-bootstrap";
 import SearchBtn from "./searchBtn/SearchBtn";
 import {
   loginInfo,
@@ -46,7 +46,7 @@ const CheckoutOfficial = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const [officeUser, setOfficeUser] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [unit, setUnit] = useState("");
+  const [department, setDepartment] = useState("");
 
   const reasonLeavingInputRef = useRef();
   const meliCodeInputRef = useRef();
@@ -85,10 +85,11 @@ const CheckoutOfficial = () => {
         id: userName.value !== undefined ? userName.value : "",
       };
       const userRes = await getUser(values);
-      console.log(userRes.data);
-      if (Object.keys(userRes) !== 0) {
+      console.log();
+      if (userRes) {
         setOfficeUser(userRes.data[0].manager);
         setCompanyName(userRes.data[0].company);
+        setDepartment(userRes.data[0].department);
         dispatch(
           addUserName({
             value: userRes.data[0]._id,
@@ -169,6 +170,8 @@ const CheckoutOfficial = () => {
               dispatch(addUserName(""));
               setTime(null);
               setFormErrors("");
+              setCompanyName("");
+              setDepartment("");
               toast("درخواست با موفقیت ثبت شد!");
             }
           } else {
@@ -192,16 +195,64 @@ const CheckoutOfficial = () => {
     }
   };
 
-  // useEffect(() => {
-  //   document.addEventListener("keydown", function (event) {
-  //     if (event.target.nodeName === "INPUT") {
-  //       var form = event.target.form;
-  //       var index = Array.prototype.indexOf.call(form, event.target);
-  //       form.elements[index + 2].focus();
-  //       event.preventDefault();
-  //     }
-  //   });
-  // }, []);
+  const applyHandler = async (e) => {
+    e.preventDefault();
+    setIsSubmit(true);
+    if (userName && personalCode && meliCode && time && reasonLeaving) {
+      try {
+        const checkoutValues = {
+          leaver: userName.value,
+          description: description,
+          leavingWorkCause: reasonLeaving.value,
+          leavingWorkDate: time,
+        };
+        const userPostReasonLeavingRes = await postUserDataCheckout(
+          checkoutValues
+        );
+
+        if (userPostReasonLeavingRes.data.code === 415) {
+          if (officeUser !== undefined) {
+            const ActionValues = {
+              action_id: userPostReasonLeavingRes.data.id,
+              action_code: 0,
+              user_id: localStorage.getItem("id"),
+              toPerson: officeUser,
+              type: 10,
+            };
+            const actionRes = await postAction(ActionValues);
+
+            if (actionRes.data.code === 415) {
+              dispatch(addMeliCode(""));
+              dispatch(addPersonalCode(""));
+              dispatch(addDescreption(""));
+              dispatch(setReasonLeavingHandler(""));
+              dispatch(addUserName(""));
+              setTime(null);
+              setFormErrors("");
+              setCompanyName("");
+              setDepartment("");
+              toast("درخواست با موفقیت ثبت شد!");
+            }
+          } else {
+            toast(". مدیر کاربرمورد نظر یافت نشد");
+          }
+        }
+      } catch (ex) {
+        console.log(ex);
+      }
+    } else {
+      setFormErrors(
+        validationForm({
+          personalCode: personalCode,
+          meliCode: meliCode,
+          userName: userName.value,
+          reasonLeavingWork: reasonLeavingWork.value,
+          time: time,
+        })
+      );
+      toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchAsyncMeliCode());
@@ -240,6 +291,18 @@ const CheckoutOfficial = () => {
     dispatch(addUserName(e));
     dispatch(addMeliCode(""));
     dispatch(addPersonalCode(""));
+  };
+
+  const cancelHandler = () => {
+    dispatch(addMeliCode(""));
+    dispatch(addPersonalCode(""));
+    dispatch(addDescreption(""));
+    dispatch(setReasonLeavingHandler(""));
+    dispatch(addUserName(""));
+    setTime(null);
+    setFormErrors("");
+    setCompanyName("");
+    setDepartment("");
   };
 
   // const handleEnter = (e) => {
@@ -285,16 +348,16 @@ const CheckoutOfficial = () => {
   });
 
   return (
-    <div className="container">
-      <Form className="form-group" onSubmit={handlePostReasonLeaving}>
-        <div className="row">
-          <div className="mb-4 col-12 col-sm-12  col-md-6  col-lg-3  col-xl-3">
+    <div className="container-fluid">
+      <Form className="form-group">
+        <Row>
+          <Col md="12" lg="6" xl="3">
             <label className="mb-1 required-field form-label">
-              نام و نام خانوادگی:{" "}
+              نام و نام خانوادگی:
             </label>
             <Select
               id="item1"
-              // onKeyDown={handleEnter}
+              className="mb-4 mb-md-4"
               ref={userNameInputRef}
               value={userName}
               options={users}
@@ -303,14 +366,14 @@ const CheckoutOfficial = () => {
               onChange={userNameHandler}
             />
             <p className="font12 text-danger mb-0"> {formErrors.userName} </p>
-          </div>
-          <div className="mb-4 col-12 col-sm-12  col-md-6  col-lg-3  col-xl-3">
+          </Col>
+          <Col md="12" lg="6" xl="3">
             <label className="mb-1 required-field form-label"> کد ملی: </label>
             <NumberFormat
               id="item2"
               // onKeyDown={handleEnter}
               ref={meliCodeInputRef}
-              className="form-control"
+              className="form-control mb-4 mb-md-4"
               value={meliCode}
               onChange={meliCodeHandler}
               onBlur={() => handleGetUser()}
@@ -318,8 +381,8 @@ const CheckoutOfficial = () => {
               format="##########"
             />
             <p className="font12 text-danger mb-0"> {formErrors.meliCode} </p>
-          </div>
-          <div className="mb-4 col-8 col-sm-8  col-md-6  col-lg-3  col-xl-3">
+          </Col>
+          <Col md="12" lg="6" xl="3">
             <label className="mb-1 required-field form-label">
               کد پرسنلی:{" "}
             </label>
@@ -327,7 +390,7 @@ const CheckoutOfficial = () => {
               id="item3"
               // onKeyDown={() => handleEnter()}
               ref={personalCodeInputRef}
-              className="form-control "
+              className="form-control mb-lg-4 mb-md-1"
               name="personalCode"
               value={personalCode}
               onChange={personalCodeHandler}
@@ -335,17 +398,18 @@ const CheckoutOfficial = () => {
               format="#######"
             />
             <p className="font12 text-danger mb-0">{formErrors.personalCode}</p>
-          </div>
+          </Col>
           <SearchBtn
             id="item4"
             // handleEnter={() => handleEnter()}
             refrence={searchingInputRef}
             handleGetUser={handleGetUser}
           />
-          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
-            <label className="required-field">علت ترک خدمت : </label>
+          <Col md="12" lg="6" xl="3">
+            <label className="mb-1 required-field">علت ترک خدمت : </label>
             <Select
               id="item5"
+              className="mb-md-4 mb-4"
               value={reasonLeaving}
               options={reasonLeavingData}
               onChange={(e) => dispatch(setReasonLeavingHandler(e))}
@@ -354,39 +418,34 @@ const CheckoutOfficial = () => {
             <p className="font12 text-danger mb-0">
               {formErrors.reasonLeavingWork}
             </p>
-          </div>
-          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
-            <label className="">شرکت : </label>
+          </Col>
+          <Col md="12" lg="6" xl="3" className="mb-4">
+            <label className="mb-1 required-field">تاریخ ترک خدمت : </label>
+            <DatePicker
+              id="item6"
+              ref={dateLeavingInputRef}
+              className="form-control mb-md-4"
+              persianDigits={true}
+              value={time}
+              onChange={timerHandler}
+              isGregorian={false}
+              timePicker={false}
+              inputFormat="YYYY-MM-DD"
+              inputJalaaliFormat="jYYYY-jM-jD"
+            />
+            <p className="font12 text-danger mb-0">{formErrors.time}</p>
+          </Col>
+          <Col md="12" lg="6" xl="3">
+            <label className="mb-1">شرکت : </label>
             <Form.Control disabled value={companyName} />
-            <p className="font12 text-danger mb-0">
-              {formErrors.reasonLeavingWork}
-            </p>
-          </div>
-          <div className="mb-4  col-12 col-sm-12  col-md-6  col-lg-4  col-xl-3">
-            <label className="">واحد : </label>
-            <Form.Control disabled value={unit} />
-          </div>
-          <div className="mb-4 col-12 col-sm-12 col-md-12  col-lg-6  col-xl-6">
-            <label className="required-field">تاریخ ترک خدمت : </label>
-            <div className="col-12 col-md-6">
-              <DatePicker
-                id="item6"
-                // onKeyDown={() => handleEnter()}
-                ref={dateLeavingInputRef}
-                className="form-control"
-                persianDigits={true}
-                value={time}
-                onChange={timerHandler}
-                isGregorian={false}
-                timePicker={false}
-                inputFormat="YYYY-M-D"
-                inputJalaaliFormat="jYYYY-jM-jD"
-              />
-              <p className="font12 text-danger mb-0">{formErrors.time}</p>
-            </div>
-          </div>
+            <p className="font12 text-danger mb-4 mb-md-4"></p>
+          </Col>
+          <Col md="12" lg="6" xl="3" className="mb-4">
+            <label className="mb-1">واحد : </label>
+            <Form.Control disabled value={department} />
+          </Col>
           <div className="col-sm-12 col-md-12  col-lg-12  col-xl-12">
-            <label className="py-1 " htmlFor="CheckoutTextarea">
+            <label className="mb-1 py-1 " htmlFor="CheckoutTextarea">
               توضیحات :
             </label>
             <textarea
@@ -399,19 +458,29 @@ const CheckoutOfficial = () => {
               rows="5"
             />
           </div>
-        </div>
-        <div className="row">
-          <div className="mx-auto d-flex justify-content-between mt-4 col-xl-4 col-md-5">
+        </Row>
+        <div className="justify-content-center text-center d-flex">
+          <div className="">
             <button
-              type="submit"
-              className="w-45 btn btn-success text-center my-5"
+              onClick={cancelHandler}
+              className="me-4 btn btn-secondary my-5"
             >
-              تایید
+              ایجاد مورد جدید
             </button>
-            <Button className="w-45 btn btn-secondary text-center my-5">
-              انصراف
-            </Button>
+            <button
+              onClick={applyHandler}
+              className="ms-2 btn btn-success my-5"
+            >
+              ثبت
+            </button>
+            <button
+              onClick={handlePostReasonLeaving}
+              className="ms-4 btn btn-success my-5"
+            >
+              ثبت و ایجاد مورد جدید
+            </button>
           </div>
+          <button className="ms-2 btn btn-primary my-5">ارسال</button>
         </div>
       </Form>
     </div>

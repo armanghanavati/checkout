@@ -1,15 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Container } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  fetchCurrentReqInfo,
   selectAcceptCheckoutModal,
+  selectDetailes,
+  selectUserTableList,
   setAcceptCheckoutModal,
+  currentReqCompany,
+  currentReqDep,
+  selectCurrentComp,
+  selectCurrentDep,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import "./Styles.css";
+import moment from "moment-jalaali";
 
 const AcceptCheckoutModal = () => {
   const dispatch = useDispatch();
   const AcceptCheckoutModal = useSelector(selectAcceptCheckoutModal);
+  const userCheckoutList = useSelector(selectUserTableList);
+  const details = useSelector(selectDetailes);
+  const currentReqCo = useSelector(selectCurrentComp);
+  const currentReqDepartment = useSelector(selectCurrentDep);
 
   return (
     <Modal
@@ -21,25 +33,73 @@ const AcceptCheckoutModal = () => {
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
-      <Modal.Title className="modal-header bg-success text-white p-2 d-flex justify-content-between">
-        <p className="modal-title"> شماره سریال: </p>
-        <p className="modal-title"> تایید درخواست </p>
-        <p className="modal-title"> تاریخ درخواست: </p>
-      </Modal.Title>
+      <Modal.Header className="d-block bg-success text-white">
+        <Modal.Title className="d-flex justify-content-between">
+          <div>
+            <span className="fw-bold me-2">شماره سریال: </span>
+            <span>
+              {details.reqInfo !== undefined
+                ? details.reqInfo.serial_number
+                : ""}
+            </span>
+          </div>
+          <div>
+            <span>تایید درخواست </span>
+          </div>
+          <div>
+            <span className="fw-bold me-2">تاریخ درخواست:</span>
+            <span>
+              {details.process !== undefined
+                ? moment(details.process[0].date, "YYYY/MM/DD")
+                    .locale("fa")
+                    .format("jYYYY/jMM/jDD")
+                : ""}
+            </span>
+          </div>
+        </Modal.Title>
+      </Modal.Header>
       <Modal.Body className="show-grid">
         <Row>
           <Col xs={12} md={8} xl={12}>
-            <p className="font-weight-bold">
-              نام و نام خانوادگی: <span> روزبه قنواتیان </span>
+            <p className="mb-3 me-1">
+              <span className="fw-bold">نام و نام خانوادگی: </span>
+              <span>
+                {`${
+                  details.leaver !== undefined ? details.leaver.first_name : ""
+                } ${
+                  details.leaver !== undefined ? details.leaver.last_name : ""
+                }`}
+              </span>
             </p>
           </Col>
+          <p className="mb-3 me-1">
+            <span className="fw-bold">شرکت: </span>
+            <span>{currentReqCo}</span>
+          </p>
           <Col xs={6} md={4}>
-            <p className="font-weight-bold">واحد سازمانی:</p>
+            <p className="mb-3 me-1">
+              <span className="fw-bold">واحد سازمانی: </span>
+              <span>{currentReqDepartment}</span>
+            </p>
           </Col>
-          <p className="font-weight-bold">شرکت:</p>
-          <p className="font-weight-bold">علت ترک خدمت: </p>
-          <p className="font-weight-bold">تاریخ ترک خدمت:</p>
-          <p className="font-weight-bold">توضیحات:</p>
+          <p className=" mb-3">
+            <span className="fw-bold">علت ترک خدمت: </span>
+            {details.leavingWorkCause !== undefined
+              ? details.leavingWorkCause
+              : ""}{" "}
+          </p>
+          <p className=" mb-3">
+            <span className="fw-bold">تاریخ ترک خدمت: </span>
+            {details.leavingWorkDate !== undefined
+              ? moment(details.leavingWorkDate, "YYYY/MM/DD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
+              : ""}
+          </p>
+          <p className="font-weight-bold mb-3">
+            <span className="fw-bold">توضیحات: </span>
+            {details.description !== undefined ? details.description : ""}
+          </p>
         </Row>
       </Modal.Body>
       <Modal.Footer className="justify-content-between">

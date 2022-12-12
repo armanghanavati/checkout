@@ -23,6 +23,7 @@ export const fetchAsyncMeliCode = createAsyncThunk(
   async () => {
     const resUserInfo = await userInfo();
     localStorage.setItem("id", resUserInfo.data._id);
+    console.log(resUserInfo.data)
     return resUserInfo.data;
   }
 );

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import Select from "react-select";
@@ -17,6 +17,12 @@ import {
   addToDate,
   addFromDate,
   handleGetUsersTable,
+  selectAllCompany,
+  selectAllDeps,
+  addDep,
+  selectDep,
+  addCompany,
+  selectCompany,
 } from "../../../checkoutOfficialSlice/TableCheckoutSlice";
 import { selectReasonLeavingData } from "../../../checkoutOfficialSlice/CheckoutOfficialSlice";
 
@@ -30,8 +36,23 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   const toDateTime = useSelector(selectToDate);
   const allStatus = useSelector(selectAllStatus);
   const valueStatus = useSelector(selectValueStatus);
+  const allCompany = useSelector(selectAllCompany);
+  const allDeps = useSelector(selectAllDeps);
+  const dep = useSelector(selectDep);
+  const company = useSelector(selectCompany);
 
-  const test = () => {
+  // let pushAllCompany = [];
+  // let getAllDep = [];
+  // getAllDep.push({ value: "", label: "همه" });
+  // allDeps.map((dep) => {
+  //   return getAllDep.push({
+  //     value: dep.DeptCode,
+  //     label: dep.DeptName,
+  //   });
+  // });
+  console.log(allDeps);
+  
+  const fildsSection = () => {
     if (name === "applicant") {
       return (
         <Select
@@ -51,7 +72,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
       return (
         <Select
           {...allProps}
-          className=""
+          className="mb-4"
           value={LeavingWorkCause}
           options={reasonLeavingData}
           onChange={(e) => {
@@ -67,29 +88,29 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
         <Select
           {...allProps}
           className=""
-          // value={LeavingWorkCause}
-          // options={reasonLeavingData}
-          // onChange={(e) => {
-          //   dispatch(addLeavingWorkCause(e));
-          //   if (onchecked) {
-          //     dispatch(handleGetUsersTable());
-          //   }
-          // }}
+          value={company}
+          options={allCompany}
+          onChange={(e) => {
+            dispatch(addCompany(e));
+            if (onchecked) {
+              dispatch(addCompany());
+            }
+          }}
         />
       );
-    } else if (name === "unit") {
+    } else if (name === "department") {
       return (
         <Select
           {...allProps}
           className=""
-          // value={LeavingWorkCause}
-          // options={reasonLeavingData}
-          // onChange={(e) => {
-          //   dispatch(addLeavingWorkCause(e));
-          //   if (onchecked) {
-          //     dispatch(handleGetUsersTable());
-          //   }
-          // }}
+          value={dep}
+          options={allDeps}
+          onChange={(e) => {
+            dispatch(addDep(e));
+            if (onchecked) {
+              dispatch(handleGetUsersTable());
+            }
+          }}
         />
       );
     } else if (name === "status") {
@@ -132,10 +153,11 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
       );
     }
   };
+
   return (
     <Fragment>
       <Form.Label className=" mb-1 form-label">{lable}</Form.Label>
-      {test()}
+      {fildsSection()}
     </Fragment>
   );
 };

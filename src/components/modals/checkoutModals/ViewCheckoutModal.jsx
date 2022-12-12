@@ -1,14 +1,21 @@
 import React, { useState } from "react";
-import { Modal, Button, Form, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  selectCurrentComp,
+  selectCurrentDep,
+  selectDetailes,
   selectViewCheckoutModal,
   setViewCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
+import moment from "moment-jalaali";
 
 const ViewCheckoutModal = () => {
   const dispatch = useDispatch();
   const viewCheckoutModal = useSelector(selectViewCheckoutModal);
+  const currentReqCo = useSelector(selectCurrentComp);
+  const currentReqDepartment = useSelector(selectCurrentDep);
+  const details = useSelector(selectDetailes);
 
   return (
     <Modal
@@ -20,30 +27,86 @@ const ViewCheckoutModal = () => {
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
-      <Modal.Title className="modal-header bg-warning text-white p-2 d-flex justify-content-between">
-        <p className="modal-title"> شماره سریال: </p>
-        <p className="modal-title"> مشاهده درخواست </p>
-        <p className="modal-title"> تاریخ درخواست: </p>
-      </Modal.Title>
-      <Modal.Body>
-        <p>نام و نام خانوادگی:</p>
-        <p>واحد سازمانی:</p>
-        <p>شرکت:</p>
-        <p>علت ترک خدمت: </p>
-        <p>تاریخ ترک خدمت:</p>
-        <p>توضیحات:</p>
+      <Modal.Header className="d-block bg-warning text-white">
+        <Modal.Title className="d-flex justify-content-between">
+          <div>
+            <span className="fw-bold me-2">شماره سریال: </span>
+            <span>
+              {details.reqInfo !== undefined
+                ? details.reqInfo.serial_number
+                : ""}
+            </span>
+          </div>
+          <div>
+            <span>مشاهده درخواست </span>
+          </div>
+          <div>
+            <span className="fw-bold me-2">تاریخ درخواست:</span>
+            <span>
+              {details.process !== undefined
+                ? moment(details.process[0].date, "YYYY/MM/DD")
+                    .locale("fa")
+                    .format("jYYYY/jMM/jDD")
+                : ""}
+            </span>
+          </div>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body className="show-grid">
+        <Row>
+          <Col xs={12} md={8} xl={12}>
+            <p className="mb-3 me-1">
+              <span className="fw-bold">نام و نام خانوادگی: </span>
+              <span>
+                {`${
+                  details.leaver !== undefined ? details.leaver.first_name : ""
+                } ${
+                  details.leaver !== undefined ? details.leaver.last_name : ""
+                }`}
+              </span>
+            </p>
+          </Col>
+          <p className="mb-3 me-1">
+            <span className="fw-bold">شرکت: </span>
+            <span>{currentReqCo}</span>
+          </p>
+          <Col xs={6} md={4}>
+            <p className="mb-3 me-1">
+              <span className="fw-bold">واحد سازمانی: </span>
+              <span>{currentReqDepartment}</span>
+            </p>
+          </Col>
+          <p className=" mb-3">
+            <span className="fw-bold">علت ترک خدمت: </span>
+            {details.leavingWorkCause !== undefined
+              ? details.leavingWorkCause
+              : ""}{" "}
+          </p>
+          <p className=" mb-3">
+            <span className="fw-bold">تاریخ ترک خدمت: </span>
+            {details.leavingWorkDate !== undefined
+              ? moment(details.leavingWorkDate, "YYYY/MM/DD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
+              : ""}
+          </p>
+          <p className="font-weight-bold mb-3">
+            <span className="fw-bold">توضیحات: </span>
+            {details.description !== undefined ? details.description : ""}
+          </p>
+        </Row>
       </Modal.Body>
       <Modal.Footer className="justify-content-between">
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
-              placeholder="توضیحات تکمیل کننده درخواست"
+              // placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
             />
           </Col>
           <Button className="ms-2 col-5" variant="warning">
-            مشاهده درخواست
+            ارسال نظر
           </Button>
         </div>
         <div>

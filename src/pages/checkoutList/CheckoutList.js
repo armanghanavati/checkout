@@ -3,6 +3,9 @@ import { Container, Col, Row } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { fetchHandleGetReasonLeavingWork } from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
 import {
+  fetchAllCompany,
+  fetchAllDepartment,
+  fetchCurrentReqInfo,
   fetchGetAllStatuses,
   handleGetUsersTable,
 } from "../../components/checkoutOfficialSlice/TableCheckoutSlice";
@@ -14,6 +17,8 @@ const CheckoutList = () => {
     dispatch(handleGetUsersTable());
     dispatch(fetchGetAllStatuses());
     dispatch(fetchHandleGetReasonLeavingWork());
+    dispatch(fetchAllCompany());
+    dispatch(fetchAllDepartment());
   }, [dispatch]);
 
   return (
