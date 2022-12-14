@@ -24,6 +24,7 @@ import {
   fetchGetAllUsers,
   addDescreption,
   selectDescreption,
+  addApllyModal,
 } from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
 import {
   getAllUsersByPersonalCode,
@@ -36,6 +37,7 @@ import {
 import { toast } from "react-toastify";
 import "./style.css";
 import DatePicker from "react-datepicker2";
+import ApplyModal from "../../components/modals/checkoutOfficals/ApplyModal";
 
 const CheckoutOfficial = () => {
   const [time, setTime] = useState(null);
@@ -44,6 +46,7 @@ const CheckoutOfficial = () => {
   const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
   const [officeUser, setOfficeUser] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [department, setDepartment] = useState("");
@@ -61,7 +64,7 @@ const CheckoutOfficial = () => {
   const userName = useSelector(selectUserName);
   const personalCode = useSelector(selectPersonalCode);
   const userData = useSelector(loginInfo);
-  const meliCode = useSelector(selectMeliCode);
+  const melliCode = useSelector(selectMeliCode);
   const reasonLeaving = useSelector(selectReasonLeaving);
   const reasonLeavingData = useSelector(selectReasonLeavingData);
 
@@ -77,16 +80,18 @@ const CheckoutOfficial = () => {
     }
   };
 
-  const handleGetUser = async () => {
+  const handleGetUser = async (userName, melliCode, personalCode) => {
     try {
       const values = {
-        meliCode: meliCode,
+        meliCode: melliCode,
         personelCode: personalCode,
         id: userName.value !== undefined ? userName.value : "",
       };
+      console.log(values);
       const userRes = await getUser(values);
-      console.log();
-      if (userRes) {
+      console.log(userRes);
+
+      if (userRes.data.length !== 0) {
         setOfficeUser(userRes.data[0].manager);
         setCompanyName(userRes.data[0].company);
         setDepartment(userRes.data[0].department);
@@ -99,7 +104,7 @@ const CheckoutOfficial = () => {
         dispatch(addPersonalCode(userRes.data[0].personelCode));
         dispatch(addMeliCode(userRes.data[0].user_name));
       } else {
-        toast("کاربر یافت نشد");
+        toast.error("کاربر یافت نشد");
       }
     } catch (ex) {
       console.log(ex);
@@ -108,7 +113,7 @@ const CheckoutOfficial = () => {
 
   const validationForm = ({
     personalCode,
-    meliCode,
+    melliCode,
     userName,
     reasonLeavingWork,
     time,
@@ -117,8 +122,8 @@ const CheckoutOfficial = () => {
     if (!personalCode) {
       errors.personalCode = "لطفا کد پرسنلی را مشخص کنید!";
     }
-    if (!meliCode) {
-      errors.meliCode = "لطفا کد ملی را مشخص کنید!";
+    if (!melliCode) {
+      errors.melliCode = "لطفا کد ملی را مشخص کنید!";
     }
     if (!userName) {
       errors.userName = "لطفا نام و نام خانوادگی را انتخاب نمایید!";
@@ -139,7 +144,7 @@ const CheckoutOfficial = () => {
   const handlePostReasonLeaving = async (e) => {
     e.preventDefault();
     setIsSubmit(true);
-    if (userName && personalCode && meliCode && time && reasonLeaving) {
+    if (userName && personalCode && melliCode && time && reasonLeaving) {
       try {
         const checkoutValues = {
           leaver: userName.value,
@@ -163,16 +168,19 @@ const CheckoutOfficial = () => {
             const actionRes = await postAction(ActionValues);
 
             if (actionRes.data.code === 415) {
-              dispatch(addMeliCode(""));
-              dispatch(addPersonalCode(""));
-              dispatch(addDescreption(""));
-              dispatch(setReasonLeavingHandler(""));
-              dispatch(addUserName(""));
-              setTime(null);
-              setFormErrors("");
-              setCompanyName("");
-              setDepartment("");
-              toast("درخواست با موفقیت ثبت شد!");
+              // if (dispatch(addApllyModal(true))) {
+              //   dispatch(addMeliCode(""));
+              //   dispatch(addPersonalCode(""));
+              //   dispatch(addDescreption(""));
+              //   dispatch(setReasonLeavingHandler(""));
+              //   dispatch(addUserName(""));
+              //   setTime(null);
+              //   setFormErrors("");
+              //   setCompanyName("");
+              //   setDepartment("");
+              //   setShowBtn(true);
+              //   toast.success("درخواست با موفقیت ثبت شد!");
+              // }
             }
           } else {
             toast(". مدیر کاربرمورد نظر یافت نشد");
@@ -185,66 +193,7 @@ const CheckoutOfficial = () => {
       setFormErrors(
         validationForm({
           personalCode: personalCode,
-          meliCode: meliCode,
-          userName: userName.value,
-          reasonLeavingWork: reasonLeavingWork.value,
-          time: time,
-        })
-      );
-      toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
-    }
-  };
-
-  const applyHandler = async (e) => {
-    e.preventDefault();
-    setIsSubmit(true);
-    if (userName && personalCode && meliCode && time && reasonLeaving) {
-      try {
-        const checkoutValues = {
-          leaver: userName.value,
-          description: description,
-          leavingWorkCause: reasonLeaving.value,
-          leavingWorkDate: time,
-        };
-        const userPostReasonLeavingRes = await postUserDataCheckout(
-          checkoutValues
-        );
-
-        if (userPostReasonLeavingRes.data.code === 415) {
-          if (officeUser !== undefined) {
-            const ActionValues = {
-              action_id: userPostReasonLeavingRes.data.id,
-              action_code: 0,
-              user_id: localStorage.getItem("id"),
-              toPerson: officeUser,
-              type: 10,
-            };
-            const actionRes = await postAction(ActionValues);
-
-            if (actionRes.data.code === 415) {
-              dispatch(addMeliCode(""));
-              dispatch(addPersonalCode(""));
-              dispatch(addDescreption(""));
-              dispatch(setReasonLeavingHandler(""));
-              dispatch(addUserName(""));
-              setTime(null);
-              setFormErrors("");
-              setCompanyName("");
-              setDepartment("");
-              toast("درخواست با موفقیت ثبت شد!");
-            }
-          } else {
-            toast(". مدیر کاربرمورد نظر یافت نشد");
-          }
-        }
-      } catch (ex) {
-        console.log(ex);
-      }
-    } else {
-      setFormErrors(
-        validationForm({
-          personalCode: personalCode,
-          meliCode: meliCode,
+          melliCode: melliCode,
           userName: userName.value,
           reasonLeavingWork: reasonLeavingWork.value,
           time: time,
@@ -256,23 +205,31 @@ const CheckoutOfficial = () => {
 
   useEffect(() => {
     dispatch(fetchAsyncMeliCode());
-
     dispatch(fetchHandleGetReasonLeavingWork());
   }, [dispatch]);
 
   useEffect(() => {
-    // reasonLeavingInputRef.current.focus();
-    if (userData.first_name !== undefined) {
-      handleGetAllUsers();
+    function paterNhandler() {
+      if (userData.first_name !== undefined) {
+        handleGetAllUsers();
+      }
+      if (Object.keys(formErrors).length === 0 && isSubmit) {
+        return personalCode, melliCode, userName;
+      }
     }
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-      return personalCode, meliCode, userName;
-    }
+    paterNhandler();
   }, [formErrors, userData, dispatch]);
 
-  const meliCodeHandler = (e) => {
-    dispatch(addMeliCode(e.target.value));
-    if (e.target.value !== "") {
+  const meliCodeHandler = (event) => {
+    dispatch(addMeliCode(event.target.value));
+    console.log(meliCodeInputRef.current.state.numAsString.length >= 9);
+    if (meliCodeInputRef.current.state.numAsString.length >= 9) {
+      handleGetUser(userName, event.target.value, personalCode);
+    }
+    if (
+      event.target.value !== "" &&
+      handleGetUser(userName, event.target.value, personalCode).length === 0
+    ) {
       dispatch(addPersonalCode(""));
       dispatch(addUserName(""));
     }
@@ -280,29 +237,150 @@ const CheckoutOfficial = () => {
 
   const personalCodeHandler = (e) => {
     dispatch(addPersonalCode(e.target.value));
-    if (e.target.value !== "") {
-      // dispatch(clearCode());
+
+    if (personalCodeInputRef.current.state.numAsString.length >= 6) {
+      handleGetUser(userName, melliCode, e.target.value);
+    }
+    if (
+      e.target.value !== "" &&
+      handleGetUser(userName, melliCode, e.target.value).length === 0
+    ) {
       dispatch(addMeliCode(""));
       dispatch(addUserName(""));
     }
   };
 
   const userNameHandler = (e) => {
+    handleGetUser(e, melliCode, personalCode);
     dispatch(addUserName(e));
     dispatch(addMeliCode(""));
     dispatch(addPersonalCode(""));
   };
 
-  const cancelHandler = () => {
+  const cancelHandler = (e) => {
+    e.preventDefault();
     dispatch(addMeliCode(""));
     dispatch(addPersonalCode(""));
     dispatch(addDescreption(""));
     dispatch(setReasonLeavingHandler(""));
     dispatch(addUserName(""));
     setTime(null);
+    setShowBtn(false);
     setFormErrors("");
     setCompanyName("");
     setDepartment("");
+  };
+
+  const applyHandler = async (e) => {
+    e.preventDefault();
+    setIsSubmit(true);
+    if (userName && personalCode && melliCode && time && reasonLeaving) {
+      try {
+        const checkoutValues = {
+          leaver: userName.value,
+          description: description,
+          leavingWorkCause: reasonLeaving.value,
+          leavingWorkDate: time,
+        };
+        const userPostReasonLeavingRes = await postUserDataCheckout(
+          checkoutValues
+        );
+
+        if (userPostReasonLeavingRes.data.code === 415) {
+          if (officeUser !== undefined) {
+            const ActionValues = {
+              action_id: userPostReasonLeavingRes.data.id,
+              action_code: 0,
+              user_id: localStorage.getItem("id"),
+              toPerson: officeUser,
+              type: 10,
+            };
+
+            const actionRes = await postAction(ActionValues);
+
+            if (actionRes.data.code === 415) {
+              setShowBtn(true);
+              toast("درخواست با موفقیت ثبت شد!");
+            }
+          } else {
+            toast(". مدیر کاربرمورد نظر یافت نشد");
+          }
+        }
+      } catch (ex) {
+        console.log(ex);
+      }
+    } else {
+      setFormErrors(
+        validationForm({
+          personalCode: personalCode,
+          melliCode: melliCode,
+          userName: userName.value,
+          reasonLeavingWork: reasonLeavingWork.value,
+          time: time,
+        })
+      );
+      toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
+    }
+  };
+
+  const postBtnHandler = async (e) => {
+    e.preventDefault();
+    setIsSubmit(true);
+    if (userName && personalCode && melliCode && time && reasonLeaving) {
+      try {
+        const checkoutValues = {
+          leaver: userName.value,
+          description: description,
+          leavingWorkCause: reasonLeaving.value,
+          leavingWorkDate: time,
+        };
+        const userPostReasonLeavingRes = await postUserDataCheckout(
+          checkoutValues
+        );
+
+        if (userPostReasonLeavingRes.data.code === 415) {
+          if (officeUser !== undefined) {
+            const ActionValues = {
+              action_id: userPostReasonLeavingRes.data.id,
+              action_code: 0,
+              user_id: localStorage.getItem("id"),
+              toPerson: officeUser,
+              type: 10,
+            };
+            const actionRes = await postAction(ActionValues);
+
+            if (actionRes.data.code === 415) {
+              dispatch(addMeliCode(""));
+              dispatch(addPersonalCode(""));
+              dispatch(addDescreption(""));
+              dispatch(setReasonLeavingHandler(""));
+              dispatch(addUserName(""));
+              setTime(null);
+              setFormErrors("");
+              setCompanyName("");
+              setDepartment("");
+              setShowBtn(false);
+              toast.success("درخواست با موفقیت ثبت و ارسال شد!");
+            }
+          } else {
+            toast(". مدیر کاربرمورد نظر یافت نشد");
+          }
+        }
+      } catch (ex) {
+        console.log(ex);
+      }
+    } else {
+      setFormErrors(
+        validationForm({
+          personalCode: personalCode,
+          melliCode: melliCode,
+          userName: userName.value,
+          reasonLeavingWork: reasonLeavingWork.value,
+          time: time,
+        })
+      );
+      toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
+    }
   };
 
   // const handleEnter = (e) => {
@@ -362,27 +440,27 @@ const CheckoutOfficial = () => {
               value={userName}
               options={users}
               placeholder="جستجو . . ."
-              onBlur={() => handleGetUser()}
+              // onBlur={() => handleGetUser()}
               onChange={userNameHandler}
             />
             <p className="font12 text-danger mb-0"> {formErrors.userName} </p>
           </Col>
-          <Col md="12" lg="6" xl="3">
+          <Col md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label"> کد ملی: </label>
             <NumberFormat
               id="item2"
               // onKeyDown={handleEnter}
               ref={meliCodeInputRef}
               className="form-control mb-4 mb-md-4"
-              value={meliCode}
+              value={melliCode}
               onChange={meliCodeHandler}
-              onBlur={() => handleGetUser()}
+              // onBlur={() => handleGetUser()}
               name="meliCode"
               format="##########"
             />
-            <p className="font12 text-danger mb-0"> {formErrors.meliCode} </p>
+            <p className="font12 text-danger mb-0"> {formErrors.melliCode} </p>
           </Col>
-          <Col md="12" lg="6" xl="3">
+          <Col md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label">
               کد پرسنلی:{" "}
             </label>
@@ -394,10 +472,18 @@ const CheckoutOfficial = () => {
               name="personalCode"
               value={personalCode}
               onChange={personalCodeHandler}
-              onBlur={() => handleGetUser()}
+              // onBlur={() => handleGetUser()}
               format="#######"
             />
             <p className="font12 text-danger mb-0">{formErrors.personalCode}</p>
+          </Col>
+          <Col md="12" lg="6" xl="2">
+            <label className="mb-1">نام سرپرست : </label>
+            <Form.Control
+              disabled
+              // value={companyName}
+            />
+            <p className="font12 text-danger mb-4 mb-md-4"></p>
           </Col>
           <SearchBtn
             id="item4"
@@ -468,21 +554,23 @@ const CheckoutOfficial = () => {
               ایجاد مورد جدید
             </button>
             <button
-              onClick={applyHandler}
-              className="ms-2 btn btn-success my-5"
+              onClick={handlePostReasonLeaving}
+              disabled={showBtn ? true : false}
+              className="ms-4 btn btn-success my-5"
             >
               ثبت
             </button>
-            <button
-              onClick={handlePostReasonLeaving}
-              className="ms-4 btn btn-success my-5"
-            >
-              ثبت و ایجاد مورد جدید
-            </button>
           </div>
-          <button className="ms-2 btn btn-primary my-5">ارسال</button>
+          <button
+            onClick={postBtnHandler}
+            disabled={showBtn ? false : true}
+            className="ms-2 btn btn-primary my-5"
+          >
+            ارسال
+          </button>
         </div>
       </Form>
+      <ApplyModal />
     </div>
   );
 };

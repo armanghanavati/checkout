@@ -1,10 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
+import { postAction } from "../../common/services";
 import {
+  checkDate,
+  findToPerson,
   getAllCompany,
   getAllDepartment,
   getAllStatuses,
+  getCurrentReqHistory,
   getCurrentReqInfo,
   getUserListTable,
+  postAcceptBtn,
+  postCheckDate,
 } from "../../common/tableListServices";
 
 const initialState = {
@@ -22,14 +29,24 @@ const initialState = {
   editCheckoutModal: false,
   viewCheckoutModal: false,
   cancelCheckoutModal: false,
+  infoCheckoutModal: false,
   allStatus: [],
   allCompany: [],
   company: "",
+  location: "",
   department: "",
   allDepartment: [],
-  detailes: {},
+  detailes: "",
+  // postAcceptHandler: [],
   currentReqCompany: "",
   currentReqDep: "",
+  currentReqCompanyCancel: "",
+  currentReqDepCancel: "",
+  currentReqCompanyView: "",
+  currentReqDepView: "",
+  currentReqCompanyEdit: "",
+  currentReqDepEdit: "",
+  complateDescription: "",
 };
 
 export const fetchAllCompany = createAsyncThunk(
@@ -106,13 +123,149 @@ export const fetchAllDepartment = createAsyncThunk(
 
 export const fetchCurrentReqInfo = createAsyncThunk(
   "tableCheckoutList/fetchCurrentReqInfo",
-  async ({ reqId, reqType, company, department }, { dispatch, getState }) => {
-    // console.log({ reqId, reqType, company, department });
-    dispatch(setCurrentReqCompany(company));
-    dispatch(setCurrentReqDep(department));
+  async (
+    { reqId, reqType, objCompany, objDepartment },
+    { dispatch, getState }
+  ) => {
+    dispatch(setCurrentReqCompany(objCompany));
+    dispatch(setCurrentReqDep(objDepartment));
     const detailsRes = await getCurrentReqInfo(reqId, reqType);
     console.log(detailsRes.data);
     return detailsRes.data;
+  }
+);
+
+///////////////////// Accept Btn /////////////////
+export const postHandlerBtnAccept = createAsyncThunk(
+  "tableCheckoutList/postHandlerBtnAccept",
+  async (obj, { dispatch, getState }) => {
+    const { user } = getState().checkout;
+    const { detailes, complateDescription } = getState().tableCheckoutList;
+    const getLastActionId = detailes.process[detailes.process.length - 1]._id;
+    const getReqId = detailes.reqInfo._id;
+    const type = "10";
+
+    try {
+      const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+      if (postCheckDateRes.data.type === "accepted") {
+        const valuesAcceptBtn = {
+          location: user.location,
+          company: user.company.CompanyCode,
+          role: [49, 50, 51, 52, 53],
+          existRole: true,
+        };
+        const postHandlerRes = await findToPerson(valuesAcceptBtn);
+        if (postHandlerRes.data.length !== 0) {
+          let getId = [];
+          postHandlerRes.data.map((item) => {
+            return getId.push(item._id);
+          });
+          const actionValue = {
+            action_id: detailes.reqInfo._id,
+            action_code: "",
+            user_id: localStorage.getItem("id"),
+            toPersons: getId,
+            type: 10,
+            comment: complateDescription,
+          };
+          console.log(actionValue);
+          const postActionRes = await postAction(actionValue);
+          console.log(postActionRes.data);
+          if (postActionRes.data.type === 415) {
+          } else {
+            toast.error("دریافت کننده یافت مورد نظر یافت نشد!");
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+////////////// --> Cancel Btn
+export const postBtnCancel = createAsyncThunk(
+  "tableCheckoutList/postBtnCancel",
+  async (obj, { getState }) => {
+    const { user } = getState().checkout;
+    const { detailes, complateDescription } = getState().tableCheckoutList;
+    const getLastActionId = detailes.process[detailes.process.length - 1]._id;
+    const getReqId = detailes.reqInfo._id;
+    const type = "10";
+    const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+    console.log(user);
+    if (postCheckDateRes.data.type === "accepted") {
+      const actionValue = {
+        action_id: detailes.reqInfo._id,
+        action_code: 2,
+        user_id: localStorage.getItem("id"),
+        toPerson: user._id,
+        type: 10,
+        comment: complateDescription,
+      };
+
+      console.log(actionValue);
+      const postActionRes = await postAction(actionValue);
+      toast.success("درخاست شما با موفقیت کنسل شد.");
+      return postActionRes;
+    }
+  }
+);
+
+/////////////// -->  Edit Button <-- //
+
+export const postEditBtn = createAsyncThunk(
+  "tableCheckoutList/postEditBtn",
+  async (obj, { dispatch, getState }) => {
+    const { user } = getState().checkout;
+    const { detailes, complateDescription } = getState().tableCheckoutList;
+    const getLastActionId = detailes.process[detailes.process.length - 1]._id;
+    const getReqId = detailes.reqInfo._id;
+    const type = "10";
+    const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+    console.log(postCheckDateRes);
+    if (postCheckDateRes.data.type === "accepted") {
+      toast.success("درخاست شما با موفقیت ثبت شد.");
+    }
+  }
+);
+
+//  --> View Btn //
+export const postViewBtn = createAsyncThunk(
+  "tableCheckoutList/postEditBtn",
+  async (obj, { dispatch, getState }) => {
+    const { detailes, complateDescription } = getState().tableCheckoutList;
+    const getLastActionId = detailes.process[detailes.process.length - 1]._id;
+    const getReqId = detailes.reqInfo._id;
+    const type = "10";
+    const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+    console.log(postCheckDateRes);
+    if (postCheckDateRes.data.type === "accepted") {
+      const actionValue = {
+        action_id: detailes.reqInfo._id,
+        action_code: 8,
+        user_id: localStorage.getItem("id"),
+        type: 10,
+        comment: complateDescription,
+      };
+      console.log(actionValue);
+      const postActionRes = await postAction(actionValue);
+      toast.success("نظر شما با موفقیت ثبت شد.");
+      return postActionRes;
+    }
+  }
+);
+//   -->  History Btn //
+export const postHistoryBtn = createAsyncThunk(
+  "tableCheckoutList/postHistoryBtn",
+  async (obj, { dispatch, getState }) => {
+    const { detailes } = getState().tableCheckoutList;
+    const getSeries = detailes.reqInfo._id;
+    console.log(getSeries);
+    const historeRes = await getCurrentReqHistory(getSeries);
+    console.log(historeRes);
+
+    // { id: "", type: "" }
   }
 );
 
@@ -138,6 +291,10 @@ const CheckoutList = createSlice({
     setAcceptCheckoutModal: (state, { payload }) => {
       return { ...state, acceptCheckoutModal: payload };
     },
+    setInfoCheckoutModal: (state, { payload }) => {
+      return { ...state, infoCheckoutModal: payload };
+    },
+
     addMemberId: (state, { payload }) => {
       console.log({ ...state, memberId: payload });
       return { ...state, memberId: payload };
@@ -163,6 +320,12 @@ const CheckoutList = createSlice({
     setCurrentReqDep: (state, { payload }) => {
       return { ...state, currentReqDep: payload };
     },
+    addLocation: (state, { payload }) => {
+      return { ...state, location: payload };
+    },
+    addComplateDescription: (state, { payload }) => {
+      return { ...state, complateDescription: payload };
+    },
   },
   extraReducers: {
     [handleGetUsersTable.fulfilled]: (state, { payload }) => {
@@ -186,6 +349,9 @@ const CheckoutList = createSlice({
     [fetchCurrentReqInfo.fulfilled]: (state, { payload }) => {
       return { ...state, detailes: payload };
     },
+    [postHandlerBtnAccept.fulfilled]: (state, { payload }) => {
+      return { ...state, postAcceptHandler: payload };
+    },
   },
 });
 
@@ -205,6 +371,9 @@ export const {
   addCompany,
   setCurrentReqCompany,
   setCurrentReqDep,
+  addComplateDescription,
+  addLocation,
+  setInfoCheckoutModal,
 } = CheckoutList.actions;
 
 export const selectUserTableList = (state) =>
@@ -224,10 +393,12 @@ export const selectAllCompany = (state) => state.tableCheckoutList.allCompany;
 export const selectAllDeps = (state) => state.tableCheckoutList.allDepartment;
 export const selectDep = (state) => state.tableCheckoutList.department;
 export const selectDetailes = (state) => state.tableCheckoutList.detailes;
+
 export const selectCurrentComp = (state) =>
   state.tableCheckoutList.currentReqCompany;
 export const selectCurrentDep = (state) =>
   state.tableCheckoutList.currentReqDep;
+
 export const selectAcceptCheckoutModal = (state) =>
   state.tableCheckoutList.acceptCheckoutModal;
 export const selectEditCheckoutModal = (state) =>
@@ -236,4 +407,10 @@ export const selectCancelCheckoutModal = (state) =>
   state.tableCheckoutList.cancelCheckoutModal;
 export const selectViewCheckoutModal = (state) =>
   state.tableCheckoutList.viewCheckoutModal;
+export const selectInfoCheckoutModal = (state) =>
+  state.tableCheckoutList.infoCheckoutModal;
+
+export const selectComplateDescription = (state) =>
+  state.tableCheckoutList.complateDescription;
+
 export default CheckoutList.reducer;

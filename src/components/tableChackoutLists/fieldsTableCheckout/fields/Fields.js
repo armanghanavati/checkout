@@ -50,8 +50,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   //     label: dep.DeptName,
   //   });
   // });
-  console.log(allDeps);
-  
+
   const fildsSection = () => {
     if (name === "applicant") {
       return (

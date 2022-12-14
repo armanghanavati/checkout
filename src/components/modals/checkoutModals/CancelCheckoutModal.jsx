@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  addComplateDescription,
+  postBtnCancel,
   selectCancelCheckoutModal,
+  selectComplateDescription,
   selectCurrentComp,
   selectCurrentDep,
   selectDetailes,
@@ -16,6 +19,14 @@ const CancelCheckoutModal = () => {
   const cancelCheckoutModal = useSelector(selectCancelCheckoutModal);
   const currentReqDepartment = useSelector(selectCurrentDep);
   const details = useSelector(selectDetailes);
+  const complateDescription = useSelector(selectComplateDescription);
+
+  const cancelHandler = () => {
+    console.log("click");
+    dispatch(postBtnCancel());
+    dispatch(setCancelCheckoutModal(false));
+  };
+
   return (
     <Modal
       show={cancelCheckoutModal}
@@ -99,12 +110,18 @@ const CancelCheckoutModal = () => {
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
-              placeholder="توضیحات ابطال کننده درخواست"
+              placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
+              value={complateDescription}
+              onChange={(e) => dispatch(addComplateDescription(e.target.value))}
             />
           </Col>
-          <Button className="ms-2 col-5" variant="danger">
+          <Button
+            onClick={cancelHandler}
+            className="ms-2 col-5"
+            variant="danger"
+          >
             ابطال درخواست
           </Button>
         </div>

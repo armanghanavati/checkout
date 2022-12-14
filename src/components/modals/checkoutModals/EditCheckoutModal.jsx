@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  postEditBtn,
   selectCurrentComp,
   selectCurrentDep,
   selectDetailes,
@@ -14,28 +15,40 @@ import DatePicker from "react-datepicker2";
 const EditCheckoutModal = () => {
   const dispatch = useDispatch();
   const currentReqCo = useSelector(selectCurrentComp);
-  const editCheckoutModal = useSelector(selectEditCheckoutModal);
   const currentReqDepartment = useSelector(selectCurrentDep);
+  const editCheckoutModal = useSelector(selectEditCheckoutModal);
   const details = useSelector(selectDetailes);
+
+  console.log(details);
+
   const reasonChanger = details.leavingWorkCause;
+
+  console.log(details);
   const desChanger = details.description;
   const [reasonLeavingTitle, setReasonLeavingTitle] = useState(reasonChanger);
+  console.log(reasonLeavingTitle);
   const [dateTitle, setDateTitle] = useState(null);
   const [descriptionTitle, setDescriptionTitle] = useState(desChanger);
+
   useEffect(() => {
-    if (details.leavingWorkDate !== undefined) {
-      setDateTitle(moment(details.leavingWorkDate, "YYYY/MM/DD"));
+    function onChangeHandlerInputs() {
+      if (details.leavingWorkDate !== undefined) {
+        setDateTitle(moment(details.leavingWorkDate, "YYYY/MM/DD"));
+      }
+      if (details.leavingWorkCause !== undefined) {
+        setReasonLeavingTitle(details.leavingWorkCause);
+      }
+      if (details.description !== undefined) {
+        setDescriptionTitle(details.description);
+      }
     }
-    if (details.leavingWorkCause !== undefined) {
-      setReasonLeavingTitle(details.leavingWorkCause);
-    }
-    if (details.description !== undefined) {
-      setDescriptionTitle(details.description);
-    }
+    onChangeHandlerInputs();
   }, [details]);
 
   const editHandler = () => {
-    alert("Accepted");
+    console.log("accepted");
+    dispatch(postEditBtn());
+    dispatch(setEditCheckoutModal(false));
   };
 
   return (
@@ -105,7 +118,7 @@ const EditCheckoutModal = () => {
               onChange={(e) => setReasonLeavingTitle(e.target.value)}
             />
           </p>
-          <p className=" mb-3">
+          <div className=" mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>
             <DatePicker
               id="item6"
@@ -118,7 +131,7 @@ const EditCheckoutModal = () => {
               inputFormat="YYYY-MM-DD"
               inputJalaaliFormat="jYYYY-jM-jD"
             />
-          </p>
+          </div>
           <p className="font-weight-bold mb-3">
             <span className="fw-bold">توضیحات: </span>
             <textarea

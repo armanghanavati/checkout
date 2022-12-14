@@ -17,6 +17,7 @@ const TableCheckOutItems = ({
   loading,
   pageCount: controlledPageCount,
 }) => {
+  
   const {
     getTableProps,
     getTableBodyProps,

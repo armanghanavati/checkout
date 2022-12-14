@@ -16,6 +16,7 @@ const initialState = {
   descreption: "",
   allUserNames: [],
   isSubmit: false,
+  applyModal: false,
 };
 
 export const fetchAsyncMeliCode = createAsyncThunk(
@@ -23,7 +24,7 @@ export const fetchAsyncMeliCode = createAsyncThunk(
   async () => {
     const resUserInfo = await userInfo();
     localStorage.setItem("id", resUserInfo.data._id);
-    console.log(resUserInfo.data)
+    console.log(resUserInfo.data);
     return resUserInfo.data;
   }
 );
@@ -87,6 +88,9 @@ const CheckoutOfficialSlice = createSlice({
     addDescreption: (state, { payload }) => {
       return { ...state, descreption: payload };
     },
+    addApllyModal: (state, { payload }) => {
+      return { ...state, applyModal: payload };
+    },
     // clearCode: (state) => {
     //   state.meliCode = state.meliCode;
     // },
@@ -118,11 +122,13 @@ export const {
   addUserName,
   addDescreption,
   setReasonLeavingHandler,
+  addApllyModal,
 } = CheckoutOfficialSlice.actions;
 export const selectUserName = (state) => state.checkout.userName;
 export const selectSubmit = (state) => state.checkout.isSubmit;
 export const loginInfo = (state) => state.checkout.user;
 export const selectAllUserNames = (state) => state.checkout.allUserNames;
+export const selectApplyModal = (state) => state.checkout.applyModal;
 
 export const selectPersonalCode = (state) => state.checkout.personalCode;
 

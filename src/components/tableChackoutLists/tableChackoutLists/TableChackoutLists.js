@@ -7,6 +7,7 @@ import {
   faPenToSquare,
   faCheck,
   faBan,
+  faRotateLeft,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,16 +15,20 @@ import {
   addMemberId,
   addStatus,
   fetchCurrentReqInfo,
+  postHandler,
+  postHandlerBtnAccept,
   selectAcceptCheckoutModal,
   selectCancelCheckoutModal,
   selectDetailes,
   selectEditCheckoutModal,
+  selectInfoCheckoutModal,
   selectUserMembers,
   selectUserTableList,
   selectViewCheckoutModal,
   setAcceptCheckoutModal,
   setCancelCheckoutModal,
   setEditCheckoutModal,
+  setInfoCheckoutModal,
   setViewCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import moment from "moment-jalaali";
@@ -33,6 +38,7 @@ import CancelCheckoutModal from "../../modals/checkoutModals/CancelCheckoutModal
 import EditCheckoutModal from "../../modals/checkoutModals/EditCheckoutModal";
 import { handleGetUsersTable } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import FieldsTableCheckout from "../fieldsTableCheckout/FieldsTableCheckout";
+import HistoryCheckoutModal from "../../modals/checkoutModals/HistoryCheckoutModal";
 
 const CheckoutList = ({ isSubmit }) => {
   const dispatch = useDispatch();
@@ -49,6 +55,8 @@ const CheckoutList = ({ isSubmit }) => {
   const cancelModal = useSelector(selectCancelCheckoutModal);
   const editModal = useSelector(selectEditCheckoutModal);
   const details = useSelector(selectDetailes);
+  const infoModal = useSelector(selectInfoCheckoutModal);
+
   const columns = useMemo(() => [
     {
       Header: " سریال درخواست",
@@ -99,12 +107,13 @@ const CheckoutList = ({ isSubmit }) => {
             className="d-flex align-items-center btn-sm"
             variant="success"
             onClick={() => {
+              console.log(request);
               dispatch(
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
-                  company: request.company,
-                  department: request.department.name,
+                  objCompany: request.company,
+                  objDepartment: request.department.name,
                 })
               );
               dispatch(setAcceptCheckoutModal(true));
@@ -120,8 +129,8 @@ const CheckoutList = ({ isSubmit }) => {
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
-                  company: request.company,
-                  department: request.department.name,
+                  objCompany: request.company,
+                  objDepartment: request.department.name,
                 })
               );
               dispatch(setEditCheckoutModal(true));
@@ -137,8 +146,8 @@ const CheckoutList = ({ isSubmit }) => {
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
-                  company: request.company,
-                  department: request.department.name,
+                  objCompany: request.company,
+                  objDepartment: request.department.name,
                 })
               );
               dispatch(setCancelCheckoutModal(true));
@@ -154,14 +163,31 @@ const CheckoutList = ({ isSubmit }) => {
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
-                  company: request.company,
-                  department: request.department.name,
+                  objCompany: request.company,
+                  objDepartment: request.department.name,
                 })
               );
               dispatch(setViewCheckoutModal(true));
             }}
           >
             <FontAwesomeIcon icon={faEye} />
+          </Button>
+          <Button
+            className="d-flex align-items-center text-dark btn-sm"
+            variant="info"
+            onClick={() => {
+              // dispatch();
+
+              // fetchCurrentReqInfo({
+              //   reqId: request._id,
+              //   reqType: request.type,
+              //   objCompany: request.company,
+              //   objDepartment: request.department.name,
+              // })
+              dispatch(setInfoCheckoutModal(true));
+            }}
+          >
+            <FontAwesomeIcon icon={faRotateLeft} />
           </Button>
         </div>
       </Fragment>
@@ -251,7 +277,7 @@ const CheckoutList = ({ isSubmit }) => {
             data-prefix="fas"
             className="ml-2"
             icon={faArrowsRotate}
-          />
+          />{" "}
           به روز رسانی جدول
         </span>
       </Button>
@@ -269,6 +295,7 @@ const CheckoutList = ({ isSubmit }) => {
         {editModal && <EditCheckoutModal />}
         {cancelModal && <CancelCheckoutModal />}
         {viewModal && <ViewCheckoutModal />}
+        {infoModal && <HistoryCheckoutModal />}
       </section>
     </div>
   );

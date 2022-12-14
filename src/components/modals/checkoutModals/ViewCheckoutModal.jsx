@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  addComplateDescription,
+  postViewBtn,
+  selectComplateDescription,
   selectCurrentComp,
   selectCurrentDep,
   selectDetailes,
@@ -16,6 +19,12 @@ const ViewCheckoutModal = () => {
   const currentReqCo = useSelector(selectCurrentComp);
   const currentReqDepartment = useSelector(selectCurrentDep);
   const details = useSelector(selectDetailes);
+  const complateDescription = useSelector(selectComplateDescription);
+
+  const clickViewHandler = () => {
+    dispatch(postViewBtn());
+    dispatch(setViewCheckoutModal(false));
+  };
 
   return (
     <Modal
@@ -100,12 +109,19 @@ const ViewCheckoutModal = () => {
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
-              // placeholder="توضیحات تکمیل کننده درخواست"
+              placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
+              value={complateDescription}
+              onChange={(e) => dispatch(addComplateDescription(e.target.value))}
             />
           </Col>
-          <Button className="ms-2 col-5" variant="warning">
+
+          <Button
+            onClick={clickViewHandler}
+            className="ms-2 col-5"
+            variant="warning"
+          >
             ارسال نظر
           </Button>
         </div>
