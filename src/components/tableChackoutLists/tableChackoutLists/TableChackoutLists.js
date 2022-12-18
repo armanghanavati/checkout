@@ -1,28 +1,31 @@
 import React, { Fragment, useCallback, useMemo, useState, useRef } from "react";
 import TableCheckOutItems from "./TableCheckOutItems";
-import { Button, Container } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowsRotate,
   faPenToSquare,
   faCheck,
   faBan,
-  faRotateLeft,
   faEye,
+  faClockRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addMemberId,
+  addCompany,
+  addDep,
+  addFromDate,
+  addLeavingWorkCause,
   addStatus,
+  addToDate,
+  addUserMemb,
   fetchCurrentReqInfo,
-  postHandler,
-  postHandlerBtnAccept,
+  handleGetUsersTable,
+  postHistoryBtn,
   selectAcceptCheckoutModal,
   selectCancelCheckoutModal,
-  selectDetailes,
   selectEditCheckoutModal,
   selectInfoCheckoutModal,
-  selectUserMembers,
   selectUserTableList,
   selectViewCheckoutModal,
   setAcceptCheckoutModal,
@@ -36,16 +39,13 @@ import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
 import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
 import CancelCheckoutModal from "../../modals/checkoutModals/CancelCheckoutModal";
 import EditCheckoutModal from "../../modals/checkoutModals/EditCheckoutModal";
-import { handleGetUsersTable } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import FieldsTableCheckout from "../fieldsTableCheckout/FieldsTableCheckout";
 import HistoryCheckoutModal from "../../modals/checkoutModals/HistoryCheckoutModal";
 
 const CheckoutList = ({ isSubmit }) => {
   const dispatch = useDispatch();
-  const [time, setTiem] = useState(null);
   const [data, setData] = useState([]);
   const [load, setload] = useState(false);
-  const [showModel, setShowModel] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const fetchIdRef = useRef(0);
   const sortIdRef = useRef(0);
@@ -54,8 +54,9 @@ const CheckoutList = ({ isSubmit }) => {
   const viewModal = useSelector(selectViewCheckoutModal);
   const cancelModal = useSelector(selectCancelCheckoutModal);
   const editModal = useSelector(selectEditCheckoutModal);
-  const details = useSelector(selectDetailes);
   const infoModal = useSelector(selectInfoCheckoutModal);
+
+  console.log(userCheckoutList);
 
   const columns = useMemo(() => [
     {
@@ -99,6 +100,18 @@ const CheckoutList = ({ isSubmit }) => {
       sortType: "basic",
     },
   ]);
+
+  const reasetTableHandler = () => {
+    dispatch(addLeavingWorkCause(""));
+    dispatch(addUserMemb(""));
+    dispatch(addStatus(""));
+    dispatch(addToDate(null));
+    dispatch(addFromDate(null));
+    dispatch(addDep(""));
+    dispatch(addCompany(""));
+    dispatch(handleGetUsersTable());
+  };
+
   const buttons = (request) => {
     return (
       <Fragment>
@@ -176,21 +189,44 @@ const CheckoutList = ({ isSubmit }) => {
             className="d-flex align-items-center text-dark btn-sm"
             variant="info"
             onClick={() => {
-              // dispatch();
-
-              // fetchCurrentReqInfo({
-              //   reqId: request._id,
-              //   reqType: request.type,
-              //   objCompany: request.company,
-              //   objDepartment: request.department.name,
-              // })
+              dispatch(
+                fetchCurrentReqInfo({
+                  reqId: request._id,
+                  reqType: request.type,
+                  objCompany: request.company,
+                  objDepartment: request.department.name,
+                })
+              );
+              dispatch(
+                postHistoryBtn(request.reqInfo.serial_number)
+              );
               dispatch(setInfoCheckoutModal(true));
             }}
           >
-            <FontAwesomeIcon icon={faRotateLeft} />
+            <FontAwesomeIcon icon={faClockRotateLeft} />
           </Button>
         </div>
       </Fragment>
+    );
+  };
+
+  const linkBtn = (request) => {
+    return (
+      <a
+        onClick={() => {
+          dispatch(
+            fetchCurrentReqInfo({
+              reqId: request._id,
+              reqType: request.type,
+              objCompany: request.company,
+              objDepartment: request.department.name,
+            })
+          );
+          dispatch(setViewCheckoutModal(true));
+        }}
+      >
+        {request.reqInfo.serial_number}
+      </a>
     );
   };
 
@@ -199,7 +235,7 @@ const CheckoutList = ({ isSubmit }) => {
     if (requests.length !== 0) {
       for (var i = 0; i < requests.length; i++) {
         var tableItem = {
-          col1: requests[i].reqInfo.serial_number,
+          col1: linkBtn(requests[i]),
           col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
             .locale("fa")
             .format("jYYYY/jMM/jDD"),
@@ -214,6 +250,7 @@ const CheckoutList = ({ isSubmit }) => {
       }
     }
     const fetchId = ++fetchIdRef.current;
+
     setload(true);
     if (fetchId === fetchIdRef.current) {
       const startRow = pageSize * pageIndex;
@@ -230,7 +267,7 @@ const CheckoutList = ({ isSubmit }) => {
       if (requests.length !== 0) {
         for (var i = 0; i < requests.length; i++) {
           var tableItem = {
-            col1: requests[i].reqInfo.serial_number,
+            col1: linkBtn(requests[i]),
             col2: moment(requests[i].process[0].date, "YYYY/MM/DD")
               .locale("fa")
               .format("jYYYY/jMM/jDD"),
@@ -268,8 +305,17 @@ const CheckoutList = ({ isSubmit }) => {
 
   return (
     <div className="my-4">
-      <FieldsTableCheckout isSubmit={isSubmit} />
-      <Button className="my-2">
+      <FieldsTableCheckout
+        requests={userCheckoutList}
+        columns={columns}
+        data={data}
+        onSort={handleSort}
+        fetchData={fetchData}
+        loading={load}
+        pageCount={pageCount}
+        isSubmit={isSubmit}
+      />
+      <Button onClick={reasetTableHandler} className="my-2">
         <span>
           <FontAwesomeIcon
             aria-hidden="true"

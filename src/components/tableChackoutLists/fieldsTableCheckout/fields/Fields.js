@@ -25,6 +25,7 @@ import {
   selectCompany,
 } from "../../../checkoutOfficialSlice/TableCheckoutSlice";
 import { selectReasonLeavingData } from "../../../checkoutOfficialSlice/CheckoutOfficialSlice";
+import { usePagination, useSortBy, useTable } from "react-table";
 
 const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   const dispatch = useDispatch();
@@ -51,6 +52,11 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   //   });
   // });
 
+  // const {
+  //   gotoPage,
+  //   state: { pageIndex, pageSize, sortBy },
+  // } = useTable();
+
   const fildsSection = () => {
     if (name === "applicant") {
       return (
@@ -58,6 +64,8 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           value={userMemb}
           onChange={(e) => {
             dispatch(addUserMemb(e));
+            // gotoPage(0);
+
             if (onchecked) {
               dispatch(handleGetUsersTable());
             }

@@ -3,7 +3,15 @@ import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-const SearchBtn = ({ handleGetUser, refrence, handleEnter }) => {
+const SearchBtn = ({
+  handleGetUser,
+  refrence,
+  handleEnter,
+  userName,
+  melliCode,
+  personalCode,
+  supervisor,
+}) => {
   const [showUser, setShowUser] = useState(false);
 
   return (
@@ -11,7 +19,9 @@ const SearchBtn = ({ handleGetUser, refrence, handleEnter }) => {
       <Button
         onKeyUp={handleEnter}
         ref={refrence}
-        onClick={() => handleGetUser()}
+        onClick={() =>
+          handleGetUser(userName, melliCode, personalCode, supervisor)
+        }
       >
         <FontAwesomeIcon icon={faSearch} />
       </Button>

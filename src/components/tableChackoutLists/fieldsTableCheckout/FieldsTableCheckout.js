@@ -5,18 +5,49 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 import "./style.css";
 import {
   handleGetUsersTable,
+  selectCompany,
+  selectDep,
+  selectFromDate,
+  selectLeavingWorkCause,
   selectStatus,
+  selectToDate,
+  addLeavingWorkCause,
+  addUserMemb,
+  addStatus,
+  addToDate,
+  addFromDate,
+  addDep,
+  addCompany,
   selectUserMemb,
+  selectValueStatus,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const FieldsTableCheckout = () => {
+  const dep = useSelector(selectDep);
+  const company = useSelector(selectCompany);
+  const userMemb = useSelector(selectUserMemb);
+  const LeavingWorkCause = useSelector(selectLeavingWorkCause);
+  const fromDateTime = useSelector(selectFromDate);
+  const toDateTime = useSelector(selectToDate);
+  const valueStatus = useSelector(selectValueStatus);
+
   const [isChecked, setIsChecked] = useState(false);
   const dispatch = useDispatch();
 
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(handleGetUsersTable());
+  };
+
+  const cancelFilter = () => {
+    dispatch(addLeavingWorkCause(""));
+    dispatch(addUserMemb(""));
+    dispatch(addStatus(""));
+    dispatch(addToDate(null));
+    dispatch(addFromDate(null));
+    dispatch(addDep(""));
+    dispatch(addCompany(""));
   };
 
   return (
@@ -56,7 +87,11 @@ const FieldsTableCheckout = () => {
               <Button className="text-center" variant="success" type="submit">
                 اعمال فیلتر
               </Button>
-              <Button className="text-center ms-1" variant="secondary">
+              <Button
+                onClick={cancelFilter}
+                className="text-center ms-1"
+                variant="secondary"
+              >
                 لغو فیلتر
               </Button>
             </div>

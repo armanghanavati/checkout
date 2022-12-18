@@ -24,7 +24,11 @@ const ApplyModal = () => {
 
   //     dispatch(setAcceptCheckoutModal(false));
   //     dispatch(addComplateDescription(""));
+  const cancelHandler = () => {
+    dispatch(addApllyModal(false));
+  };
   //   };
+  const acceptHandler = () => {};
 
   return (
     <Modal
@@ -46,13 +50,10 @@ const ApplyModal = () => {
         آیا میخواهید درخواست مورد نظر را برای مدیران ارسال کنید؟
       </Modal.Body>
       <Modal.Footer className="justify-content-center">
-        <Button variant="danger" onClick={() => dispatch(addApllyModal(false))}>
+        <Button name="cancelModal" variant="danger" onClick={cancelHandler}>
           خیر
         </Button>
-        <Button
-          variant="success"
-          onClick={() => dispatch(addApllyModal(false))}
-        >
+        <Button name="acceptModal" variant="success" onClick={acceptHandler}>
           بله
         </Button>
       </Modal.Footer>

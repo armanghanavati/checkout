@@ -12,6 +12,7 @@ import {
   setViewCheckoutModal,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import moment from "moment-jalaali";
+import { toast } from "react-toastify";
 
 const ViewCheckoutModal = () => {
   const dispatch = useDispatch();
@@ -21,10 +22,12 @@ const ViewCheckoutModal = () => {
   const details = useSelector(selectDetailes);
   const complateDescription = useSelector(selectComplateDescription);
 
-  const clickViewHandler = () => {
-    dispatch(postViewBtn());
-    dispatch(setViewCheckoutModal(false));
-  };
+  // const validation = () => {
+  //   let error = "";
+  //   if (!complateDescription) {
+  //     return (error.complateDescription = "لطفا نظر مورد");
+  //   }
+  // };
 
   return (
     <Modal
@@ -109,16 +112,17 @@ const ViewCheckoutModal = () => {
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
-              placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
               value={complateDescription}
               onChange={(e) => dispatch(addComplateDescription(e.target.value))}
             />
           </Col>
-
           <Button
-            onClick={clickViewHandler}
+            onClick={() => {
+              dispatch(postViewBtn());
+              dispatch(setViewCheckoutModal(false));
+            }}
             className="ms-2 col-5"
             variant="warning"
           >

@@ -10,17 +10,11 @@ import {
   selectCurrentDep,
   selectComplateDescription,
   addComplateDescription,
-  postHandler,
-  fetchAllDepartment,
-  fetchCurrentReqInfo,
   postHandlerBtnAccept,
   // postHandler,
 } from "../../checkoutOfficialSlice/TableCheckoutSlice";
 import "./Styles.css";
 import moment from "moment-jalaali";
-import { toast } from "react-toastify";
-import { postAction } from "../../../common/services";
-import { postCheckDate } from "../../../common/tableListServices";
 
 const AcceptCheckoutModal = () => {
   const dispatch = useDispatch();
@@ -30,16 +24,6 @@ const AcceptCheckoutModal = () => {
   const currentReqCo = useSelector(selectCurrentComp);
   const currentReqDepartment = useSelector(selectCurrentDep);
   const complateDescription = useSelector(selectComplateDescription);
-
-  // const test = details.map((id) => {
-  //   return id;
-  // });
-
-  // console.log(details.process.length);
-
-  // useEffect(() => {
-  //   dispatch(postHandler());
-  // }, [dispatch]);
 
   const postUsersHandler = (e) => {
     e.preventDefault();

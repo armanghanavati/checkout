@@ -6,6 +6,7 @@ import CheckoutOfficial from "./pages/checkoutOfficial/CheckoutOfficial";
 import CheckoutList from "./pages/checkoutList/CheckoutList";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import Login from "./Login";
+
 function App() {
   return (
     <Router>

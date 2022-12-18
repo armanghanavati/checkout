@@ -31,8 +31,6 @@ export const postAction = (ActionValues) => {
   return axios.post(`${config.localapi}/action`, ActionValues);
 };
 
-
-
 //ip/settlement/list/{user id}, params: {}
 
 // findInCompany / personelCode / { company } / { location };

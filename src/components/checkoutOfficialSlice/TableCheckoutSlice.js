@@ -10,8 +10,6 @@ import {
   getCurrentReqHistory,
   getCurrentReqInfo,
   getUserListTable,
-  postAcceptBtn,
-  postCheckDate,
 } from "../../common/tableListServices";
 
 const initialState = {
@@ -47,6 +45,9 @@ const initialState = {
   currentReqCompanyEdit: "",
   currentReqDepEdit: "",
   complateDescription: "",
+  series: "",
+  type: "",
+  historyData: [],
 };
 
 export const fetchAllCompany = createAsyncThunk(
@@ -129,6 +130,7 @@ export const fetchCurrentReqInfo = createAsyncThunk(
   ) => {
     dispatch(setCurrentReqCompany(objCompany));
     dispatch(setCurrentReqDep(objDepartment));
+    dispatch(setCurrentReqType(reqType));
     const detailsRes = await getCurrentReqInfo(reqId, reqType);
     console.log(detailsRes.data);
     return detailsRes.data;
@@ -147,6 +149,7 @@ export const postHandlerBtnAccept = createAsyncThunk(
 
     try {
       const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+      console.log(postCheckDateRes);
       if (postCheckDateRes.data.type === "accepted") {
         const valuesAcceptBtn = {
           location: user.location,
@@ -225,7 +228,7 @@ export const postEditBtn = createAsyncThunk(
     const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
     console.log(postCheckDateRes);
     if (postCheckDateRes.data.type === "accepted") {
-      toast.success("درخاست شما با موفقیت ثبت شد.");
+      toast.success("درخواست شما با موفقیت ثبت شد.");
     }
   }
 );
@@ -235,6 +238,7 @@ export const postViewBtn = createAsyncThunk(
   "tableCheckoutList/postEditBtn",
   async (obj, { dispatch, getState }) => {
     const { detailes, complateDescription } = getState().tableCheckoutList;
+    console.log(complateDescription, detailes);
     const getLastActionId = detailes.process[detailes.process.length - 1]._id;
     const getReqId = detailes.reqInfo._id;
     const type = "10";
@@ -250,22 +254,27 @@ export const postViewBtn = createAsyncThunk(
       };
       console.log(actionValue);
       const postActionRes = await postAction(actionValue);
-      toast.success("نظر شما با موفقیت ثبت شد.");
-      return postActionRes;
+      console.log(postActionRes);
+      if (postActionRes.data.code === 415) {
+        dispatch(addComplateDescription(""));
+        toast.success("نظر شما با موفقیت ارسال شد.", {
+          className: "bg-success text-white",
+        });
+      } else {
+        toast.else("خطا! لطفا دوباره امتحان کنید");
+      }
     }
   }
 );
+
 //   -->  History Btn //
 export const postHistoryBtn = createAsyncThunk(
   "tableCheckoutList/postHistoryBtn",
-  async (obj, { dispatch, getState }) => {
-    const { detailes } = getState().tableCheckoutList;
-    const getSeries = detailes.reqInfo._id;
-    console.log(getSeries);
-    const historeRes = await getCurrentReqHistory(getSeries);
-    console.log(historeRes);
-
-    // { id: "", type: "" }
+  async (serial, { dispatch, getState }) => {
+    const { type } = getState().tableCheckoutList;
+    console.log(serial);
+    const historeRes = await getCurrentReqHistory(serial, type);
+    return historeRes.data;
   }
 );
 
@@ -326,6 +335,12 @@ const CheckoutList = createSlice({
     addComplateDescription: (state, { payload }) => {
       return { ...state, complateDescription: payload };
     },
+    addSeries: (state, { payload }) => {
+      return { ...state, series: payload };
+    },
+    setCurrentReqType: (state, { payload }) => {
+      return { ...state, type: payload };
+    },
   },
   extraReducers: {
     [handleGetUsersTable.fulfilled]: (state, { payload }) => {
@@ -352,6 +367,9 @@ const CheckoutList = createSlice({
     [postHandlerBtnAccept.fulfilled]: (state, { payload }) => {
       return { ...state, postAcceptHandler: payload };
     },
+    [postHistoryBtn.fulfilled]: (state, { payload }) => {
+      return { ...state, historyData: payload };
+    },
   },
 });
 
@@ -374,6 +392,8 @@ export const {
   addComplateDescription,
   addLocation,
   setInfoCheckoutModal,
+  addSeries,
+  setCurrentReqType,
 } = CheckoutList.actions;
 
 export const selectUserTableList = (state) =>
@@ -412,5 +432,7 @@ export const selectInfoCheckoutModal = (state) =>
 
 export const selectComplateDescription = (state) =>
   state.tableCheckoutList.complateDescription;
+
+export const selectHistoryData = (state) => state.tableCheckoutList.historyData;
 
 export default CheckoutList.reducer;

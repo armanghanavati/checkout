@@ -31,6 +31,8 @@ export const getCurrentReqInfo = (reqId, type) => {
 
 //check_Date -->
 export const checkDate = (getLastActionId, getReqId) => {
+  console.log(getReqId);
+  console.log(getLastActionId);
   return axios.get(
     `${config.localapi}/action/checkDate/${getReqId}/${getLastActionId}/10`
   );
@@ -49,8 +51,8 @@ export const findToPerson = (actionValues) => {
 // Edition   --> action_code: 10000, toPerson: undefined
 // Reject   --> toPerson: leaver._id, action_code: 2
 
-export const getCurrentReqHistory = (serial) => {
+export const getCurrentReqHistory = (serial, reqType) => {
   return axios.get(`${config.localapi}/action/findComments/${serial}`, {
-    params: { id: "", type: "" },
+    params: { id: localStorage.getItem("id"), type: reqType },
   });
 };

@@ -8,6 +8,7 @@ import {
   faAngleLeft,
   faAngleDoubleLeft,
 } from "@fortawesome/free-solid-svg-icons";
+
 const TableCheckOutItems = ({
   requests,
   columns,
@@ -17,7 +18,6 @@ const TableCheckOutItems = ({
   loading,
   pageCount: controlledPageCount,
 }) => {
-  
   const {
     getTableProps,
     getTableBodyProps,
@@ -45,6 +45,11 @@ const TableCheckOutItems = ({
     useSortBy,
     usePagination
   );
+
+  useEffect(() => {
+    gotoPage(0);
+  }, [requests]);
+
   useEffect(() => {
     fetchData({ pageIndex, pageSize, requests });
     onSort({ sortBy, pageIndex, pageSize, requests });
@@ -126,10 +131,10 @@ const TableCheckOutItems = ({
               />{" "}
             </div>
             <div className="col-12 col-md-2">
-              صفحه{" "}
+              صفحه
               <strong>
                 {pageIndex + 1} از {pageOptions.length}
-              </strong>{" "}
+              </strong>
             </div>
             <div className="col-12 col-md-4">
               <Button
@@ -139,7 +144,7 @@ const TableCheckOutItems = ({
                 disabled={!canPreviousPage}
               >
                 <FontAwesomeIcon icon={faAngleDoubleRight} />
-              </Button>{" "}
+              </Button>
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"
@@ -147,7 +152,7 @@ const TableCheckOutItems = ({
                 disabled={!canPreviousPage}
               >
                 <FontAwesomeIcon icon={faAngleRight} />
-              </Button>{" "}
+              </Button>
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"
@@ -155,7 +160,7 @@ const TableCheckOutItems = ({
                 disabled={!canNextPage}
               >
                 <FontAwesomeIcon icon={faAngleLeft} />
-              </Button>{" "}
+              </Button>
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"
@@ -163,7 +168,7 @@ const TableCheckOutItems = ({
                 disabled={!canNextPage}
               >
                 <FontAwesomeIcon icon={faAngleDoubleLeft} />
-              </Button>{" "}
+              </Button>
             </div>
           </div>
         </Col>
