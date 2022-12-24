@@ -8,9 +8,18 @@ import {
   selectDetailes,
   selectEditCheckoutModal,
   setEditCheckoutModal,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../slices/TableCheckoutSlice";
+
 import moment from "moment-jalaali";
 import DatePicker from "react-datepicker2";
+import Select from "react-select";
+import {
+  selectReasonLeaving,
+  setReasonLeavingHandler,
+  selectReasonLeavingModal,
+  selectReasonLeavingData,
+  addReasonLeavingModal,
+} from "../../slices/CheckoutOfficialSlice";
 
 const EditCheckoutModal = () => {
   const dispatch = useDispatch();
@@ -18,15 +27,11 @@ const EditCheckoutModal = () => {
   const currentReqDepartment = useSelector(selectCurrentDep);
   const editCheckoutModal = useSelector(selectEditCheckoutModal);
   const details = useSelector(selectDetailes);
-
-  console.log(details);
+  const reasonLeavingData = useSelector(selectReasonLeavingData);
 
   const reasonChanger = details.leavingWorkCause;
-
-  console.log(details);
   const desChanger = details.description;
-  const [reasonLeavingTitle, setReasonLeavingTitle] = useState(reasonChanger);
-  console.log(reasonLeavingTitle);
+
   const [dateTitle, setDateTitle] = useState(null);
   const [descriptionTitle, setDescriptionTitle] = useState(desChanger);
 
@@ -36,7 +41,7 @@ const EditCheckoutModal = () => {
         setDateTitle(moment(details.leavingWorkDate, "YYYY/MM/DD"));
       }
       if (details.leavingWorkCause !== undefined) {
-        setReasonLeavingTitle(details.leavingWorkCause);
+        addReasonLeavingModal(details.leavingWorkCause);
       }
       if (details.description !== undefined) {
         setDescriptionTitle(details.description);
@@ -53,6 +58,7 @@ const EditCheckoutModal = () => {
 
   return (
     <Modal
+      centered
       show={editCheckoutModal}
       onHide={() => dispatch(setEditCheckoutModal(false))}
       backdrop="static"
@@ -110,14 +116,14 @@ const EditCheckoutModal = () => {
               <span>{currentReqDepartment}</span>
             </p>
           </Col>
-          <p className=" mb-3">
-            <span className="fw-bold">علت ترک خدمت: </span>
-            <input
-              className="form-control"
-              value={reasonLeavingTitle}
-              onChange={(e) => setReasonLeavingTitle(e.target.value)}
-            />
-          </p>
+          <span className=" fw-bold">علت ترک خدمت: </span>
+          <Select
+            className="mb-3"
+            placeholder="جستجو . . ."
+            options={reasonLeavingData}
+            defaultValue={reasonChanger}
+            onChange={(e) => dispatch(addReasonLeavingModal(e))}
+          />
           <div className=" mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>
             <DatePicker

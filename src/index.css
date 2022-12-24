@@ -7,6 +7,8 @@ body *{
     font-size: 14px !important;
 }
 
+
+
 .font12{
     font-size: 12px !important;
 }
@@ -20,4 +22,64 @@ body *{
 
 .tether-element{
     z-index: 10000;
+}
+
+.font95{
+    font-size: 95px !important;
+}
+
+
+@media (max-width: 768px){
+    .triangle {
+        border-style: solid;
+        border-width: 0 18px 18px 18px;
+        border-color: transparent transparent #fff transparent;
+        top: 2px;
+        right: -18px;
+    }}
+
+@media (max-width: 768px){
+    .triangleBorder{
+    border-style: solid; 
+    border-width: 20px 0px 20px 20px;
+    border-color:  transparent transparent transparent #dee2e6;
+    top: 10px;
+    right: -20px;
+}
+
+}
+
+.triangle{
+     border-style: solid;
+     border-width: 18px 0px 18px 18px;
+     border-color:transparent transparent transparent #fff;
+        top: -18px;  
+        right: 2px;    
+}
+
+.triangleBorder{
+    border-style: solid; 
+    border-width: 20px 0px 20px 20px;
+    border-color:  transparent transparent transparent #dee2e6;
+    top: 10px;
+    right: -20px;
+}
+
+
+.cont_modal{
+    max-width: 90vw !important;
+}
+
+.base_modal{
+    background-color: red;
+    width: 1000px;
+}
+
+.w-45{
+    width: 45% !important;
+}
+
+.required-field::after{
+    content: "*";
+    color: red;
 }

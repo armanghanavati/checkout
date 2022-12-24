@@ -6,9 +6,10 @@ import {
   selectHistoryData,
   selectInfoCheckoutModal,
   setInfoCheckoutModal,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
-import "./Styles.css";
+} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 
 const HistoryCheckoutModal = () => {
   const dispatch = useDispatch();
@@ -16,13 +17,13 @@ const HistoryCheckoutModal = () => {
   const infoCheckoutModal = useSelector(selectInfoCheckoutModal);
   const histories = useSelector(selectHistoryData);
 
-  const userName = histories.map((history) => {
-    return history.comments.map((item) => {
-      return item;
-    });
-  });
+  // const userName = histories.map((history) => {
+  //   return history.comments.map((item) => {
+  //     return item;
+  //   });
+  // });
 
-  console.log(userName);
+  console.log(histories);
   // const test = details.map((id) => {
   //   return id;
   // });
@@ -42,6 +43,7 @@ const HistoryCheckoutModal = () => {
     <section>
       <Modal
         show={infoCheckoutModal}
+        centered
         onHide={() => dispatch(setInfoCheckoutModal(false))}
         backdrop="static"
         role="dialog"
@@ -75,22 +77,49 @@ const HistoryCheckoutModal = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="show-grid">
-          <Col className="d-flex" xxl="1" xl="2" lg="3" md="2">
-            <div>
-              <img />
-            </div>
-          </Col>
-          <Col xxl="11" xl="10" lg="9" md="10">
-            <div className="border p-4 routed postion-relative w-100 bg-white rounded ">
-              <div className="triangleBorder position-absolute w-0 h-0">
-                <div className="triangle position-absolute w-0 h-0"></div>
-              </div>
-            </div>
-          </Col>
+          <section>
+            {histories.map((history) => {
+              return (
+                <div className="mb-5 row" key={history.date}>
+                  <Col className="d-flex" xxl="1" xl="2" lg="3" md="2">
+                    {history.photo && history.photo_type ? (
+                      <img
+                        height="95px"
+                        width="95px"
+                        className="rounded-circle mb-1 mb-md-0 text-secendery"
+                        src=""
+                      />
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={faCircleUser}
+                        className="rounded-circle font95 mb-1 mb-md-0 text-secondary"
+                      />
+                    )}
+                  </Col>
+                  <Col xxl="11" xl="10" lg="9" md="10">
+                    <div className="border p-4 position-relative w-100 bg-white rounded ">
+                      <div className="triangleBorder position-absolute w-0 h-0">
+                        <div className="triangle position-absolute w-0 h-0"></div>
+                      </div>
+                      <div className="d-flex align-items-center justify-content-between flex-wrap fw-bold mb-4">
+                        {history.first_name} {history.last_name}
+                        <div>
+                          {moment(history.date, "YYYY/MM/DD")
+                            .locale("fa")
+                            .format("jYYYY/jMM/jDD")}
+                        </div>
+                      </div>
+                      <div>{history.comment}</div>
+                    </div>
+                  </Col>
+                </div>
+              );
+            })}
+          </section>
         </Modal.Body>
-        <Modal.Footer className="justify-content-between">
+        <Modal.Footer className="justify-content-end">
           <Button
-            className="justify-content-end"
+            className=""
             variant="secondary"
             onClick={() => dispatch(setInfoCheckoutModal(false))}
           >

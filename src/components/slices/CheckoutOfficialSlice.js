@@ -7,7 +7,8 @@ import {
 
 const initialState = {
   reasonLeavingData: [],
-  reasonLeavingOffice: {},
+  reasonLeavingOffice: [],
+  reasonLeavingModal: {},
   reasonLeavingTable: {},
   user: {},
   userName: [],
@@ -91,12 +92,9 @@ const CheckoutOfficialSlice = createSlice({
     addApllyModal: (state, { payload }) => {
       return { ...state, applyModal: payload };
     },
-    // clearCode: (state) => {
-    //   state.meliCode = state.meliCode;
-    // },
-    // addSubbmit: (state) => {
-    //   return state.isSubmit == !state.isSubmit;
-    // },
+    addReasonLeavingModal: (state, { payload }) => {
+      return { ...state, reasonLeavingModal: payload };
+    },
   },
   extraReducers: {
     [fetchAsyncMeliCode.fulfilled]: (state, { payload }) => {
@@ -123,12 +121,15 @@ export const {
   addDescreption,
   setReasonLeavingHandler,
   addApllyModal,
+  addReasonLeavingModal,
 } = CheckoutOfficialSlice.actions;
 export const selectUserName = (state) => state.checkout.userName;
 export const selectSubmit = (state) => state.checkout.isSubmit;
 export const loginInfo = (state) => state.checkout.user;
 export const selectAllUserNames = (state) => state.checkout.allUserNames;
 export const selectApplyModal = (state) => state.checkout.applyModal;
+export const selectReasonLeavingModal = (state) =>
+  state.checkout.reasonLeavingModal;
 
 export const selectPersonalCode = (state) => state.checkout.personalCode;
 

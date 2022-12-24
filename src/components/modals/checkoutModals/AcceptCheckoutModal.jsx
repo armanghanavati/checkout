@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Button, Form, Row, Col, Container } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectAcceptCheckoutModal,
@@ -12,8 +12,7 @@ import {
   addComplateDescription,
   postHandlerBtnAccept,
   // postHandler,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
-import "./Styles.css";
+} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 
 const AcceptCheckoutModal = () => {
@@ -36,6 +35,7 @@ const AcceptCheckoutModal = () => {
 
   return (
     <Modal
+      centered
       show={AcceptCheckoutModal}
       onHide={() => dispatch(setAcceptCheckoutModal(false))}
       backdrop="static"
@@ -95,8 +95,8 @@ const AcceptCheckoutModal = () => {
           </Col>
           <p className=" mb-3">
             <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause !== undefined
-              ? details.leavingWorkCause
+            {details.leavingWorkCause.label !== undefined
+              ? details.leavingWorkCause.label
               : ""}{" "}
           </p>
           <p className=" mb-3">

@@ -9,9 +9,6 @@ import {
   fetchAsyncMeliCode,
   addPersonalCode,
   selectPersonalCode,
-  clearCode,
-  addSubbmit,
-  selectSubmit,
   fetchHandleGetReasonLeavingWork,
   selectReasonLeavingData,
   selectReasonLeaving,
@@ -20,29 +17,22 @@ import {
   addMeliCode,
   selectUserName,
   addUserName,
-  selectAllUserNames,
-  fetchGetAllUsers,
   addDescreption,
   selectDescreption,
   addApllyModal,
   selectApplyModal,
-} from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
+} from "../../components/slices/CheckoutOfficialSlice";
 import {
   getAllUsersByPersonalCode,
   getUser,
   postUserDataCheckout,
-  getReasonLeavingWork,
   postAction,
-  userInfo,
 } from "../../common/services";
 import { toast } from "react-toastify";
-import "./style.css";
 import DatePicker from "react-datepicker2";
-import ApplyModal from "../../components/modals/checkoutOfficals/ApplyModal";
 
 const CheckoutOfficial = () => {
   const [time, setTime] = useState(null);
-  const [reasonLeavingWork, setReasonLeavingWork] = useState({});
   const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
@@ -159,6 +149,8 @@ const CheckoutOfficial = () => {
     e.preventDefault();
     setIsSubmit(true);
     if (userName && personalCode && melliCode && time && reasonLeaving) {
+      console.log(reasonLeaving);
+      setFormErrors("");
       try {
         const checkoutValues = {
           leaver: userName.value,
@@ -169,13 +161,26 @@ const CheckoutOfficial = () => {
         const userPostReasonLeavingRes = await postUserDataCheckout(
           checkoutValues
         );
+        console.log(userPostReasonLeavingRes.data);
         if (userPostReasonLeavingRes.data.code === 415) {
           if (officeUser !== undefined) {
             dispatch(addApllyModal(true));
           } else {
-            toast(". مدیر کاربرمورد نظر یافت نشد");
-            setFormErrors("");
+            toast.error("مدیر کاربرمورد نظر یافت نشد!", {
+              className: "bg-danger text-white",
+            });
           }
+        }
+        if (userPostReasonLeavingRes.data.code === 412) {
+          setFormErrors(
+            validationForm({
+              personalCode: personalCode,
+              melliCode: melliCode,
+              userName: userName.value,
+              reasonLeaving: reasonLeaving.value,
+              time: time,
+            })
+          );
         }
       } catch (ex) {
         console.log(ex);
@@ -208,6 +213,7 @@ const CheckoutOfficial = () => {
       }
     }
     paterNhandler();
+    console.log(Object.keys(formErrors).length);
   }, [formErrors, userData, dispatch]);
 
   const [melliCodeCopy, setMelliCodeCopy] = useState("");
@@ -245,26 +251,6 @@ const CheckoutOfficial = () => {
       setDepartment("");
       setSupervisor("");
     }
-    // dispatch(addPersonalCode(e.target.value));
-    // console.log(personalCodeInputRef.current.state.numAsString.length);
-    // if (
-    //   personalCodeInputRef.current.props.value.length === 0 ||
-    //   (personalCodeInputRef.current.state.numAsString.length >= 6 &&
-    //     melliCode.length == "" &&
-    //     userName.length == "")
-    // ) {
-    //   handleGetUser(userName, melliCode, e.target.value, supervisor);
-    // }
-    // if (
-    //   e.target.value !== "" ||
-    //   personalCodeInputRef.current.state.numAsString.length === 7
-    // ) {
-    //   dispatch(addMeliCode(""));
-    //   dispatch(addUserName(""));
-    //   setCompanyName("");
-    //   setSupervisor("");
-    //   setDepartment("");
-    // }
   };
 
   const userNameHandler = (e) => {
@@ -289,58 +275,6 @@ const CheckoutOfficial = () => {
     setCompanyName("");
     setDepartment("");
   };
-
-  // const applyHandler = async (e) => {
-  //   e.preventDefault();
-  //   setIsSubmit(true);
-  //   if (userName && personalCode && melliCode && time && reasonLeaving) {
-  //     try {
-  //       const checkoutValues = {
-  //         leaver: userName.value,
-  //         description: description,
-  //         leavingWorkCause: reasonLeaving.value,
-  //         leavingWorkDate: time,
-  //       };
-  //       const userPostReasonLeavingRes = await postUserDataCheckout(
-  //         checkoutValues
-  //       );
-
-  //       if (userPostReasonLeavingRes.data.code === 415) {
-  //         if (officeUser !== undefined) {
-  //           const ActionValues = {
-  //             action_id: userPostReasonLeavingRes.data.id,
-  //             action_code: 0,
-  //             user_id: localStorage.getItem("id"),
-  //             toPerson: officeUser,
-  //             type: 10,
-  //           };
-
-  //           const actionRes = await postAction(ActionValues);
-
-  //           if (actionRes.data.code === 415) {
-  //             setShowBtn(true);
-  //             toast("درخواست با موفقیت ثبت شد!");
-  //           }
-  //         } else {
-  //           toast(". مدیر کاربرمورد نظر یافت نشد");
-  //         }
-  //       }
-  //     } catch (ex) {
-  //       console.log(ex);
-  //     }
-  //   } else {
-  //     setFormErrors(
-  //       validationForm({
-  //         personalCode: personalCode,
-  //         melliCode: melliCode,
-  //         userName: userName.value,
-  //         reasonLeavingWork: reasonLeavingWork.value,
-  //         time: time,
-  //       })
-  //     );
-  //     toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
-  //   }
-  // };
 
   const postBtnHandler = async (e) => {
     e.preventDefault();
@@ -383,7 +317,9 @@ const CheckoutOfficial = () => {
               toast.success("درخواست با موفقیت ثبت و ارسال شد!");
             }
           } else {
-            toast(". مدیر کاربرمورد نظر یافت نشد");
+            toast.error("مدیر کاربرمورد نظر یافت نشد!", {
+              className: "bg-danger text-white",
+            });
           }
         }
       } catch (ex) {
@@ -399,7 +335,12 @@ const CheckoutOfficial = () => {
           time: time,
         })
       );
-      toast(" ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.");
+      toast.error(
+        " ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.",
+        {
+          className: "bg-danger text-white",
+        }
+      );
     }
   };
 

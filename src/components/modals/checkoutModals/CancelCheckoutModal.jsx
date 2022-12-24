@@ -10,7 +10,7 @@ import {
   selectCurrentDep,
   selectDetailes,
   setCancelCheckoutModal,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 
 const CancelCheckoutModal = () => {
@@ -29,6 +29,7 @@ const CancelCheckoutModal = () => {
 
   return (
     <Modal
+      centered
       show={cancelCheckoutModal}
       onHide={() => dispatch(setCancelCheckoutModal(false))}
       backdrop="static"
@@ -88,8 +89,8 @@ const CancelCheckoutModal = () => {
           </Col>
           <p className=" mb-3">
             <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause !== undefined
-              ? details.leavingWorkCause
+            {details.leavingWorkCause.label !== undefined
+              ? details.leavingWorkCause.label
               : ""}{" "}
           </p>
           <p className=" mb-3">

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Container, Col, Row } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { fetchHandleGetReasonLeavingWork } from "../../components/checkoutOfficialSlice/CheckoutOfficialSlice";
+import { fetchHandleGetReasonLeavingWork } from "../../components/slices/CheckoutOfficialSlice";
 import {
   fetchAllCompany,
   fetchAllDepartment,
   fetchCurrentReqInfo,
   fetchGetAllStatuses,
   handleGetUsersTable,
-} from "../../components/checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../components/slices/TableCheckoutSlice";
 import TableChackoutLists from "../../components/tableChackoutLists/tableChackoutLists/TableChackoutLists";
 
 const CheckoutList = () => {

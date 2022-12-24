@@ -1,6 +1,7 @@
 import React, { Fragment, useCallback, useMemo, useState, useRef } from "react";
 import TableCheckOutItems from "./TableCheckOutItems";
 import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowsRotate,
@@ -24,6 +25,7 @@ import {
   postHistoryBtn,
   selectAcceptCheckoutModal,
   selectCancelCheckoutModal,
+  selectDetailes,
   selectEditCheckoutModal,
   selectInfoCheckoutModal,
   selectUserTableList,
@@ -33,7 +35,7 @@ import {
   setEditCheckoutModal,
   setInfoCheckoutModal,
   setViewCheckoutModal,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 import ViewCheckoutModal from "../../modals/checkoutModals/ViewCheckoutModal";
 import AcceptCheckoutModal from "../../modals/checkoutModals/AcceptCheckoutModal";
@@ -55,6 +57,7 @@ const CheckoutList = ({ isSubmit }) => {
   const cancelModal = useSelector(selectCancelCheckoutModal);
   const editModal = useSelector(selectEditCheckoutModal);
   const infoModal = useSelector(selectInfoCheckoutModal);
+  const detailes = useSelector(selectDetailes);
 
   console.log(userCheckoutList);
 
@@ -119,17 +122,22 @@ const CheckoutList = ({ isSubmit }) => {
           <Button
             className="d-flex align-items-center btn-sm"
             variant="success"
-            onClick={() => {
-              console.log(request);
-              dispatch(
+            onClick={async () => {
+              const data = await dispatch(
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
                   objCompany: request.company,
-                  objDepartment: request.department.name,
+                  objDepartment: request.department,
                 })
               );
-              dispatch(setAcceptCheckoutModal(true));
+              if (data.payload.code === 403) {
+                toast.error("جزئیات مورد نظر یافت نشد!");
+              } else if (data.payload.description !== undefined) {
+                dispatch(setAcceptCheckoutModal(true));
+              } else {
+                toast.error("خطا در دریافت اطلاعات!");
+              }
             }}
           >
             <FontAwesomeIcon icon={faCheck} />
@@ -137,16 +145,22 @@ const CheckoutList = ({ isSubmit }) => {
           <Button
             className="d-flex align-items-center btn-sm"
             variant="primary"
-            onClick={() => {
-              dispatch(
+            onClick={async () => {
+              const data = await dispatch(
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
                   objCompany: request.company,
-                  objDepartment: request.department.name,
+                  objDepartment: request.department,
                 })
               );
-              dispatch(setEditCheckoutModal(true));
+              if (data.payload.code === 403) {
+                toast.error("جزئیات مورد نظر یافت نشد!");
+              } else if (data.payload.description !== undefined) {
+                dispatch(setEditCheckoutModal(true));
+              } else {
+                toast.error("خطا در دریافت اطلاعات!");
+              }
             }}
           >
             <FontAwesomeIcon icon={faPenToSquare} />
@@ -154,16 +168,22 @@ const CheckoutList = ({ isSubmit }) => {
           <Button
             className="d-flex align-items-center btn-sm"
             variant="danger"
-            onClick={() => {
-              dispatch(
+            onClick={async () => {
+              const data = await dispatch(
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
                   objCompany: request.company,
-                  objDepartment: request.department.name,
+                  objDepartment: request.department,
                 })
               );
-              dispatch(setCancelCheckoutModal(true));
+              if (data.payload.code === 403) {
+                toast.error("جزئیات مورد نظر یافت نشد!");
+              } else if (data.payload.description !== undefined) {
+                dispatch(setCancelCheckoutModal(true));
+              } else {
+                toast.error("خطا در دریافت اطلاعات!");
+              }
             }}
           >
             <FontAwesomeIcon icon={faBan} />
@@ -171,16 +191,22 @@ const CheckoutList = ({ isSubmit }) => {
           <Button
             className="d-flex align-items-center btn-sm"
             variant="warning"
-            onClick={() => {
-              dispatch(
+            onClick={async () => {
+              const data = await dispatch(
                 fetchCurrentReqInfo({
                   reqId: request._id,
                   reqType: request.type,
                   objCompany: request.company,
-                  objDepartment: request.department.name,
+                  objDepartment: request.department,
                 })
               );
-              dispatch(setViewCheckoutModal(true));
+              if (data.payload.code === 403) {
+                toast.error("جزئیات مورد نظر یافت نشد!");
+              } else if (data.payload.description !== undefined) {
+                dispatch(setViewCheckoutModal(true));
+              } else {
+                toast.error("خطا در دریافت اطلاعات!");
+              }
             }}
           >
             <FontAwesomeIcon icon={faEye} />
@@ -197,10 +223,8 @@ const CheckoutList = ({ isSubmit }) => {
                   objDepartment: request.department.name,
                 })
               );
-              dispatch(
-                postHistoryBtn(request.reqInfo.serial_number)
-              );
               dispatch(setInfoCheckoutModal(true));
+              dispatch(postHistoryBtn(request.reqInfo.serial_number));
             }}
           >
             <FontAwesomeIcon icon={faClockRotateLeft} />

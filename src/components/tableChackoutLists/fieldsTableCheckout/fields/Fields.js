@@ -23,8 +23,8 @@ import {
   selectDep,
   addCompany,
   selectCompany,
-} from "../../../checkoutOfficialSlice/TableCheckoutSlice";
-import { selectReasonLeavingData } from "../../../checkoutOfficialSlice/CheckoutOfficialSlice";
+} from "../../../slices/TableCheckoutSlice";
+import { selectReasonLeavingData } from "../../../slices/CheckoutOfficialSlice";
 import { usePagination, useSortBy, useTable } from "react-table";
 
 const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {

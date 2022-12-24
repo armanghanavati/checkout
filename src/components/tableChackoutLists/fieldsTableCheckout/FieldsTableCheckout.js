@@ -20,7 +20,7 @@ import {
   addCompany,
   selectUserMemb,
   selectValueStatus,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../slices/TableCheckoutSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const FieldsTableCheckout = () => {

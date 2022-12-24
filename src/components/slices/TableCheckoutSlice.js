@@ -35,7 +35,6 @@ const initialState = {
   department: "",
   allDepartment: [],
   detailes: "",
-  // postAcceptHandler: [],
   currentReqCompany: "",
   currentReqDep: "",
   currentReqCompanyCancel: "",
@@ -176,7 +175,9 @@ export const postHandlerBtnAccept = createAsyncThunk(
           console.log(postActionRes.data);
           if (postActionRes.data.type === 415) {
           } else {
-            toast.error("دریافت کننده یافت مورد نظر یافت نشد!");
+            toast.error("دریافت کننده مورد نظر یافت نشد!", {
+              className: "bg-danger text-white",
+            });
           }
         }
       }
@@ -209,7 +210,9 @@ export const postBtnCancel = createAsyncThunk(
 
       console.log(actionValue);
       const postActionRes = await postAction(actionValue);
-      toast.success("درخاست شما با موفقیت کنسل شد.");
+      toast.success("درخاست شما با موفقیت کنسل شد.", {
+        className: "bg-success text-white",
+      });
       return postActionRes;
     }
   }
@@ -274,6 +277,7 @@ export const postHistoryBtn = createAsyncThunk(
     const { type } = getState().tableCheckoutList;
     console.log(serial);
     const historeRes = await getCurrentReqHistory(serial, type);
+    console.log(historeRes);
     return historeRes.data;
   }
 );
@@ -338,13 +342,12 @@ const CheckoutList = createSlice({
     addSeries: (state, { payload }) => {
       return { ...state, series: payload };
     },
-    setCurrentReqType: (state, { payload }) => {
-      return { ...state, type: payload };
+    setCurrentReqType: (state, action) => {
+      return { ...state, type: action.payload };
     },
   },
   extraReducers: {
     [handleGetUsersTable.fulfilled]: (state, { payload }) => {
-      console.log(payload);
       return {
         ...state,
         userCheckoutTableList: payload.list,

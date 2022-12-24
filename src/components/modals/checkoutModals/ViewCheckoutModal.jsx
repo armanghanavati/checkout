@@ -10,7 +10,7 @@ import {
   selectDetailes,
   selectViewCheckoutModal,
   setViewCheckoutModal,
-} from "../../checkoutOfficialSlice/TableCheckoutSlice";
+} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 import { toast } from "react-toastify";
 
@@ -31,6 +31,7 @@ const ViewCheckoutModal = () => {
 
   return (
     <Modal
+      centered
       show={viewCheckoutModal}
       onHide={() => dispatch(setViewCheckoutModal(false))}
       backdrop="static"
@@ -90,8 +91,8 @@ const ViewCheckoutModal = () => {
           </Col>
           <p className=" mb-3">
             <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause !== undefined
-              ? details.leavingWorkCause
+            {details.leavingWorkCause.label !== undefined
+              ? details.leavingWorkCause.label
               : ""}{" "}
           </p>
           <p className=" mb-3">
