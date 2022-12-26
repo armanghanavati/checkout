@@ -93,7 +93,7 @@ const ViewCheckoutModal = () => {
             <span className="fw-bold">علت ترک خدمت: </span>
             {details.leavingWorkCause.label !== undefined
               ? details.leavingWorkCause.label
-              : ""}{" "}
+              : ""}
           </p>
           <p className=" mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>

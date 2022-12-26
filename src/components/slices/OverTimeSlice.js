@@ -7,10 +7,12 @@ import { postAction } from "../../common/services";
 const initialState = {
   startTimeDate: null,
   endTimeDate: null,
-  formErrors: {},
+  formErrors: { reasonOverT: "", startTD: "", endTD: "" },
   des: "",
   overTimeReson: [],
   overTimeReasonValue: [],
+  showOverTime: false,
+  isSubmit: false,
 };
 
 export const fetchOverTimeReason = createAsyncThunk(
@@ -51,7 +53,7 @@ export const postOverTimeApi = createAsyncThunk(
         const postOverTimeActionRes = await postAction(actionValues);
         console.log(postOverTimeActionRes);
         if (postOverTimeActionRes.data.code === 415) {
-          toast.success("با موفقیت ثبت و ارسال شد.", {
+          toast.success(" در خواست شما با موفقیت ثبت و ارسال شد.", {
             className: "bg-success text-white",
           });
           dispatch(addStartDate(null));
@@ -85,6 +87,12 @@ const OverTimeSlice = createSlice({
     addOverTimeReasonValue: (state, { payload }) => {
       return { ...state, overTimeReasonValue: payload };
     },
+    addShowOverTime: (state, { payload }) => {
+      return { ...state, showOverTime: payload };
+    },
+    setIsSubmit: (state, { payload }) => {
+      return { ...state, isSubmit: payload };
+    },
   },
   extraReducers: {
     [fetchOverTimeReason.fulfilled]: (state, { payload }) => {
@@ -99,6 +107,8 @@ export const {
   addDescreption,
   addOverTimeReasonValue,
   addFormErrors,
+  addShowOverTime,
+  setIsSubmit,
 } = OverTimeSlice.actions;
 
 export const selectOverTimeReason = (state) => state.overTime.overTimeReson;
@@ -106,6 +116,8 @@ export const selectStartDate = (state) => state.overTime.startTimeDate;
 export const selectEndDate = (state) => state.overTime.endTimeDate;
 export const selectDescreption = (state) => state.overTime.des;
 export const selectFormErrors = (state) => state.overTime.formErrors;
+export const selectShowOverTime = (state) => state.overTime.showOverTime;
+export const selectIsSubmit = (state) => state.overTime.isSubmit;
 export const selectOverTimeReasonValue = (state) =>
   state.overTime.overTimeReasonValue;
 export default OverTimeSlice.reducer;

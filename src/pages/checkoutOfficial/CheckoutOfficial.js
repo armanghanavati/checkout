@@ -236,6 +236,7 @@ const CheckoutOfficial = () => {
   };
 
   const [personalCodeCopy, setPersonalCodeCopy] = useState("");
+
   const personalCodeHandler = (e) => {
     dispatch(addPersonalCode(e.target.value));
     var valueLength = e.target.value.replace(/\s/g, "").length;
@@ -509,7 +510,7 @@ const CheckoutOfficial = () => {
               value={reasonLeaving}
               options={reasonLeavingData}
               onChange={(e) => dispatch(setReasonLeavingHandler(e))}
-              placeholder="جستجو . . ."
+              placeholder="انتخاب"
             />
             <p className="font12 text-danger mt-1 mb-0">
               {formErrors.reasonLeaving}
