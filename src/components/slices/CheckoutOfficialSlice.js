@@ -1,17 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getAllUsersByPersonalCode,
-  userInfo,
   getReasonLeavingWork,
-} from "../../common/services";
+} from "../../common/checkout";
 
 const initialState = {
   reasonLeavingData: [],
   reasonLeavingOffice: [],
   reasonLeavingModal: {},
   reasonLeavingTable: {},
-  user: {},
-  userName: [],
+  userName: {},
   personalCode: "",
   meliCode: "",
   descreption: "",
@@ -20,18 +18,8 @@ const initialState = {
   applyModal: false,
 };
 
-export const fetchAsyncMeliCode = createAsyncThunk(
-  "checkout/fetchAsyncMeliCode",
-  async () => {
-    const resUserInfo = await userInfo();
-    localStorage.setItem("id", resUserInfo.data._id);
-    console.log(resUserInfo.data);
-    return resUserInfo.data;
-  }
-);
-
-export const fetchHandleGetReasonLeavingWork = createAsyncThunk(
-  "checkout/fetchHandleGetReasonLeavingWork",
+export const handleReasonLeavingWork = createAsyncThunk(
+  "checkout/handleReasonLeavingWork",
   async () => {
     try {
       const reasonLeavingRes = await getReasonLeavingWork();
@@ -42,14 +30,16 @@ export const fetchHandleGetReasonLeavingWork = createAsyncThunk(
   }
 );
 
-export const fetchGetAllUsers = createAsyncThunk(
-  "checkout/fetchGetAllUsers",
-  async () => {
+export const handleUsersCheckout = createAsyncThunk(
+  "checkout/handleUsersCheckout",
+  async (obj, { getState }) => {
+    const { userLogin } = getState().mainHome;
     try {
       const resAllUsers = await getAllUsersByPersonalCode(
-        initialState.user.company.companyCode,
-        initialState.user.location
+        userLogin.company.companyCode,
+        userLogin.location
       );
+      console.log(resAllUsers.data);
       return resAllUsers.data;
     } catch (error) {
       console.log(error);
@@ -57,77 +47,63 @@ export const fetchGetAllUsers = createAsyncThunk(
   }
 );
 
-// const handleGetAllUsers = async () => {
-//   try {
-//     const usersRes = await getAllUsersByPersonalCode(
-//       userData.company.CompanyCode,
-//       userData.location
-//     );
-//     setUsers(usersRes.data);
-//   } catch (ex) {
-//     console.log(ex);
-//   }
-// };
-
 const CheckoutOfficialSlice = createSlice({
   name: "checkout",
   initialState,
   reducers: {
-    addUserName: (state, { payload }) => {
+    RsetUsernames: (state, { payload }) => {
       return { ...state, userName: payload };
     },
-    setReasonLeavingHandler: (state, { payload }) => {
+    RsetReasonLeavingWork: (state, { payload }) => {
       console.log(payload);
       return { ...state, reasonLeavingOffice: payload };
     },
-    addMeliCode: (state, { payload }) => {
+    RsetMeliCode: (state, { payload }) => {
       return { ...state, meliCode: payload };
     },
-    addPersonalCode: (state, { payload }) => {
+    RsetPersonalCode: (state, { payload }) => {
       return { ...state, personalCode: payload };
     },
-    addDescreption: (state, { payload }) => {
+    RsetDescriptions: (state, { payload }) => {
       return { ...state, descreption: payload };
     },
-    addApllyModal: (state, { payload }) => {
+    RsetApplyModal: (state, { payload }) => {
       return { ...state, applyModal: payload };
     },
-    addReasonLeavingModal: (state, { payload }) => {
+    RsetReasonLeavingModal: (state, { payload }) => {
       return { ...state, reasonLeavingModal: payload };
     },
   },
   extraReducers: {
-    [fetchAsyncMeliCode.fulfilled]: (state, { payload }) => {
-      return { ...state, user: payload };
-    },
-    [fetchHandleGetReasonLeavingWork.fulfilled]: (state, { payload }) => {
+    [handleReasonLeavingWork.fulfilled]: (state, { payload }) => {
       return {
         ...state,
         reasonLeavingData: payload,
       };
     },
-    [fetchGetAllUsers.fulfilled]: (state, { payload }) => {
-      return { ...state, users: payload };
+    [handleUsersCheckout.fulfilled]: (state, { payload }) => {
+      return { ...state, allUserNames: payload };
     },
   },
 });
 
 export const {
-  addPersonalCode,
-  addMeliCode,
+  RsetPersonalCode,
+  RsetMeliCode,
   clearCode,
   addSubbmit,
-  addUserName,
-  addDescreption,
-  setReasonLeavingHandler,
-  addApllyModal,
-  addReasonLeavingModal,
+  RsetUsernames,
+  RsetDescriptions,
+  RsetReasonLeavingWork,
+  RsetApplyModal,
+  RsetReasonLeavingModal,
 } = CheckoutOfficialSlice.actions;
-export const selectUserName = (state) => state.checkout.userName;
 export const selectSubmit = (state) => state.checkout.isSubmit;
 export const loginInfo = (state) => state.checkout.user;
 export const selectAllUserNames = (state) => state.checkout.allUserNames;
 export const selectApplyModal = (state) => state.checkout.applyModal;
+export const selectAllUsers = (state) => state.checkout.allUser;
+export const selectUserValue = (state) => state.checkout.userName;
 export const selectReasonLeavingModal = (state) =>
   state.checkout.reasonLeavingModal;
 

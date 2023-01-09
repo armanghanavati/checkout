@@ -1,18 +1,20 @@
 import axios from "axios";
 import config from "./urlConfig.json";
 
-//ip/officeOverTimeReason --> get
+//  علت اضافه کار
 export const getOverTimeReason = () => {
   return axios.get(`${config.localapi}/officeOverTimeReason`);
 };
 
-//ip/officeOverTime , {reason: "", fromDate: date1, toDate: date2}  --> post
-//type:14
+// ارسال فرم اضافه کار به لیست
 export const postOverTime = async (values) => {
   console.log(values);
   return axios.post(`${config.localapi}/officeOverTime`, values);
 };
 
-
-
-//ip/officeOverTime/list , {params: {applicant_id: "", memberId: "", fromDate: "", toDate: "", mDep: "", status: ""}}
+// کاربران درخواست اضافه کار
+export const officeOverTimeList = (values) => {
+  return axios.get(`${config.localapi}/officeOverTime/list`, {
+    params: values,
+  });
+};

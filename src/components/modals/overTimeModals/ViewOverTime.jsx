@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  addComplateDescription,
-  selectComplateDescription,
-  selectCurrentComp,
-  selectCurrentDep,
-  selectViewCheckoutModal,
-  RsetViewCheckoutModal,
-} from "../../slices/TableCheckoutSlice";
+import { selectCurrentComp } from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
+import {
+  RsetDescriptions,
+  RsetViewOverTimeModal,
+  selectViewOverTime,
+} from "../../slices/OverTimeSlice";
 import {
   handlePostComment,
   RsetDescriptionModals,
@@ -17,26 +15,28 @@ import {
   selectCurrentReqInfo,
 } from "../../slices/mainSlices";
 
-const ViewCheckoutModal = () => {
+const ViewOverTime = () => {
   const dispatch = useDispatch();
-  const viewCheckoutModal = useSelector(selectViewCheckoutModal);
-  const currentReqCo = useSelector(selectCurrentComp);
-  const currentReqDepartment = useSelector(selectCurrentDep);
-  const details = useSelector(selectCurrentReqInfo);
-  const complateDescription = useSelector(selectDescriptionModals);
 
-  // const validation = () => {
-  //   let error = "";
-  //   if (!complateDescription) {
-  //     return (error.complateDescription = "لطفا نظر مورد");
-  //   }
-  // };
+  const view = useSelector(selectViewOverTime);
+  const details = useSelector(selectCurrentReqInfo);
+  const des = useSelector(selectDescriptionModals);
+
+  const fromDate = moment(details.reqInfo.fromDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  const toDate = moment(details.reqInfo.toDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  console.log(details);
 
   return (
     <Modal
       centered
-      show={viewCheckoutModal}
-      onHide={() => dispatch(RsetViewCheckoutModal(false))}
+      show={view}
+      onHide={() => dispatch(RsetViewOverTimeModal(false))}
       backdrop="static"
       role="dialog"
       dialogClassName="cont_modal"
@@ -74,41 +74,27 @@ const ViewCheckoutModal = () => {
             <p className="mb-3 me-1">
               <span className="fw-bold">نام و نام خانوادگی: </span>
               <span>
-                {`${
-                  details.leaver !== undefined ? details.leaver.first_name : ""
-                } ${
-                  details.leaver !== undefined ? details.leaver.last_name : ""
-                }`}
+                {details.process !== undefined
+                  ? `${details.process[0].userInfo.first_name} ${details.process[0].userInfo.last_name}`
+                  : ""}
               </span>
             </p>
           </Col>
           <p className="mb-3 me-1">
-            <span className="fw-bold">شرکت: </span>
-            <span>{currentReqCo}</span>
+            <span className="fw-bold">تاریخ و ساعت شروع: </span>
+            <span>{details.reqInfo !== undefined ? fromDate : ""}</span>
           </p>
           <Col xs={6} md={4}>
             <p className="mb-3 me-1">
-              <span className="fw-bold">واحد سازمانی: </span>
-              <span>{currentReqDepartment}</span>
+              <span className="fw-bold">تاریخ و ساعت پایان: </span>
+              <span>{details.reqInfo !== undefined ? toDate : ""}</span>
             </p>
           </Col>
           <p className=" mb-3">
-            <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause.label !== undefined
-              ? details.leavingWorkCause.label
-              : ""}
-          </p>
-          <p className=" mb-3">
-            <span className="fw-bold">تاریخ ترک خدمت: </span>
-            {details.leavingWorkDate !== undefined
-              ? moment(details.leavingWorkDate, "YYYY/MM/DD")
-                  .locale("fa")
-                  .format("jYYYY/jMM/jDD")
-              : ""}
-          </p>
-          <p className="font-weight-bold mb-3">
-            <span className="fw-bold">توضیحات: </span>
-            {details.description !== undefined ? details.description : ""}
+            <span className="fw-bold"> نوع اضافه کار: </span>
+            <span>
+              {details.reqInfo !== undefined ? details.reqInfo.reason.name : ""}
+            </span>
           </p>
         </Row>
       </Modal.Body>
@@ -116,16 +102,16 @@ const ViewCheckoutModal = () => {
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
+              value={des}
+              onChange={(e) => dispatch(RsetDescriptionModals(e.target.value))}
               type="text"
               name="description"
-              value={complateDescription}
-              onChange={(e) => dispatch(RsetDescriptionModals(e.target.value))}
             />
           </Col>
           <Button
             onClick={() => {
-              dispatch(handlePostComment(10));
-              dispatch(RsetViewCheckoutModal(false));
+              dispatch(handlePostComment(14));
+              dispatch(RsetViewOverTimeModal(false));
             }}
             className="ms-2 col-5"
             variant="warning"
@@ -135,12 +121,12 @@ const ViewCheckoutModal = () => {
         </div>
         <div>
           <Button
+            onClick={() => {
+              dispatch(RsetViewOverTimeModal(false));
+              dispatch(RsetDescriptionModals(""));
+            }}
             className="justify-content-end"
             variant="secondary"
-            onClick={() => {
-              dispatch(RsetDescriptionModals(""));
-              dispatch(RsetViewCheckoutModal(false));
-            }}
           >
             بستن
           </Button>
@@ -150,4 +136,4 @@ const ViewCheckoutModal = () => {
   );
 };
 
-export default ViewCheckoutModal;
+export default ViewOverTime;

@@ -1,32 +1,26 @@
 import axios from "axios";
 import config from "./urlConfig.json";
 
-export const userInfo = () => {
-  return axios.get(`${config.localapi}/user/login`, {
-    params: { username: "1742026362", password: "Armangh26362" },
-  });
-};
-
+// checkout registration users select
 export const getAllUsersByPersonalCode = (companyCode, location) => {
   return axios.get(
     `${config.localapi}/user/findInCompany/personelCode/${companyCode}/${location}`
   );
 };
 
-export const getUser = (values) => {
-  return axios.get(`${config.localapi}/user/fill/searchFields`, {
-    params: values,
-  });
-};
-
+// ارسال اطلاعات پرسنل مستعفی
 export const postUserDataCheckout = (values) => {
   return axios.post(`${config.localapi}/settlement`, values);
 };
 
+//  دریافت علت ترک خدمت
 export const getReasonLeavingWork = () => {
   return axios.get(`${config.localapi}/leavingWorkCause`);
 };
 
-export const postAction = (ActionValues) => {
-  return axios.post(`${config.localapi}/action`, ActionValues);
+//  دریافت کاربران مستعفی
+export const getUser = (values) => {
+  return axios.get(`${config.localapi}/user/fill/searchFields`, {
+    params: values,
+  });
 };

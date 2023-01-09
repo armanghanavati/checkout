@@ -1,45 +1,42 @@
 import React, { useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  selectAcceptCheckoutModal,
-  selectUserTableList,
-  RsetAcceptCheckoutModal,
-  selectCurrentComp,
-  selectCurrentDep,
-  selectComplateDescription,
-  addComplateDescription,
-  // postHandler,
-} from "../../slices/TableCheckoutSlice";
+
 import moment from "moment-jalaali";
 import {
-  handlePostAccept,
+  RsetAcceptOverTimeModal,
+  selectAcceptOverTime,
   selectCurrentReqInfo,
-} from "../../slices/mainSlices";
+} from "../../slices/OverTimeSlice";
 
-const AcceptCheckoutModal = () => {
+const AcceptOverTime = () => {
   const dispatch = useDispatch();
-  const AcceptCheckoutModal = useSelector(selectAcceptCheckoutModal);
-  const userCheckoutList = useSelector(selectUserTableList);
+  const AcceptCheckoutModal = useSelector(selectAcceptOverTime);
   const details = useSelector(selectCurrentReqInfo);
-  const currentReqCo = useSelector(selectCurrentComp);
-  const currentReqDepartment = useSelector(selectCurrentDep);
-  const complateDescription = useSelector(selectComplateDescription);
+
+  const fromDate = moment(details.reqInfo.fromDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  const toDate = moment(details.reqInfo.toDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  // console.log(
+  //   moment(details.reqInfo.fromDate, "YYYY/MM/DD hh:mm A")
+  //     .locale("fa")
+  //     .format("jYYYY/jMM/jDD hh:mm A")
+  // );
 
   const postUsersHandler = (e) => {
     e.preventDefault();
-
-    dispatch(handlePostAccept(10));
-
-    dispatch(RsetAcceptCheckoutModal(false));
-    dispatch(addComplateDescription(""));
   };
 
   return (
     <Modal
       centered
       show={AcceptCheckoutModal}
-      onHide={() => dispatch(RsetAcceptCheckoutModal(false))}
+      onHide={() => dispatch(RsetAcceptOverTimeModal(false))}
       backdrop="static"
       role="dialog"
       dialogClassName="cont_modal"
@@ -77,41 +74,33 @@ const AcceptCheckoutModal = () => {
             <p className="mb-3 me-1">
               <span className="fw-bold">نام و نام خانوادگی: </span>
               <span>
-                {`${
-                  details.leaver !== undefined ? details.leaver.first_name : ""
-                } ${
-                  details.leaver !== undefined ? details.leaver.last_name : ""
-                }`}
+                {details.process !== undefined
+                  ? `${details.process[0].userInfo.first_name} ${details.process[0].userInfo.last_name}`
+                  : ""}
               </span>
             </p>
           </Col>
           <p className="mb-3 me-1">
-            <span className="fw-bold">شرکت: </span>
-            <span>{currentReqCo}</span>
+            <span className="fw-bold">تاریخ و ساعت شروع: </span>
+            <span>{details.reqInfo !== undefined ? fromDate : ""}</span>
           </p>
           <Col xs={6} md={4}>
             <p className="mb-3 me-1">
-              <span className="fw-bold">واحد سازمانی: </span>
-              <span>{currentReqDepartment}</span>
+              <span className="fw-bold">تاریخ و ساعت پایان: </span>
+              <span>{details.reqInfo !== undefined ? toDate : ""}</span>
             </p>
           </Col>
           <p className=" mb-3">
-            <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause.label !== undefined
-              ? details.leavingWorkCause.label
-              : ""}{" "}
-          </p>
-          <p className=" mb-3">
-            <span className="fw-bold">تاریخ ترک خدمت: </span>
-            {details.leavingWorkDate !== undefined
-              ? moment(details.leavingWorkDate, "YYYY/MM/DD")
-                  .locale("fa")
-                  .format("jYYYY/jMM/jDD")
-              : ""}
+            <span className="fw-bold">نوع اضافه کار: </span>
+            <span>
+              {details.reqInfo !== undefined ? details.reqInfo.reason : ""}
+            </span>
           </p>
           <p className="font-weight-bold mb-3">
             <span className="fw-bold">توضیحات: </span>
-            {details.description !== undefined ? details.description : ""}
+            <span>
+              {/* {details.reqInfo !== undefined ? details.reqInfo.description : ""} */}
+            </span>
           </p>
         </Row>
       </Modal.Body>
@@ -122,8 +111,6 @@ const AcceptCheckoutModal = () => {
               placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
-              value={complateDescription}
-              onChange={(e) => dispatch(addComplateDescription(e.target.value))}
             />
           </Col>
           <Button
@@ -138,7 +125,7 @@ const AcceptCheckoutModal = () => {
         <Button
           className="justify-content-end"
           variant="secondary"
-          onClick={() => dispatch(RsetAcceptCheckoutModal(false))}
+          onClick={() => dispatch(RsetAcceptOverTimeModal(false))}
         >
           بستن
         </Button>
@@ -147,4 +134,4 @@ const AcceptCheckoutModal = () => {
   );
 };
 
-export default AcceptCheckoutModal;
+export default AcceptOverTime;

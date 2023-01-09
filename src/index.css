@@ -23,9 +23,25 @@ body *{
 .tether-element{
     z-index: 10000;
 }
-
+.font60{
+    font-size: 60px !important;
+}
 .font95{
     font-size: 95px !important;
+}
+
+
+.spinner {
+    animation: spin infinite 1s linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -83,3 +99,13 @@ body *{
     content: "*";
     color: red;
 }
+
+.cursorPointer{
+    cursor: pointer !important;
+}
+
+.datePicker{
+    
+    width: 250px;
+}
+

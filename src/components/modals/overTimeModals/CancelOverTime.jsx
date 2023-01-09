@@ -6,59 +6,66 @@ import {
   selectComplateDescription,
   selectCurrentComp,
   selectCurrentDep,
-  selectViewCheckoutModal,
-  RsetViewCheckoutModal,
 } from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 import {
-  handlePostComment,
-  RsetDescriptionModals,
-  selectDescriptionModals,
+  RsetCancelOverTimeModal,
+  selectCancelOverTime,
   selectCurrentReqInfo,
-} from "../../slices/mainSlices";
+} from "../../slices/OverTimeSlice";
+import { handlePostCancelModal } from "../../slices/mainSlices";
 
-const ViewCheckoutModal = () => {
+const CancelOverTime = () => {
   const dispatch = useDispatch();
-  const viewCheckoutModal = useSelector(selectViewCheckoutModal);
-  const currentReqCo = useSelector(selectCurrentComp);
+  const cancel = useSelector(selectCancelOverTime);
   const currentReqDepartment = useSelector(selectCurrentDep);
   const details = useSelector(selectCurrentReqInfo);
-  const complateDescription = useSelector(selectDescriptionModals);
+  const complateDescription = useSelector(selectComplateDescription);
 
-  // const validation = () => {
-  //   let error = "";
-  //   if (!complateDescription) {
-  //     return (error.complateDescription = "لطفا نظر مورد");
-  //   }
-  // };
+  const fromDate = moment(details.reqInfo.fromDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  const toDate = moment(details.reqInfo.toDate, "YYYY/MM/DD hh:mm A")
+    .locale("fa")
+    .format("jYYYY/jMM/jDD hh:mm A");
+
+  console.log(details);
+
+  const cancelHandler = () => {
+    console.log("click");
+    dispatch(handlePostCancelModal(14));
+    dispatch(RsetCancelOverTimeModal(false));
+  };
 
   return (
     <Modal
       centered
-      show={viewCheckoutModal}
-      onHide={() => dispatch(RsetViewCheckoutModal(false))}
+      show={cancel}
+      onHide={() => dispatch(RsetCancelOverTimeModal(false))}
       backdrop="static"
       role="dialog"
       dialogClassName="cont_modal"
-      // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
-      <Modal.Header className="d-block bg-warning text-white">
+      <Modal.Header className="d-block bg-danger text-white">
         <Modal.Title className="d-flex justify-content-between">
           <div>
             <span className="fw-bold me-2">شماره سریال: </span>
             <span>
+              {" "}
               {details.reqInfo !== undefined
                 ? details.reqInfo.serial_number
                 : ""}
             </span>
           </div>
           <div>
-            <span>مشاهده درخواست </span>
+            <span>ابطال درخواست </span>
           </div>
           <div>
             <span className="fw-bold me-2">تاریخ درخواست:</span>
             <span>
+              {" "}
               {details.process !== undefined
                 ? moment(details.process[0].date, "YYYY/MM/DD")
                     .locale("fa")
@@ -74,41 +81,27 @@ const ViewCheckoutModal = () => {
             <p className="mb-3 me-1">
               <span className="fw-bold">نام و نام خانوادگی: </span>
               <span>
-                {`${
-                  details.leaver !== undefined ? details.leaver.first_name : ""
-                } ${
-                  details.leaver !== undefined ? details.leaver.last_name : ""
-                }`}
+                {details.process !== undefined
+                  ? `${details.process[0].userInfo.first_name} ${details.process[0].userInfo.last_name}`
+                  : ""}
               </span>
             </p>
           </Col>
           <p className="mb-3 me-1">
-            <span className="fw-bold">شرکت: </span>
-            <span>{currentReqCo}</span>
+            <span className="fw-bold">تاریخ و ساعت شروع: </span>
+            <span>{details.reqInfo !== undefined ? fromDate : ""}</span>
           </p>
           <Col xs={6} md={4}>
             <p className="mb-3 me-1">
-              <span className="fw-bold">واحد سازمانی: </span>
-              <span>{currentReqDepartment}</span>
+              <span className="fw-bold">تاریخ و ساعت پایان: </span>
+              <span> {details.reqInfo !== undefined ? toDate : ""} </span>
             </p>
           </Col>
           <p className=" mb-3">
-            <span className="fw-bold">علت ترک خدمت: </span>
-            {details.leavingWorkCause.label !== undefined
-              ? details.leavingWorkCause.label
-              : ""}
-          </p>
-          <p className=" mb-3">
-            <span className="fw-bold">تاریخ ترک خدمت: </span>
-            {details.leavingWorkDate !== undefined
-              ? moment(details.leavingWorkDate, "YYYY/MM/DD")
-                  .locale("fa")
-                  .format("jYYYY/jMM/jDD")
-              : ""}
-          </p>
-          <p className="font-weight-bold mb-3">
-            <span className="fw-bold">توضیحات: </span>
-            {details.description !== undefined ? details.description : ""}
+            <span className="fw-bold">نوع اضافه کار: </span>
+            <span>
+              {details.reqInfo !== undefined ? details.reqInfo.reason : ""}
+            </span>
           </p>
         </Row>
       </Modal.Body>
@@ -116,31 +109,26 @@ const ViewCheckoutModal = () => {
         <div className="d-flex">
           <Col xl="12">
             <Form.Control
+              placeholder="توضیحات تکمیل کننده درخواست"
               type="text"
               name="description"
               value={complateDescription}
-              onChange={(e) => dispatch(RsetDescriptionModals(e.target.value))}
+              onChange={(e) => dispatch(addComplateDescription(e.target.value))}
             />
           </Col>
           <Button
-            onClick={() => {
-              dispatch(handlePostComment(10));
-              dispatch(RsetViewCheckoutModal(false));
-            }}
+            onClick={cancelHandler}
             className="ms-2 col-5"
-            variant="warning"
+            variant="danger"
           >
-            ارسال نظر
+            ابطال درخواست
           </Button>
         </div>
         <div>
           <Button
             className="justify-content-end"
             variant="secondary"
-            onClick={() => {
-              dispatch(RsetDescriptionModals(""));
-              dispatch(RsetViewCheckoutModal(false));
-            }}
+            onClick={() => dispatch(RsetCancelOverTimeModal(false))}
           >
             بستن
           </Button>
@@ -150,4 +138,4 @@ const ViewCheckoutModal = () => {
   );
 };
 
-export default ViewCheckoutModal;
+export default CancelOverTime;

@@ -1,10 +1,6 @@
 import React, { useEffect } from "react";
 import { Modal, Button, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  selectHistoriesCheckoutModal,
-  RsetHistoresCheckoutModal,
-} from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
@@ -13,13 +9,24 @@ import {
   selectHistories,
   selectUserPic,
 } from "../../slices/mainSlices";
+import {
+  RsetHistoryOverTimeModal,
+  selectHistoryOverTimeModal,
+} from "../../slices/OverTimeSlice";
 
-const HistoryCheckoutModal = () => {
+const HistoryOverTime = () => {
   const dispatch = useDispatch();
   const details = useSelector(selectCurrentReqInfo);
-  const historiesCheckoutModal = useSelector(selectHistoriesCheckoutModal);
+  const historiesModal = useSelector(selectHistoryOverTimeModal);
   const histories = useSelector(selectHistories);
   const userImage = useSelector(selectUserPic);
+  // const userName = histories.map((history) => {
+  //   return history.comments.map((item) => {
+  //     return item;
+  //   });
+  // });
+
+  console.log(histories);
 
   const handleUserImage = () => {
     if (userImage.photo_type !== "") {
@@ -45,9 +52,9 @@ const HistoryCheckoutModal = () => {
   return (
     <section>
       <Modal
-        show={historiesCheckoutModal}
+        show={historiesModal}
         centered
-        onHide={() => dispatch(RsetHistoresCheckoutModal(false))}
+        onHide={() => dispatch(RsetHistoryOverTimeModal(false))}
         backdrop="static"
         role="dialog"
         dialogClassName="cont_modal"
@@ -112,7 +119,7 @@ const HistoryCheckoutModal = () => {
           <Button
             className=""
             variant="secondary"
-            onClick={() => dispatch(RsetHistoresCheckoutModal(false))}
+            onClick={() => dispatch(RsetHistoryOverTimeModal(false))}
           >
             بستن
           </Button>
@@ -122,4 +129,4 @@ const HistoryCheckoutModal = () => {
   );
 };
 
-export default HistoryCheckoutModal;
+export default HistoryOverTime;

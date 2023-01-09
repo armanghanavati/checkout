@@ -3,35 +3,37 @@ import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
   addComplateDescription,
-  postBtnCancel,
   selectCancelCheckoutModal,
   selectComplateDescription,
   selectCurrentComp,
   selectCurrentDep,
-  selectDetailes,
-  setCancelCheckoutModal,
+  RsetCancelCheckoutModal,
 } from "../../slices/TableCheckoutSlice";
 import moment from "moment-jalaali";
+import {
+  handlePostCancelModal,
+  selectCurrentReqInfo,
+} from "../../slices/mainSlices";
 
 const CancelCheckoutModal = () => {
   const dispatch = useDispatch();
   const currentReqCo = useSelector(selectCurrentComp);
   const cancelCheckoutModal = useSelector(selectCancelCheckoutModal);
   const currentReqDepartment = useSelector(selectCurrentDep);
-  const details = useSelector(selectDetailes);
+  const details = useSelector(selectCurrentReqInfo);
   const complateDescription = useSelector(selectComplateDescription);
 
   const cancelHandler = () => {
     console.log("click");
-    dispatch(postBtnCancel());
-    dispatch(setCancelCheckoutModal(false));
+    dispatch(handlePostCancelModal(10));
+    dispatch(RsetCancelCheckoutModal(false));
   };
 
   return (
     <Modal
       centered
       show={cancelCheckoutModal}
-      onHide={() => dispatch(setCancelCheckoutModal(false))}
+      onHide={() => dispatch(RsetCancelCheckoutModal(false))}
       backdrop="static"
       role="dialog"
       dialogClassName="cont_modal"
@@ -130,7 +132,7 @@ const CancelCheckoutModal = () => {
           <Button
             className="justify-content-end"
             variant="secondary"
-            onClick={() => dispatch(setCancelCheckoutModal(false))}
+            onClick={() => dispatch(RsetCancelCheckoutModal(false))}
           >
             بستن
           </Button>

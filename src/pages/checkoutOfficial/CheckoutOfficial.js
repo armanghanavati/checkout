@@ -5,44 +5,45 @@ import Select from "react-select";
 import { Button, Form, Col, Row, Modal } from "react-bootstrap";
 import SearchBtn from "./searchBtn/SearchBtn";
 import {
-  loginInfo,
-  fetchAsyncMeliCode,
-  addPersonalCode,
+  RsetPersonalCode,
   selectPersonalCode,
-  fetchHandleGetReasonLeavingWork,
+  handleReasonLeavingWork,
   selectReasonLeavingData,
   selectReasonLeaving,
-  setReasonLeavingHandler,
+  RsetReasonLeavingWork,
   selectMeliCode,
-  addMeliCode,
-  selectUserName,
-  addUserName,
-  addDescreption,
+  RsetMeliCode,
+  selectUserValue,
+  RsetUsernames,
+  RsetDescriptions,
   selectDescreption,
-  addApllyModal,
+  RsetApplyModal,
   selectApplyModal,
+  selectAllUsers,
+  handleUsersCheckout,
+  selectAllUserNames,
 } from "../../components/slices/CheckoutOfficialSlice";
-import {
-  getAllUsersByPersonalCode,
-  getUser,
-  postUserDataCheckout,
-  postAction,
-} from "../../common/services";
-import { toast } from "react-toastify";
+import { postAction, actionAddPerson } from "../../common/mainApi";
 import DatePicker from "react-datepicker2";
+import {
+  handleUserLogin,
+  selectUserLogin,
+} from "../../components/slices/mainSlices";
+import { getUser, postUserDataCheckout } from "../../common/checkout";
+
+import { errorMessage, successMessage } from "../../components/utils/message";
 
 const CheckoutOfficial = () => {
   const [time, setTime] = useState(null);
-  const [users, setUsers] = useState([]);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmit, setIsSubmit] = useState(false);
-  const [showBtn, setShowBtn] = useState(false);
+  const [isDisable, setIsDisable] = useState(false);
   const [officeUser, setOfficeUser] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [department, setDepartment] = useState("");
   const [supervisor, setSupervisor] = useState("");
+  const [requestUserId, setRequestUserId] = useState("");
 
-  const reasonLeavingInputRef = useRef();
   const meliCodeInputRef = useRef();
   const personalCodeInputRef = useRef();
   const searchingInputRef = useRef();
@@ -51,26 +52,16 @@ const CheckoutOfficial = () => {
   const dateLeavingInputRef = useRef();
 
   const dispatch = useDispatch();
+  const users = useSelector(selectAllUserNames);
+  const userName = useSelector(selectUserValue);
+
   const description = useSelector(selectDescreption);
-  const userName = useSelector(selectUserName);
   const personalCode = useSelector(selectPersonalCode);
-  const userData = useSelector(loginInfo);
+  const userData = useSelector(selectUserLogin);
   const melliCode = useSelector(selectMeliCode);
   const reasonLeaving = useSelector(selectReasonLeaving);
   const reasonLeavingData = useSelector(selectReasonLeavingData);
   const applyModal = useSelector(selectApplyModal);
-
-  const handleGetAllUsers = async () => {
-    try {
-      const usersRes = await getAllUsersByPersonalCode(
-        userData.company.CompanyCode,
-        userData.location
-      );
-      setUsers(usersRes.data);
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
 
   const handleGetUser = async (
     userName,
@@ -96,19 +87,19 @@ const CheckoutOfficial = () => {
           `${userRes.data[0].supervisor.first_name} ${userRes.data[0].supervisor.last_name}`
         );
         dispatch(
-          addUserName({
+          RsetUsernames({
             value: userRes.data[0]._id,
             label: `${userRes.data[0].first_name} ${userRes.data[0].last_name}`,
           })
         );
-        dispatch(addPersonalCode(userRes.data[0].personelCode));
-        dispatch(addMeliCode(userRes.data[0].user_name));
+        dispatch(RsetPersonalCode(userRes.data[0].personelCode));
+        dispatch(RsetMeliCode(userRes.data[0].user_name));
         console.log(meliCodeInputRef.current.state.numAsString.length);
       } else if (
         meliCodeInputRef.current.state.numAsString.length === 10 ||
         personalCodeInputRef.current.state.numAsString.length === 7
       ) {
-        toast.error("کاربر یافت نشد");
+        errorMessage("کاربر یافت نشد");
       }
     } catch (ex) {
       console.log(ex);
@@ -145,7 +136,7 @@ const CheckoutOfficial = () => {
     setTime(e);
   };
 
-  const handlePostReasonLeaving = async (e) => {
+  const handleCheckputRegistration = async (e) => {
     e.preventDefault();
     setIsSubmit(true);
     if (userName && personalCode && melliCode && time && reasonLeaving) {
@@ -161,16 +152,24 @@ const CheckoutOfficial = () => {
         const userPostReasonLeavingRes = await postUserDataCheckout(
           checkoutValues
         );
+        setRequestUserId(userPostReasonLeavingRes.data.id);
         console.log(userPostReasonLeavingRes.data);
         if (userPostReasonLeavingRes.data.code === 415) {
           if (officeUser !== undefined) {
-            dispatch(addApllyModal(true));
+            const ActionValues = {
+              action_id: userPostReasonLeavingRes.data.id,
+              action_code: 0,
+              user_id: localStorage.getItem("id"),
+              type: 10,
+            };
+            const actionRes = await postAction(ActionValues);
+            console.log(actionRes);
+            dispatch(RsetApplyModal(true));
           } else {
-            toast.error("مدیر کاربرمورد نظر یافت نشد!", {
-              className: "bg-danger text-white",
-            });
+            errorMessage("مدیر کاربرمورد نظر یافت نشد!");
           }
         }
+
         if (userPostReasonLeavingRes.data.code === 412) {
           setFormErrors(
             validationForm({
@@ -199,14 +198,14 @@ const CheckoutOfficial = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAsyncMeliCode());
-    dispatch(fetchHandleGetReasonLeavingWork());
+    dispatch(handleUserLogin());
+    dispatch(handleReasonLeavingWork());
   }, [dispatch]);
 
   useEffect(() => {
     function paterNhandler() {
       if (userData.first_name !== undefined) {
-        handleGetAllUsers();
+        dispatch(handleUsersCheckout());
       }
       if (Object.keys(formErrors).length === 0 && isSubmit) {
         return personalCode, melliCode, userName;
@@ -219,15 +218,15 @@ const CheckoutOfficial = () => {
   const [melliCodeCopy, setMelliCodeCopy] = useState("");
 
   const meliCodeHandler = (event) => {
-    dispatch(addMeliCode(event.target.value));
+    dispatch(RsetMeliCode(event.target.value));
     var valueLength = event.target.value.replace(/\s/g, "").length;
     console.log(valueLength, melliCodeCopy, event.target.value);
     if (valueLength === 10 && melliCodeCopy !== event.target.value) {
       setMelliCodeCopy(event.target.value);
       handleGetUser(userName, event.target.value, personalCode, supervisor);
     } else if (valueLength < 10) {
-      dispatch(addPersonalCode(""));
-      dispatch(addUserName(""));
+      dispatch(RsetPersonalCode(""));
+      dispatch(RsetUsernames(""));
       setMelliCodeCopy("");
       setCompanyName("");
       setDepartment("");
@@ -238,15 +237,15 @@ const CheckoutOfficial = () => {
   const [personalCodeCopy, setPersonalCodeCopy] = useState("");
 
   const personalCodeHandler = (e) => {
-    dispatch(addPersonalCode(e.target.value));
+    dispatch(RsetPersonalCode(e.target.value));
     var valueLength = e.target.value.replace(/\s/g, "").length;
 
     if (valueLength === 7 && personalCodeCopy !== e.target.value) {
       setPersonalCodeCopy(e.target.value);
       handleGetUser(userName, melliCode, e.target.value, supervisor);
     } else if (valueLength < 7) {
-      dispatch(addMeliCode(""));
-      dispatch(addUserName(""));
+      dispatch(RsetMeliCode(""));
+      dispatch(RsetUsernames(""));
       setPersonalCodeCopy("");
       setCompanyName("");
       setDepartment("");
@@ -255,166 +254,51 @@ const CheckoutOfficial = () => {
   };
 
   const userNameHandler = (e) => {
-    dispatch(addUserName(e));
+    dispatch(RsetUsernames(e));
     handleGetUser(e);
-    dispatch(addMeliCode(""));
-    dispatch(addPersonalCode(""));
+    dispatch(RsetMeliCode(""));
+    dispatch(RsetPersonalCode(""));
     setSupervisor("");
   };
 
-  const cancelHandler = (e) => {
+  const handleResetForm = (e) => {
     e.preventDefault();
-    dispatch(addMeliCode(""));
-    dispatch(addPersonalCode(""));
-    dispatch(addDescreption(""));
-    dispatch(setReasonLeavingHandler(""));
-    dispatch(addUserName(""));
+    dispatch(RsetMeliCode(""));
+    dispatch(RsetPersonalCode(""));
+    dispatch(RsetDescriptions(""));
+    dispatch(RsetReasonLeavingWork(""));
+    dispatch(RsetUsernames(""));
     setSupervisor("");
     setTime(null);
-    setShowBtn(false);
+    setIsDisable(false);
     setFormErrors("");
     setCompanyName("");
     setDepartment("");
   };
 
-  const postBtnHandler = async (e) => {
+  const handleActionToPersons = async (e) => {
     e.preventDefault();
-    setIsSubmit(true);
-    if (userName && personalCode && melliCode && time && reasonLeaving) {
-      try {
-        const checkoutValues = {
-          leaver: userName.value,
-          description: description,
-          leavingWorkCause: reasonLeaving.value,
-          leavingWorkDate: time,
-        };
-        const userPostReasonLeavingRes = await postUserDataCheckout(
-          checkoutValues
-        );
-
-        if (userPostReasonLeavingRes.data.code === 415) {
-          if (officeUser !== undefined) {
-            const ActionValues = {
-              action_id: userPostReasonLeavingRes.data.id,
-              action_code: 0,
-              user_id: localStorage.getItem("id"),
-              toPerson: officeUser,
-              type: 10,
-            };
-            const actionRes = await postAction(ActionValues);
-            console.log(actionRes);
-            if (actionRes.data.code === 415) {
-              dispatch(addMeliCode(""));
-              dispatch(addPersonalCode(""));
-              dispatch(addDescreption(""));
-              dispatch(setReasonLeavingHandler(""));
-              dispatch(addUserName(""));
-              setTime(null);
-              setFormErrors("");
-              setSupervisor("");
-              setCompanyName("");
-              setDepartment("");
-              setShowBtn(false);
-              toast.success("درخواست با موفقیت ثبت و ارسال شد!");
-            }
-          } else {
-            toast.error("مدیر کاربرمورد نظر یافت نشد!", {
-              className: "bg-danger text-white",
-            });
-          }
-        }
-      } catch (ex) {
-        console.log(ex);
+    try {
+      const toPersons = {
+        toPersons: [officeUser],
+      };
+      const addPersonActionRes = await actionAddPerson(
+        requestUserId,
+        10,
+        toPersons
+      );
+      console.log(addPersonActionRes.data);
+      if (addPersonActionRes.data.code === 415) {
+        dispatch(RsetApplyModal(false));
+        handleResetForm(e);
+        successMessage("درخواست با موفقیت ثبت و ارسال شد!");
+      } else {
+        errorMessage("عملیات انجام نشد");
       }
-    } else {
-      setFormErrors(
-        validationForm({
-          personalCode: personalCode,
-          melliCode: melliCode,
-          userName: userName.value,
-          reasonLeaving: reasonLeaving.value,
-          time: time,
-        })
-      );
-      toast.error(
-        " ثبت درخواست تسویه حساب انجام نشد! لطفا دوباره امتحان کنید.",
-        {
-          className: "bg-danger text-white",
-        }
-      );
+    } catch (error) {
+      console.log(error);
     }
   };
-
-  const cancelModalHandler = () => {
-    dispatch(addApllyModal(false));
-    setShowBtn(true);
-  };
-
-  const acceptModalHandler = async () => {
-    const checkoutValues = {
-      leaver: userName.value,
-      description: description,
-      leavingWorkCause: reasonLeaving.value,
-      leavingWorkDate: time,
-    };
-    const userPostReasonLeavingRes = await postUserDataCheckout(checkoutValues);
-    const ActionValues = {
-      action_id: userPostReasonLeavingRes.data.id,
-      action_code: 0,
-      user_id: localStorage.getItem("id"),
-      toPerson: officeUser,
-      type: 10,
-    };
-    dispatch(addMeliCode(""));
-    dispatch(addPersonalCode(""));
-    dispatch(addDescreption(""));
-    dispatch(setReasonLeavingHandler(""));
-    dispatch(addUserName(""));
-    setTime(null);
-    setFormErrors("");
-    setCompanyName("");
-    setSupervisor("");
-    setDepartment("");
-
-    const actionRes = await postAction(ActionValues);
-    console.log(actionRes);
-    dispatch(addApllyModal(false));
-    toast.success("درخواست با موفقیت ثبت و ارسال شد!");
-    return actionRes.data;
-  };
-
-  // const handleEnter = (e) => {
-  //   console.log(e);
-  //   e.which = e.which || e.keyCode;
-  //   if (e.which === 13) {
-  //     switch (e.target.id) {
-  //       case "item1":
-  //         userNameInputRef.current.focus();
-  //         break;
-  //       case "item2":
-  //         meliCodeInputRef.current.focus();
-  //         break;
-  //       case "item3":
-  //         personalCodeInputRef.current.focus();
-  //         break;
-  //       case "item4":
-  //         searchingInputRef.current.focus();
-  //         break;
-  //       case "item5":
-  //         reasonLeavingInputRef.current.focus();
-  //         break;
-  //       case "item6":
-  //         dateLeavingInputRef.current.focus();
-  //         break;
-  //       case "item7":
-  //         descriptionInputRef.current.focus();
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //     e.preventDefault();
-  //   }
-  // };
 
   document.addEventListener("keydown", function (event) {
     if (event.keyCode === 13 && event.target.nodeName === "INPUT") {
@@ -429,7 +313,7 @@ const CheckoutOfficial = () => {
     <div className="container-fluid">
       <Form className="form-group">
         <Row>
-          <Col className="mb-4" md="12" lg="6" xl="3">
+          <Col className="mb-4" md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label">
               نام و نام خانوادگی:
             </label>
@@ -442,10 +326,12 @@ const CheckoutOfficial = () => {
               // onBlur={() => handleGetUser()}
               onChange={userNameHandler}
             />
-            <p className="font12 text-danger mb-0 mt-1">
-              {" "}
-              {formErrors.userName}{" "}
-            </p>
+
+            {!userName.value && (
+              <p className="font12 text-danger mb-0 mt-1">
+                {formErrors.userName}
+              </p>
+            )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label"> کد ملی: </label>
@@ -460,10 +346,11 @@ const CheckoutOfficial = () => {
               name="meliCode"
               format="##########"
             />
-            <p className="font12 text-danger mt-1 mb-0">
-              {" "}
-              {formErrors.melliCode}{" "}
-            </p>
+            {!melliCode && (
+              <p className="font12 text-danger mt-1 mb-0">
+                {formErrors.melliCode}
+              </p>
+            )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label">
@@ -480,9 +367,11 @@ const CheckoutOfficial = () => {
               // onBlur={() => handleGetUser()}
               format="#######"
             />
-            <p className="font12 text-danger mt-1 mb-0">
-              {formErrors.personalCode}
-            </p>
+            {!personalCode && (
+              <p className="font12 text-danger mt-1 mb-0">
+                {formErrors.personalCode}
+              </p>
+            )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="2">
             <label className="mb-1"> مدیر / سرپرست: </label>
@@ -494,6 +383,7 @@ const CheckoutOfficial = () => {
             <p className="font12 text-danger mb-4 mb-md-4"></p>
           </Col>
           <SearchBtn
+            className="col-1"
             id="item4"
             userName={userName}
             melliCode={melliCode}
@@ -503,22 +393,11 @@ const CheckoutOfficial = () => {
             refrence={searchingInputRef}
             handleGetUser={handleGetUser}
           />
-          <Col className=" mb-4" md="12" lg="6" xl="3">
-            <label className="mb-1 required-field">علت ترک خدمت : </label>
-            <Select
-              id="item5"
-              value={reasonLeaving}
-              options={reasonLeavingData}
-              onChange={(e) => dispatch(setReasonLeavingHandler(e))}
-              placeholder="انتخاب"
-            />
-            <p className="font12 text-danger mt-1 mb-0">
-              {formErrors.reasonLeaving}
-            </p>
-          </Col>
           <Col md="12" lg="6" xl="3" className="mb-4">
-            <label className="mb-1 required-field">تاریخ ترک خدمت : </label>
+            <label className="mb-1  required-field">تاریخ ترک خدمت : </label>
             <DatePicker
+              // calendarClass="datePicker"
+              datePickerClass="bg-danger"
               id="item6"
               ref={dateLeavingInputRef}
               className="form-control"
@@ -527,10 +406,60 @@ const CheckoutOfficial = () => {
               onChange={timerHandler}
               isGregorian={false}
               timePicker={false}
-              inputFormat="YYYY-MM-DD"
-              inputJalaaliFormat="jYYYY-jM-jD"
+              inputFormat="YYYY/MM/DD"
+              inputJalaaliFormat="jYYYY/jM/jD"
+              monthsShown={1}
+              timeIntervals={5}
+              timeCaption="time"
+              popperPlacement="bottom"
+              portalId="root-portal"
+              // selected={startDateSingleDay}
+              dateFormat="yyyy-MM-dd"
+              // className="text-center"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+              // onChangeRaw={handleDateChangeRaw}
+              popperClassName="date-picker-reports"
+              placeholderText="Choose a date"
+              // disabled:true
+              // minDate={isDate(minDate) ? moment(minDate) : null}
+              // maxDate={isDate(maxDate) ? moment(maxDate) : null}
+              popperModifiers={{
+                options: {
+                  rootBoundary: "viewport",
+                  tether: false,
+                  altAxis: true,
+                },
+                flip: {
+                  behavior: ["bottom"],
+                },
+                preventOverflow: {
+                  enabled: false,
+                },
+                hide: {
+                  enabled: false,
+                },
+              }}
             />
-            <p className="font12 text-danger mt-1 mb-0">{formErrors.time}</p>
+            {!time && (
+              <p className="font12 text-danger mt-1 mb-0">{formErrors.time}</p>
+            )}
+          </Col>
+          <Col className=" mb-4" md="12" lg="6" xl="3">
+            <label className="mb-1 required-field">علت ترک خدمت : </label>
+            <Select
+              id="item5"
+              value={reasonLeaving}
+              options={reasonLeavingData}
+              onChange={(e) => dispatch(RsetReasonLeavingWork(e))}
+              placeholder="انتخاب"
+            />
+            {!reasonLeaving.value && (
+              <p className="font12 text-danger mt-1 mb-0">
+                {formErrors.reasonLeaving}
+              </p>
+            )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="3">
             <label className="mb-1">شرکت : </label>
@@ -549,7 +478,7 @@ const CheckoutOfficial = () => {
               // onKeyDown={() => handleEnter()}
               ref={descriptionInputRef}
               value={description}
-              onChange={(e) => dispatch(addDescreption(e.target.value))}
+              onChange={(e) => dispatch(RsetDescriptions(e.target.value))}
               className="form-control"
               rows="5"
             />
@@ -558,22 +487,22 @@ const CheckoutOfficial = () => {
         <div className="justify-content-center text-center d-flex">
           <div className="">
             <button
-              onClick={cancelHandler}
+              onClick={handleResetForm}
               className="me-4 btn btn-secondary my-5"
             >
               ایجاد مورد جدید
             </button>
             <button
-              onClick={handlePostReasonLeaving}
-              disabled={showBtn ? true : false}
+              onClick={handleCheckputRegistration}
+              disabled={isDisable ? true : false}
               className="ms-4 btn btn-success my-5"
             >
               ثبت
             </button>
           </div>
           <button
-            onClick={postBtnHandler}
-            disabled={showBtn ? false : true}
+            onClick={handleActionToPersons}
+            disabled={isDisable ? false : true}
             className="ms-2 btn btn-primary my-5"
           >
             ارسال به مدیران جهت بررسی
@@ -582,7 +511,7 @@ const CheckoutOfficial = () => {
       </Form>
       <Modal
         show={applyModal}
-        onHide={() => dispatch(addApllyModal(false))}
+        onHide={() => dispatch(RsetApplyModal(false))}
         backdrop="static"
         role="dialog"
         size="sm"
@@ -602,14 +531,17 @@ const CheckoutOfficial = () => {
           <Button
             name="cancelModal"
             variant="danger"
-            onClick={cancelModalHandler}
+            onClick={() => {
+              dispatch(RsetApplyModal(false));
+              setIsDisable(true);
+            }}
           >
             خیر
           </Button>
           <Button
             name="acceptModal"
             variant="success"
-            onClick={acceptModalHandler}
+            onClick={handleActionToPersons}
           >
             بله
           </Button>

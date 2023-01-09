@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import inputs from "../../tableData/FieldValues";
 import Fields from "./fields/Fields";
 import { Form, Button, Row, Col } from "react-bootstrap";
-import "./style.css";
 import {
   handleGetUsersTable,
   selectCompany,
@@ -11,17 +10,18 @@ import {
   selectLeavingWorkCause,
   selectStatus,
   selectToDate,
-  addLeavingWorkCause,
-  addUserMemb,
-  addStatus,
-  addToDate,
-  addFromDate,
-  addDep,
-  addCompany,
+  RsetLeavingWork,
+  RsetUserCheckoutTable,
+  RsetStatusTable,
+  RsetToDateTable,
+  RsetFromDateTable,
+  RsetDepartmantCheckoutTable,
+  RsetCompanyCheckout,
   selectUserMemb,
   selectValueStatus,
-} from "../../slices/TableCheckoutSlice";
+} from "../../../slices/TableCheckoutSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { RsetIsLoadingCheckout } from "../../../slices/mainSlices";
 
 const FieldsTableCheckout = () => {
   const dep = useSelector(selectDep);
@@ -36,18 +36,19 @@ const FieldsTableCheckout = () => {
   const dispatch = useDispatch();
 
   const submitHandler = (e) => {
+    dispatch(RsetIsLoadingCheckout(false));
     e.preventDefault();
     dispatch(handleGetUsersTable());
   };
 
   const cancelFilter = () => {
-    dispatch(addLeavingWorkCause(""));
-    dispatch(addUserMemb(""));
-    dispatch(addStatus(""));
-    dispatch(addToDate(null));
-    dispatch(addFromDate(null));
-    dispatch(addDep(""));
-    dispatch(addCompany(""));
+    dispatch(RsetLeavingWork(""));
+    dispatch(RsetUserCheckoutTable(""));
+    dispatch(RsetStatusTable(""));
+    dispatch(RsetToDateTable(null));
+    dispatch(RsetFromDateTable(null));
+    dispatch(RsetDepartmantCheckoutTable(""));
+    dispatch(RsetCompanyCheckout(""));
   };
 
   return (

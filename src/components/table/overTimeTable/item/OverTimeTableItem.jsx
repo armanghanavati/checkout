@@ -12,7 +12,7 @@ import {
 const OverTimeTableItem = ({
   requests,
   columns,
-    data,
+  data,
   onSort,
   fetchData,
   loading,
@@ -62,7 +62,7 @@ const OverTimeTableItem = ({
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th
-                  className="col-1 bg-secondary text-white fw-normal"
+                  className="text-center col-1 bg-secondary text-white fw-normal"
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
                   {column.render("Header")}
@@ -78,7 +78,7 @@ const OverTimeTableItem = ({
             </tr>
           ))}
         </thead>
-        <tbody {...getTableBodyProps()}>
+        <tbody className="text-center" {...getTableBodyProps()}>
           {page.map((row, i) => {
             prepareRow(row);
             return (

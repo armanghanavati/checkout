@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment-jalaali";
 import {
-  addApllyModal,
+  RsetApplyModal,
   selectApplyModal,
 } from "../../checkoutOfficialSlice/CheckoutOfficialSlice";
 
@@ -20,12 +20,12 @@ const ApplyModal = () => {
   //   const postUsersHandler = (e) => {
   //     e.preventDefault();
 
-  //     dispatch(postHandlerBtnAccept());
+  //     dispatch(handlePostAccept());
 
-  //     dispatch(setAcceptCheckoutModal(false));
+  //     dispatch(RsetAcceptCheckoutModal(false));
   //     dispatch(addComplateDescription(""));
   const cancelHandler = () => {
-    dispatch(addApllyModal(false));
+    dispatch(RsetApplyModal(false));
   };
   //   };
   const acceptHandler = () => {};
@@ -33,7 +33,7 @@ const ApplyModal = () => {
   return (
     <Modal
       show={applyModal}
-      onHide={() => dispatch(addApllyModal(false))}
+      onHide={() => dispatch(RsetApplyModal(false))}
       backdrop="static"
       role="dialog"
       size="sm"

@@ -13,6 +13,9 @@ const ChekoutLinks = () => {
       <Link className="py-2 px-2 mx-2" to="/checkoutList">
         لیست درخواست های تسویه
       </Link>
+      <Link className="py-2 px-2 mx-2" to="/OverTimeTableList">
+        لیست درخواست های تسویه
+      </Link>
     </nav>
   );
 };

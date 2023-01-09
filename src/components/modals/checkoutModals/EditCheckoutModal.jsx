@@ -1,47 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  postEditBtn,
   selectCurrentComp,
   selectCurrentDep,
-  selectDetailes,
   selectEditCheckoutModal,
-  setEditCheckoutModal,
+  RsetEditCheckoutModal,
 } from "../../slices/TableCheckoutSlice";
 
 import moment from "moment-jalaali";
 import DatePicker from "react-datepicker2";
 import Select from "react-select";
 import {
-  selectReasonLeaving,
-  setReasonLeavingHandler,
-  selectReasonLeavingModal,
   selectReasonLeavingData,
-  addReasonLeavingModal,
+  RsetReasonLeavingModal,
 } from "../../slices/CheckoutOfficialSlice";
+import { handlePostEdit, selectCurrentReqInfo } from "../../slices/mainSlices";
 
 const EditCheckoutModal = () => {
   const dispatch = useDispatch();
   const currentReqCo = useSelector(selectCurrentComp);
   const currentReqDepartment = useSelector(selectCurrentDep);
   const editCheckoutModal = useSelector(selectEditCheckoutModal);
-  const details = useSelector(selectDetailes);
+  const details = useSelector(selectCurrentReqInfo);
   const reasonLeavingData = useSelector(selectReasonLeavingData);
 
   const reasonChanger = details.leavingWorkCause;
   const desChanger = details.description;
-
+  console.log(reasonChanger);
   const [dateTitle, setDateTitle] = useState(null);
   const [descriptionTitle, setDescriptionTitle] = useState(desChanger);
 
   useEffect(() => {
+    console.log(details);
     function onChangeHandlerInputs() {
       if (details.leavingWorkDate !== undefined) {
         setDateTitle(moment(details.leavingWorkDate, "YYYY/MM/DD"));
       }
       if (details.leavingWorkCause !== undefined) {
-        addReasonLeavingModal(details.leavingWorkCause);
+        RsetReasonLeavingModal(details.leavingWorkCause);
       }
       if (details.description !== undefined) {
         setDescriptionTitle(details.description);
@@ -52,15 +49,15 @@ const EditCheckoutModal = () => {
 
   const editHandler = () => {
     console.log("accepted");
-    dispatch(postEditBtn());
-    dispatch(setEditCheckoutModal(false));
+    dispatch(handlePostEdit(10));
+    dispatch(RsetEditCheckoutModal(false));
   };
 
   return (
     <Modal
       centered
       show={editCheckoutModal}
-      onHide={() => dispatch(setEditCheckoutModal(false))}
+      onHide={() => dispatch(RsetEditCheckoutModal(false))}
       backdrop="static"
       role="dialog"
       dialogClassName="cont_modal"
@@ -122,7 +119,7 @@ const EditCheckoutModal = () => {
             placeholder="جستجو . . ."
             options={reasonLeavingData}
             defaultValue={reasonChanger}
-            onChange={(e) => dispatch(addReasonLeavingModal(e))}
+            onChange={(e) => dispatch(RsetReasonLeavingModal(e))}
           />
           <div className=" mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>
@@ -159,7 +156,7 @@ const EditCheckoutModal = () => {
           <Button
             className="justify-content-end"
             variant="secondary"
-            onClick={() => dispatch(setEditCheckoutModal(false))}
+            onClick={() => dispatch(RsetEditCheckoutModal(false))}
           >
             بستن
           </Button>

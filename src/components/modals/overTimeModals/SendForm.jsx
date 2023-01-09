@@ -1,40 +1,40 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { successMessage } from "../../utils/message";
 import {
-  addDescreption,
-  addEndDate,
-  addOverTimeReasonValue,
-  addShowOverTime,
-  addStartDate,
-  postOverTimeApi,
+  RsetDescriptions,
+  RsetToDate,
+  RsetOverTimeReasonValue,
+  RsetShowOverTimeApplyModal,
+  RsetFromDate,
+  handleUsersOvertime,
   selectShowOverTime,
-  setIsSubmit,
+  RsetDisable,
 } from "../../slices/OverTimeSlice";
 
-const OverTime = () => {
+const SendForm = () => {
   const showOverTime = useSelector(selectShowOverTime);
   const dispatch = useDispatch();
   const cancelModalHandler = () => {
-    dispatch(addShowOverTime(false));
-    dispatch(setIsSubmit(true));
+    dispatch(RsetShowOverTimeApplyModal(false));
+    dispatch(RsetDisable(true));
   };
   const acceptModalHandler = () => {
-    dispatch(postOverTimeApi());
-    dispatch(addShowOverTime(false));
-    dispatch(addOverTimeReasonValue(""));
-    dispatch(addEndDate(null));
-    dispatch(addStartDate(null));
-    dispatch(addDescreption(""));
+    successMessage("درخواست شما با موفقیت به سرپرست/مدیر ارسال شد.");
+    dispatch(handleUsersOvertime());
+    dispatch(RsetShowOverTimeApplyModal(false));
+    dispatch(RsetOverTimeReasonValue(""));
+    dispatch(RsetToDate(null));
+    dispatch(RsetFromDate(null));
+    dispatch(RsetDescriptions(""));
   };
-
-  console.log(showOverTime);
 
   return (
     <>
       <Modal
         show={showOverTime}
-        onHide={() => dispatch(addShowOverTime(false))}
+        onHide={() => dispatch(RsetShowOverTimeApplyModal(false))}
         backdrop="static"
         role="dialog"
         size="sm"
@@ -71,4 +71,4 @@ const OverTime = () => {
   );
 };
 
-export default OverTime;
+export default SendForm;

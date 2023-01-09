@@ -4,9 +4,9 @@ import DatePicker from "react-datepicker2";
 import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addLeavingWorkCause,
-  addUserMemb,
-  addStatus,
+  RsetLeavingWork,
+  RsetUserCheckoutTable,
+  RsetStatusTable,
   selectAllStatus,
   selectFromDate,
   selectLeavingWorkCause,
@@ -14,18 +14,17 @@ import {
   selectUserMemb,
   selectUserMembers,
   selectValueStatus,
-  addToDate,
-  addFromDate,
+  RsetToDateTable,
+  RsetFromDateTable,
   handleGetUsersTable,
   selectAllCompany,
-  selectAllDeps,
-  addDep,
+  RsetDepartmantCheckoutTable,
   selectDep,
-  addCompany,
+  RsetCompanyCheckout,
   selectCompany,
-} from "../../../slices/TableCheckoutSlice";
-import { selectReasonLeavingData } from "../../../slices/CheckoutOfficialSlice";
-import { usePagination, useSortBy, useTable } from "react-table";
+} from "../../../../slices/TableCheckoutSlice";
+import { selectReasonLeavingData } from "../../../../slices/CheckoutOfficialSlice";
+import { selectAllDeps } from "../../../../slices/mainSlices";
 
 const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   const dispatch = useDispatch();
@@ -57,13 +56,15 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
   //   state: { pageIndex, pageSize, sortBy },
   // } = useTable();
 
+  console.log(dep);
+
   const fildsSection = () => {
     if (name === "applicant") {
       return (
         <Select
           value={userMemb}
           onChange={(e) => {
-            dispatch(addUserMemb(e));
+            dispatch(RsetUserCheckoutTable(e));
             // gotoPage(0);
 
             if (onchecked) {
@@ -75,6 +76,29 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           className="mb-4 mb-xl-4 col-12 col-sm-12 col-md-12 col-md-4 w-100"
         />
       );
+    } else if (name === "fromDate") {
+      return (
+        <DatePicker
+          inputReadOnly
+          className="form-control mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4"
+          value={fromDateTime}
+          onChange={(e) => {
+            dispatch(RsetFromDateTable(e));
+            console.log(fromDateTime);
+          }}
+          {...allProps}
+        />
+      );
+    } else if (name === "toDate") {
+      return (
+        <DatePicker
+          inputReadOnly
+          className="form-control mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4"
+          value={toDateTime}
+          onChange={(e) => dispatch(RsetToDateTable(e))}
+          {...allProps}
+        />
+      );
     } else if (name === "reasonLeavingCase") {
       return (
         <Select
@@ -83,7 +107,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           value={LeavingWorkCause}
           options={reasonLeavingData}
           onChange={(e) => {
-            dispatch(addLeavingWorkCause(e));
+            dispatch(RsetLeavingWork(e));
             if (onchecked) {
               dispatch(handleGetUsersTable());
             }
@@ -98,9 +122,9 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           value={company}
           options={allCompany}
           onChange={(e) => {
-            dispatch(addCompany(e));
+            dispatch(RsetCompanyCheckout(e));
             if (onchecked) {
-              dispatch(addCompany());
+              dispatch(RsetCompanyCheckout());
             }
           }}
         />
@@ -113,7 +137,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           value={dep}
           options={allDeps}
           onChange={(e) => {
-            dispatch(addDep(e));
+            dispatch(RsetDepartmantCheckoutTable(e));
             if (onchecked) {
               dispatch(handleGetUsersTable());
             }
@@ -125,7 +149,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
         <Select
           options={allStatus}
           onChange={(e) => {
-            dispatch(addStatus(e));
+            dispatch(RsetStatusTable(e));
             if (onchecked) {
               dispatch(handleGetUsersTable());
             }
@@ -133,29 +157,6 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           value={valueStatus}
           {...allProps}
           className="mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4 w-100"
-        />
-      );
-    } else if (name === "fromDate") {
-      return (
-        <DatePicker
-          inputReadOnly
-          className="form-control mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4"
-          value={fromDateTime}
-          onChange={(e) => {
-            dispatch(addFromDate(e));
-            console.log(fromDateTime);
-          }}
-          {...allProps}
-        />
-      );
-    } else if (name === "toDate") {
-      return (
-        <DatePicker
-          inputReadOnly
-          className="form-control mb-4 mb-xl-0 col-12 col-sm-12 col-md-12 col-md-4"
-          value={toDateTime}
-          onChange={(e) => dispatch(addToDate(e))}
-          {...allProps}
         />
       );
     }
