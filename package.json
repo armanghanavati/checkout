@@ -16,6 +16,7 @@
     "bootstrap": "^5.2.2",
     "formik": "^2.2.9",
     "moment-jalaali": "^0.9.4",
+    "num2persian": "^3.2.2",
     "react": "^16.14.0",
     "react-apexcharts": "^1.4.0",
     "react-bootstrap": "^2.6.0",

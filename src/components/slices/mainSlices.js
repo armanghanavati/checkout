@@ -1,41 +1,54 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  checkPassCompleted,
   getAllDepartment,
+  getMenu,
+  getRequestsList,
   getUserInfo,
   getUserPhoto,
   permisionChanged,
   permisionPresent,
   postAction,
   userInfo,
-} from "../../common/mainApi";
+} from "../../Services/r-ghanavatian/mainApi";
 import {
   checkDate,
   findToPerson,
   getCurrentReqHistory,
   getCurrentReqInfo,
-} from "../../common/tableListServices";
-import { errorMessage, successMessage, warningMessage } from "../utils/message";
+} from "../../Services/r-ghanavatian/tableListServices";
+import {
+  errorMessage,
+  successMessage,
+  warningMessage,
+} from "../../utils/message";
 import {
   RsetCurrentReqCompany,
   RsetCurrentReqDepCheckout,
   RsetCurrentReqType,
-} from "./TableCheckoutSlice";
+  RsetLocationCheckout,
+} from "./CheckoutOfficialSlice";
 
 const initialState = {
   userInformation: {},
   userPic: "",
   userPicHistory: "",
   isLoading: false,
-  isLoadingOver: false,
   histories: [],
   userLogin: {},
   descriptionModals: "",
   allDepartment: [],
   currentReqInfo: "",
+  reqsList: [],
+  requestMembs: [],
+  userName: "",
+  password: "",
+  menu: [],
+  userInfoChanged: {},
+  loginPage: false,
 };
 
 //  Department
-
 export const handleDepartments = createAsyncThunk(
   "mainHome/handleDepartments",
   async (obj, { getState }) => {
@@ -54,15 +67,110 @@ export const handleDepartments = createAsyncThunk(
   }
 );
 
-// Login info
-export const handleUserLogin = createAsyncThunk(
-  "mainHome/handleUserLogin",
-  async () => {
-    const resUserInfo = await userInfo();
-    localStorage.setItem("id", resUserInfo.data._id);
-    localStorage.setItem("personalCode", resUserInfo.data.personelCode);
-    console.log(resUserInfo.data);
-    return resUserInfo.data;
+// export const handleUserLogin = createAsyncThunk(
+//   "mainHome/handleUserLogin",
+//   async () => {
+//     const resUserInfo = await userInfo();
+//     localStorage.setItem("id", resUserInfo.data._id);
+//     localStorage.setItem("personalCode", resUserInfo.data.personelCode);
+//     console.log(resUserInfo.data);
+//     return resUserInfo.data;
+//   }
+// );
+
+// ->  Handle menu //
+export const handleMenu = createAsyncThunk(
+  "mainHome/handleMenu",
+  async (obj, { dispatch }) => {
+    try {
+      const { data } = await getMenu("62aad59dbe423590c073977c");
+      dispatch(RsetMenu(data));
+    } catch (ex) {
+      console.log(ex);
+    }
+  }
+);
+
+// ->  Login info //
+export const handleLogin = createAsyncThunk(
+  "mainHome/handleLogin",
+  async (history, { getState, dispatch }) => {
+    // event.preventDefault();
+    console.log(history);
+    const { userName, password } = getState().mainHome;
+    const user = { username: userName.replace(/ /g, ""), password };
+    dispatch(RsetLocationCheckout(true));
+    try {
+      const { data, status } = await userInfo(user);
+      console.log(data);
+      if (status === 200) {
+        if (data.approved === true) {
+          const checkUserInfoCompletedRes = await checkPassCompleted(
+            data._id,
+            "all"
+          );
+          console.log(checkUserInfoCompletedRes);
+          const loginProcess = async () => {
+            localStorage.setItem("id", data._id);
+            localStorage.setItem("dep", data.dep.dep_code);
+            localStorage.setItem("role", data.role);
+            localStorage.setItem("personalCode", data.personelCode);
+            const ActionValues = {
+              action_code: 18,
+              user_id: localStorage.getItem("id"),
+              type: 7,
+            };
+            const postActionRes = await postAction(ActionValues);
+            dispatch(RsetLocationCheckout(false));
+            console.log(postActionRes);
+            handleMenu();
+            //handleLastNewReqs();
+            if (data.changedPer === true) {
+              //console.log(getCookie(localStorage.getItem('personalCode')))
+              if (getCookie(localStorage.getItem("personalCode")) !== null) {
+                //console.log('in')
+                setCookie(localStorage.getItem("personalCode"), "expired", 0);
+              }
+            }
+            successMessage("ورود موفقیت آمیز بود.");
+            dispatch(RsetLoginPage(true));
+            history("/dashboard");
+            return data;
+          };
+          dispatch(RsetUserInfoChanged(checkUserInfoCompletedRes.data));
+
+          if (checkUserInfoCompletedRes.data === true) {
+            loginProcess();
+            //handleGetNSeenCounters();
+          } else if (checkUserInfoCompletedRes.data === false) {
+            loginProcess();
+            errorMessage("اطلاعات کاربری خود را تغییر دهید!");
+          }
+        } else if (data.approved === false) {
+          dispatch(RsetLocationCheckout(false));
+          errorMessage("حساب کاربری شما تایید نشده است!");
+        } else if (data.code === 408) {
+          dispatch(RsetLocationCheckout(false));
+          errorMessage("شرکت یا واحد کاربر یافت نشد!");
+        } else if (data.code === 409) {
+          dispatch(RsetLocationCheckout(false));
+          errorMessage("رمز عبور نادرست است!");
+        } else if (data.code === 410) {
+          dispatch(RsetLocationCheckout(false));
+          errorMessage("کدملی مورد نظر یافت نشد!");
+        } else {
+          dispatch(RsetLocationCheckout(false));
+          errorMessage("خطایی رخ داده است!");
+        }
+      } else {
+        dispatch(RsetLocationCheckout(false));
+        errorMessage("نام کاربری یا رمزعبور صحیح نمی باشد!");
+      }
+    } catch (ex) {
+      console.log(ex);
+      dispatch(RsetLocationCheckout(false));
+      errorMessage("ورود به حساب کاربری با خطا مواجه شد!");
+    }
   }
 );
 
@@ -156,11 +264,11 @@ export const handleUserPicture = createAsyncThunk(
   }
 );
 
-//  User details
-
+//  Request details
 export const handleCurrentReqInfo = createAsyncThunk(
   "mainHome/handleCurrentReqInfo",
   async ({ reqId, reqType, objCompany, objDepartment }, { dispatch }) => {
+    console.log(reqId, reqType, objCompany, objDepartment);
     console.log(reqId, reqType, objCompany, objDepartment);
     dispatch(RsetCurrentReqCompany(objCompany));
     dispatch(RsetCurrentReqDepCheckout(objDepartment));
@@ -205,22 +313,6 @@ export const handleHistories = createAsyncThunk(
     const historeRes = await getCurrentReqHistory(serial, type);
     console.log(historeRes.data);
     return historeRes.data;
-  }
-);
-
-//  Edit post
-export const handlePostEdit = createAsyncThunk(
-  "mainHome/handlePostEdit",
-  async (type, { getState }) => {
-    const { currentReqInfo } = getState().mainHome;
-    const getLastActionId =
-      currentReqInfo.process[currentReqInfo.process.length - 1]._id;
-    const getReqId = currentReqInfo.reqInfo._id;
-    const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
-    console.log(postCheckDateRes);
-    if (postCheckDateRes.data.type === "accepted") {
-      successMessage("درخواست شما با موفقیت ثبت شد.");
-    }
   }
 );
 
@@ -294,8 +386,62 @@ export const handlePostCancelModal = createAsyncThunk(
       };
       console.log(actionValue);
       const postActionRes = await postAction(actionValue);
-      successMessage("درخاست شما با موفقیت کنسل شد.");
+      successMessage("درخواست شما با موفقیت کنسل شد.");
       return postActionRes;
+    }
+  }
+);
+
+export const generateRanHex = createAsyncThunk(
+  "mainHome/generateRanHex",
+  async (size) => {
+    let result = [];
+    let hexRef = [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+    ];
+    for (let n = 0; n < size; n++) {
+      result.push(hexRef[Math.floor(Math.random() * 16)]);
+    }
+    return result.join("");
+  }
+);
+
+// Requests List
+export const handleReqsList = createAsyncThunk(
+  "mainHome/handleReqsList",
+  async (filterValues, { dispatch }) => {
+    //true
+    dispatch(RsetIsLoadingCheckout(true));
+    try {
+      const reqsListRes = await getRequestsList(filterValues);
+      if (
+        reqsListRes.data.members !== undefined &&
+        reqsListRes.data.list !== undefined
+      ) {
+        dispatch(RsetIsLoadingCheckout(false));
+        return reqsListRes.data;
+      } else {
+        errorMessage("اطلاعات یافت نشد!");
+        dispatch(RsetIsLoadingCheckout(false));
+      }
+    } catch (err) {
+      console.log(err);
+      dispatch(RsetIsLoadingCheckout(false));
     }
   }
 );
@@ -311,15 +457,30 @@ const mainSlices = createSlice({
         isLoading: action.payload,
       };
     },
-    RsetIsLoadingOverTime: (state, action) => {
-      return { ...state, isLoadingOver: action.payload };
-    },
     RsetDescriptionModals: (state, action) => {
       return { ...state, descriptionModals: action.payload };
     },
     RsetCurrentReqInfo: (state, { payload }) => {
       console.log(payload);
       return { ...state, currentReqInfo: payload };
+    },
+    RsetRequestsList: (state, { payload }) => {
+      return { ...state, reqsList: payload };
+    },
+    RsetUsername: (state, { payload }) => {
+      return { ...state, userName: payload };
+    },
+    RsetPassword: (state, { payload }) => {
+      return { ...state, password: payload };
+    },
+    RsetMenu: (state, { payload }) => {
+      return { ...state, menu: payload };
+    },
+    RsetUserInfoChanged: (state, { payload }) => {
+      return { ...state, userInfoChanged: payload };
+    },
+    RsetLoginPage: (state, { payload }) => {
+      return { ...state, loginPage: payload };
     },
   },
   extraReducers: {
@@ -338,7 +499,7 @@ const mainSlices = createSlice({
     [handleHistories.fulfilled]: (state, { payload }) => {
       return { ...state, histories: payload };
     },
-    [handleUserLogin.fulfilled]: (state, { payload }) => {
+    [handleLogin.fulfilled]: (state, { payload }) => {
       return { ...state, userLogin: payload };
     },
     [handleDepartments.fulfilled]: (state, { payload }) => {
@@ -348,23 +509,42 @@ const mainSlices = createSlice({
     [handleCurrentReqInfo.fulfilled]: (state, { payload }) => {
       return { ...state, currentReqInfo: payload };
     },
+    [handleReqsList.fulfilled]: (state, { payload }) => {
+      console.log(payload);
+      return {
+        ...state,
+        requestMembs: payload.members,
+        reqsList: payload.list,
+      };
+    },
   },
 });
 
 export const {
   RsetIsLoadingCheckout,
-  RsetIsLoadingOverTime,
   RsetDescriptionModals,
   RsetCurrentReqInfo,
+  RsetRequestsList,
+  RsetUsername,
+  RsetPassword,
+  RsetMenu,
+  RsetUserInfoChanged,
+  RsetLoginPage,
 } = mainSlices.actions;
+export const selectUserName = (state) => state.mainHome.userName;
+export const selectPassword = (state) => state.mainHome.password;
+export const selectLoginPage = (state) => state.mainHome.loginPage;
+
 export const selectUserInformations = (state) => state.mainHome.userInformation;
+export const selectMenu = (state) => state.mainHome.menu;
 export const selectUserPic = (state) => state.mainHome.userPic;
 export const selectIsLoadingCheckout = (state) => state.mainHome.isLoading;
-export const selectIsLoadingOver = (state) => state.mainHome.isLoadingOver;
 export const selectUserLogin = (state) => state.mainHome.userLogin;
 export const selectHistories = (state) => state.mainHome.histories;
 export const selectAllDeps = (state) => state.mainHome.allDepartment;
 export const selectCurrentReqInfo = (state) => state.mainHome.currentReqInfo;
+export const selectReqsList = (state) => state.mainHome.reqsList;
+export const selectRequestMemb = (state) => state.mainHome.requestMembs;
 
 export const selectDescriptionModals = (state) =>
   state.mainHome.descriptionModals;

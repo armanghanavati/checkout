@@ -3,14 +3,17 @@ import {
   getOverTimeReason,
   officeOverTimeList,
   postOverTime,
-} from "../../common/overTime";
-import { actionAddPerson, postAction } from "../../common/mainApi";
-import { RsetIsLoadingOverTime } from "./mainSlices";
+} from "../../Services/r-ghanavatian/overTime";
+import {
+  actionAddPerson,
+  postAction,
+} from "../../Services/r-ghanavatian/mainApi";
+import { errorMessage } from "../../utils/message";
 
 const initialState = {
   des: "",
   formErrors: {},
-  overTimeReson: [],
+  overTimeReason: [],
   overTimeReasonValue: [],
   showOverTimeApplyModal: false,
   showFields: false,
@@ -37,8 +40,12 @@ export const handleReasonOvertime = createAsyncThunk(
   async () => {
     try {
       const overTimeRes = await getOverTimeReason();
-      console.log(overTimeRes.data);
-      return overTimeRes.data;
+      console.log(overTimeRes.data.leangth !== 0);
+      if (overTimeRes.data.leangth !== 0) {
+        return overTimeRes.data;
+      } else {
+        errorMessage("اطلاعات یافت نشد. لطفا دوباره امتحان کنید.");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -100,35 +107,6 @@ export const handleUsersOvertime = createAsyncThunk(
         dispatch(RsetDescriptions(""));
         dispatch(RsetOverTimeReasonValue(""));
       }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-);
-
-export const handleUsersOverTime = createAsyncThunk(
-  "overTime/handleUsersOverTime",
-  async (obj, { dispatch, getState }) => {
-    const { fromDate, toDate, status, userRequestFilter, dep } =
-      getState().overTime;
-    try {
-      const values = {
-        applicant_id: localStorage.getItem("id"),
-        memberId:
-          userRequestFilter !== ""
-            ? userRequestFilter.value
-            : userRequestFilter,
-        mDep: dep !== "" ? dep.value : dep,
-        status: status !== "" ? status.value : status,
-        fromDate: fromDate !== null ? fromDate.format("YYYY/MM/DD") : "null",
-        toDate: toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
-      };
-      console.log(values);
-      const handleUsersOverTimeRes = await officeOverTimeList(values);
-      if (handleUsersOverTimeRes.data) {
-        dispatch(RsetIsLoadingOverTime(true));
-      }
-      return handleUsersOverTimeRes.data;
     } catch (err) {
       console.log(err);
     }
@@ -199,15 +177,7 @@ const OverTimeSlice = createSlice({
   },
   extraReducers: {
     [handleReasonOvertime.fulfilled]: (state, { payload }) => {
-      return { ...state, overTimeReson: payload };
-    },
-    [handleUsersOverTime.fulfilled]: (state, { payload }) => {
-      console.log(payload);
-      return {
-        ...state,
-        requestMembs: payload.members,
-        requestLists: payload.list,
-      };
+      return { ...state, overTimeReason: payload };
     },
   },
 });
@@ -236,10 +206,10 @@ export const {
 } = OverTimeSlice.actions;
 
 export const selectDepartmant = (state) => state.overTime.dep;
-export const selectOverTimeReason = (state) => state.overTime.overTimeReson;
+export const selectOverTimeReason = (state) => state.overTime.overTimeReason;
 export const selectStartDate = (state) => state.overTime.fromDate;
 export const selectEndDate = (state) => state.overTime.toDate;
-export const selectDescreption = (state) => state.overTime.des;
+export const selectDescription = (state) => state.overTime.des;
 export const selectFormErrors = (state) => state.overTime.formErrors;
 export const selectShowOverTime = (state) =>
   state.overTime.showOverTimeApplyModal;

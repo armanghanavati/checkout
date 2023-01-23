@@ -24,9 +24,21 @@ const Header = () => {
       </Link>
       <Link
         className="border border-secandry  rounded   text-primary navbar-brand p-2 mx-2"
-        to="/OverTimeTableList"
+        to="/overtimeTableList"
       >
         لیست اضافه کار
+      </Link>
+      <Link
+        className="border border-secandry  rounded   text-primary navbar-brand p-2 mx-2"
+        to="./expenseAccount"
+      >
+        فرم صورت هزینه
+      </Link>
+      <Link
+        className="border border-secandry  rounded   text-primary navbar-brand p-2 mx-2"
+        to="/expenseAccountTable"
+      >
+        لیست صورت هزینه
       </Link>
     </nav>
   );
