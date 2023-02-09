@@ -51,7 +51,7 @@ const HistoryCheckoutModal = () => {
         onHide={() => dispatch(RsetHistoresCheckoutModal(false))}
         backdrop="static"
         role="dialog"
-        dialogClassName="cont_modal"
+        dialogClassName="modal-90w"
         // size="lg"
         aria-labelledby="contained-modal-title-vcenter"
       >
@@ -73,8 +73,8 @@ const HistoryCheckoutModal = () => {
               <span>
                 {details.process !== undefined
                   ? moment(details.process[0].date, "YYYY/MM/DD")
-                      .locale("fa")
-                      .format("jYYYY/jMM/jDD")
+                    .locale("fa")
+                    .format("jYYYY/jMM/jDD")
                   : ""}
               </span>
             </div>

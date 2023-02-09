@@ -69,6 +69,8 @@ const CheckoutOfficial = () => {
   const reasonLeavingData = useSelector(selectReasonLeavingData);
   const applyModal = useSelector(selectApplyModal);
 
+  console.log(userData);
+
   const handleGetUser = async (
     userName,
     melliCode,
@@ -159,6 +161,7 @@ const CheckoutOfficial = () => {
         const userPostReasonLeavingRes = await postUserDataCheckout(
           checkoutValues
         );
+        console.log(userPostReasonLeavingRes);
         setRequestUserId(userPostReasonLeavingRes.data.id);
         if (userPostReasonLeavingRes.data.code === 415) {
           if (officeUser !== undefined) {
@@ -211,16 +214,15 @@ const CheckoutOfficial = () => {
 
   useEffect(() => {
     function paterNhandler() {
-      if (userData.first_name !== undefined) {
-        dispatch(handleUsersCheckout());
-      }
+      // if (userData.first_name !== undefined) {
+      //   dispatch(handleUsersCheckout());
+      // }
       if (Object.keys(formErrors).length === 0 && isSubmit) {
         return personalCode, melliCode, userName;
       }
     }
     paterNhandler();
-    console.log(Object.keys(formErrors).length);
-  }, [formErrors, userData, dispatch]);
+  }, [formErrors, dispatch]);
 
   const [melliCodeCopy, setMelliCodeCopy] = useState("");
 
@@ -285,8 +287,8 @@ const CheckoutOfficial = () => {
   };
 
   const handleActionToPersons = async (e) => {
-    e.preventDefault();
     try {
+      e.preventDefault();
       const toPersons = {
         toPersons: [officeUser],
       };
@@ -303,8 +305,8 @@ const CheckoutOfficial = () => {
       } else {
         errorMessage("عملیات انجام نشد");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   };
 
@@ -319,12 +321,11 @@ const CheckoutOfficial = () => {
 
   return (
     <div className="container-fluid">
-      <Header />
       <Form className="form-group">
         <Row>
           <Col className="mb-4" md="12" lg="6" xl="2">
             <label className="mb-1 required-field form-label">
-              نام و نام خانوادگی:
+              نام و نام خانوادگی:{" "}
             </label>
             <Select
               id="item1"
@@ -382,12 +383,12 @@ const CheckoutOfficial = () => {
               </p>
             )}
           </Col>
-          <Col className=" mb-4" md="12" lg="6" xl="2">
+          <Col className="mb-4" md="12" lg="6" xl="2">
             <label className="mb-1"> مدیر / سرپرست: </label>
             <Form.Control
               disabled
               value={supervisor}
-              // onChange={() => setSupervisor(e.target.value)}
+            // onChange={() => setSupervisor(e.target.value)}
             />
             <p className="font12 text-danger mb-4 mb-md-4"></p>
           </Col>
@@ -403,7 +404,7 @@ const CheckoutOfficial = () => {
             handleGetUser={handleGetUser}
           />
           <Col md="12" lg="6" xl="3" className="mb-4">
-            <label className="mb-1  required-field">تاریخ ترک خدمت : </label>
+            <label className="mb-1  required-field">تاریخ ترک خدمت: </label>
             <DatePicker
               // calendarClass="datePicker"
               datePickerClass="bg-danger"
@@ -450,7 +451,7 @@ const CheckoutOfficial = () => {
             )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="3">
-            <label className="mb-1 required-field">علت ترک خدمت : </label>
+            <label className="mb-1 required-field">علت ترک خدمت: </label>
             <Select
               id="item5"
               value={reasonLeaving}
@@ -465,16 +466,16 @@ const CheckoutOfficial = () => {
             )}
           </Col>
           <Col className=" mb-4" md="12" lg="6" xl="3">
-            <label className="mb-1">شرکت : </label>
+            <label className="mb-1">شرکت: </label>
             <Form.Control disabled value={companyName} />
           </Col>
           <Col md="12" lg="6" xl="3" className="mb-4">
-            <label className="mb-1">واحد : </label>
+            <label className="mb-1">واحد: </label>
             <Form.Control disabled value={department} />
           </Col>
           <div className="col-sm-12 col-md-12  col-lg-12  col-xl-12">
             <label className="mb-1 py-1 " htmlFor="CheckoutTextarea">
-              توضیحات :
+              توضیحات:
             </label>
             <textarea
               id="item7"

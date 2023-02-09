@@ -1,16 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import App from "../App";
 import Header from "./Header/Header";
+import Layout from "./Layout";
 
 const Home = () => {
-  return (
-    <>
-      <Header />
+  return <>
+    <Layout>
       داشبورد
-      <Link to="/dashboard"></Link>
-    </>
-  );
+    </Layout>
+  </>;
 };
 
 export default Home;

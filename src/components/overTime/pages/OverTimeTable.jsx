@@ -7,6 +7,8 @@ import {
   handlePermisionPresent,
   handleReqsList,
   patchPermisionChanged,
+  selectAllDeps,
+  selectUserLogin,
 } from "../../slices/mainSlices";
 import {
   selectDepartmant,
@@ -17,7 +19,6 @@ import {
 } from "../../slices/OverTimeSlice";
 import { handlStatusesCheckout } from "../../slices/CheckoutOfficialSlice";
 import OverTimeTableList from "../table/OverTimeTableList";
-import Header from "../../../layout/Header/Header";
 
 const OverTimeTable = () => {
   const dispatch = useDispatch();
@@ -26,9 +27,11 @@ const OverTimeTable = () => {
   const fromDate = useSelector(selectStartDate);
   const toDate = useSelector(selectEndDate);
   const status = useSelector(selectStatus);
+  const allDeps = useSelector(selectAllDeps);
+
+  const userLogin = useSelector(selectUserLogin);
 
   useEffect(() => {
-    dispatch(handleDepartments());
     const filterValues = {
       applicant_id: localStorage.getItem("id"),
       memberId: members !== "" ? members.value : members,
@@ -44,10 +47,15 @@ const OverTimeTable = () => {
     dispatch(patchPermisionChanged());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (userLogin.first_name !== undefined) {
+      dispatch(handleDepartments())
+    }
+  }, [userLogin])
+
   return (
     <main>
       <Container fluid>
-        <Header />
         <OverTimeFilter />
         <OverTimeTableList />
       </Container>

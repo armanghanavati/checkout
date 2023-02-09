@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Layout from "../Layout";
 
 const Header = () => {
   return (
@@ -40,7 +41,19 @@ const Header = () => {
       >
         لیست صورت هزینه
       </Link>
-    </nav>
+      <Link
+        className="border border-secandry  rounded   text-primary navbar-brand p-2 mx-2"
+        to="/filesCloud"
+      >
+        فرم ارسال فایل
+      </Link>
+      <Link
+        className="border border-secandry  rounded   text-primary navbar-brand p-2 mx-2"
+        to="/filesCloudList"
+      >
+        لیست ارسال فایل
+      </Link>
+    </nav >
   );
 };
 

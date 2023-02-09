@@ -23,6 +23,7 @@ export const getCurrentReqInfo = (reqId, type) => {
 
 // check_Date
 export const checkDate = (getLastActionId, getReqId, type) => {
+  console.log(getLastActionId, getReqId, type);
   return http.get(
     `${config.localapi}/action/checkDate/${getReqId}/${getLastActionId}/${type}`
   );

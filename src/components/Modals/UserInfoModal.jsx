@@ -16,8 +16,6 @@ const UserInfoModal = () => {
   const userInformations = useSelector(selectUserInformations);
   const userImage = useSelector(selectUserPic);
 
-  console.log(userImage);
-
   const handleUserImage = () => {
     if (userImage.photo_type !== "") {
       return (

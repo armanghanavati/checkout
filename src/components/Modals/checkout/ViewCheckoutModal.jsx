@@ -23,6 +23,7 @@ const ViewCheckoutModal = () => {
   const details = useSelector(selectCurrentReqInfo);
   const complateDescription = useSelector(selectDescriptionModals);
 
+  console.log(details.process[details.process.length - 1]);
   // const validation = () => {
   //   let error = "";
   //   if (!complateDescription) {
@@ -37,7 +38,7 @@ const ViewCheckoutModal = () => {
       onHide={() => dispatch(RsetViewCheckoutModal(false))}
       backdrop="static"
       role="dialog"
-      dialogClassName="cont_modal"
+      dialogClassName="modal-90w"
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
@@ -59,56 +60,50 @@ const ViewCheckoutModal = () => {
             <span>
               {details.process !== undefined
                 ? moment(details.process[0].date, "YYYY/MM/DD")
-                    .locale("fa")
-                    .format("jYYYY/jMM/jDD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
                 : ""}
             </span>
           </div>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="show-grid">
-        <Row>
-          <Col xs={12} md={8} xl={12}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">نام و نام خانوادگی: </span>
-              <span>
-                {`${
-                  details.leaver !== undefined ? details.leaver.first_name : ""
-                } ${
-                  details.leaver !== undefined ? details.leaver.last_name : ""
+        <ul className="list-unstyled">
+          <li className="mb-3">
+            <span className="fw-bold">نام و نام خانوادگی: </span>
+            <span>
+              {`${details.leaver !== undefined ? details.leaver.first_name : ""
+                } ${details.leaver !== undefined ? details.leaver.last_name : ""
                 }`}
-              </span>
-            </p>
-          </Col>
-          <p className="mb-3 me-1">
+            </span>
+          </li>
+          <li className="mb-3">
             <span className="fw-bold">شرکت: </span>
             <span>{currentReqCo}</span>
-          </p>
-          <Col xs={6} md={4}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">واحد سازمانی: </span>
-              <span>{currentReqDepartment}</span>
-            </p>
-          </Col>
-          <p className=" mb-3">
+          </li>
+          <li className="mb-3">
+            <span className="fw-bold">واحد سازمانی: </span>
+            <span>{currentReqDepartment}</span>
+          </li>
+          <li className=" mb-3">
             <span className="fw-bold">علت ترک خدمت: </span>
             {details.leavingWorkCause.label !== undefined
               ? details.leavingWorkCause.label
               : ""}
-          </p>
-          <p className=" mb-3">
+          </li>
+          <li className=" mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>
             {details.leavingWorkDate !== undefined
               ? moment(details.leavingWorkDate, "YYYY/MM/DD")
-                  .locale("fa")
-                  .format("jYYYY/jMM/jDD")
+                .locale("fa")
+                .format("jYYYY/jMM/jDD")
               : ""}
-          </p>
-          <p className="font-weight-bold mb-3">
+          </li>
+          <li className="mb-3">
             <span className="fw-bold">توضیحات: </span>
             {details.description !== undefined ? details.description : ""}
-          </p>
-        </Row>
+          </li>
+        </ul>
       </Modal.Body>
       <Modal.Footer className="justify-content-between">
         <div className="d-flex">

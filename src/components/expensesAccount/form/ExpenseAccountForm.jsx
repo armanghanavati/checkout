@@ -1,6 +1,4 @@
-import moment from "moment-jalaali";
-import Num2persian from "num2persian";
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState, useRef, useEffect } from "react";
 import { Form, Col, Row, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import NumberFormat from "react-number-format";
@@ -28,26 +26,25 @@ import {
   selectDesExAcTable,
   selectFromPlace,
   RsetFromPlace,
+  handleExpansesAcc,
+
 } from "../../slices/expencesAccountSlice";
-import { selectUserLogin } from "../../slices/mainSlices";
+import { handleLogin, handleUserInfoAllPage, selectUserAllPage, selectUserLogin } from "../../slices/mainSlices";
 import ExpensesAccountList from "../table/ExpensesAccountList";
 import { warningMessage } from "../../../utils/message";
 
 const ExpenseAccountForm = () => {
   const dispatch = useDispatch();
-  const name = useSelector(SelectName);
-  const lastName = useSelector(SelectLastName);
-  const isDisabled = useSelector(selectIsDisabled);
   const switchExAc = useSelector(selectSwitchExAc);
-  const userLogin = useSelector(selectUserLogin);
+  const userLogin = useSelector(selectUserAllPage);
   const desExAc = useSelector(selectDesExAc);
   const dateExAc = useSelector(selectDateExAc);
   const fileManager = useSelector(selectFileManager);
   const expenses = useSelector(selectExpensesNumb);
   const listItems = useSelector(selectListItems);
   const formErrors = useSelector(selectFormErrors);
-  const desExAcTable = useSelector(selectDesExAcTable);
-  const fromPlace = useSelector(selectFromPlace);
+  const name = useSelector(SelectName);
+  const lastName = useSelector(SelectLastName);
 
   const [reqFiles, setReqFiles] = useState([]);
   const descriptionInputRef = useRef();
@@ -156,7 +153,6 @@ const ExpenseAccountForm = () => {
     } else if (Number(expenses) <= 1000) {
       errors.expenses = " مبلغ باید بیشتر از 1,000 تومان باشد";
     }
-    console.log(errors);
     return errors;
   };
 
@@ -224,11 +220,20 @@ const ExpenseAccountForm = () => {
     }
   };
 
+  useEffect(() => {
+    function userLoginReturn() {
+      if (userLogin.first_name !== undefined) {
+        return dispatch(handleUserInfoAllPage())
+      }
+    }
+    userLoginReturn()
+  }, [userLogin.first_name !== undefined])
+
   return (
     <Fragment>
       <Form>
         <Row>
-          <Col md="12" className="mb-2 d-flex align-items-center">
+          <Col md="12" className="mt-4 mb-2 d-flex align-items-center">
             <span className="font16">صورت هزینه اعمال شده بنام:</span>
             <div className=" d-flex align-items-center">
               <div>
@@ -237,6 +242,7 @@ const ExpenseAccountForm = () => {
                   label="خودم"
                   className="d-inline-block m-0"
                   type="switch"
+                  checked={switchExAc}
                   onChange={() => {
                     dispatch(RsetSwitchExAc(!switchExAc));
                     if (!switchExAc) {
@@ -247,7 +253,6 @@ const ExpenseAccountForm = () => {
                       dispatch(RsetLastNameExAc(""));
                     }
                   }}
-                  checked={switchExAc}
                 />
               </div>
             </div>
@@ -302,14 +307,13 @@ const ExpenseAccountForm = () => {
               ref={descriptionInputRef}
               value={desExAc}
               onChange={(e) => dispatch(RsetDesExAc(e.target.value))}
-              className={`${
-                formErrors.desExAc && !desExAc
-                  ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                  : "form-control col-12 col-sm-12 col-md-12 col-md-4"
-              }`}
+              className={`${formErrors.desExAc && !desExAc
+                ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                : "form-control mb-4 col-12 col-sm-12 col-md-12 col-md-4"
+                }`}
             />
             {!desExAc && (
-              <p className="font12 text-danger mb-0 mt-1">
+              <p className="font12 text-danger mb-4 mt-1">
                 {formErrors.desExAc}
               </p>
             )}
@@ -331,14 +335,13 @@ const ExpenseAccountForm = () => {
               timePicker={false}
               inputFormat="YYYY/MM/DD"
               inputJalaaliFormat="jYYYY/jMM/jDD"
-              className={`${
-                formErrors.dateExAc && !dateExAc
-                  ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                  : "form-control col-12 col-sm-12 col-md-12 col-md-4"
-              }`}
+              className={`${formErrors.dateExAc && !dateExAc
+                ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                : "form-control col-12  col-sm-12 col-md-12 col-md-4"
+                }`}
             />
             {!dateExAc && (
-              <p className="font12 text-danger mb-0 mt-1">
+              <p className="font12 mb-4 text-danger mt-1">
                 {formErrors.dateExAc}
               </p>
             )}
@@ -392,27 +395,19 @@ const ExpenseAccountForm = () => {
                   );
                 }}
                 onChange={(e) => dispatch(RsetExpensesNumb(e.target.value))}
-                className={`${
-                  formErrors.expenses && !expenses
-                    ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                    : "form-control col-12 col-sm-12 col-md-12 col-md-4"
-                }`}
+                className={`${formErrors.expenses && !expenses
+                  ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                  : "form-control col-12 col-sm-12 col-md-12 col-md-4"
+                  }`}
               />
               <span className="ms-2">ریال</span>
             </div>
-            {console.log(
-              validation({
-                desExAc: desExAc,
-                dateExAc: dateExAc,
-                expenses: expenses,
-              })
-            )}
             {validation({
               desExAc: desExAc,
               dateExAc: dateExAc,
               expenses: expenses,
             }) ? (
-              <p className="font12 text-danger mb-0 mt-1">
+              <p className="font12 mb-4 text-danger mb-0 mt-1">
                 {formErrors.expenses}
               </p>
             ) : null}
@@ -469,6 +464,7 @@ const ExpenseAccountForm = () => {
                 if (listItems.length !== 0) {
                   return desExAc && dateExAc && expenses && reqFiles;
                 }
+                dispatch(handleExpansesAcc())
               }}
               variant="success"
               className="col-sm-12 col-md-3 col-xl-1 text-center ms-xl-4 justify-content-center my-1"
@@ -484,8 +480,8 @@ const ExpenseAccountForm = () => {
             </Button>
           </div>
         </Row>
-      </Form>
-    </Fragment>
+      </Form >
+    </Fragment >
   );
 };
 

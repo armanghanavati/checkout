@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { expansesAcc, expansesAccItem } from "../../Services/r-ghanavatian/expensesAccount";
 const initialState = {
   name: "",
   lastName: "",
@@ -9,7 +10,7 @@ const initialState = {
   dateExAc: null,
   dateExAcTable: null,
   fileManager: "",
-  expensesNumb: '',
+  expensesNumb: "",
   listItems: [],
   filterItems: false,
   itemId: "",
@@ -18,6 +19,34 @@ const initialState = {
   expensesTable: null,
   fromPlace: "",
 };
+
+// -> Post expanses account
+export const handleExpansesAcc = createAsyncThunk("expenseAccount/handleExpansesAcc",
+  async (obj, { getState }) => {
+    const { desExAc, dateExAc, expensesNumb, switchExAc, name, lastName } = getState().expenseAccount
+    let valueUsername;
+    if (switchExAc) {
+      valueUsername = { applicantname: name, applicantlname: lastName }
+    } else {
+      return valueUsername = {}
+    }
+    const values = {
+      description: desExAc,
+      cost: expensesNumb,
+      date: dateExAc
+    }
+
+    console.log(valueUsername);
+    const resExpensesAcc = await expansesAcc(valueUsername)
+    console.log(resExpensesAcc);
+    // applicantName: "",
+    // file: "",
+    // item ===>  cost, date, description
+    // request ===> if khodam -> {} , else -> { applicantname, applicantlname }
+    const resExpensesAccItem = await expansesAccItem(values)
+    console.log(resExpensesAccItem);
+  }
+)
 
 const expensesAccountSlice = createSlice({
   name: "expenseAccount",

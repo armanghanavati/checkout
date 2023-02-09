@@ -60,19 +60,10 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
 
   console.log(company);
 
-  // let getAllDep = [];
-  // getAllDep.push({ value: "", label: "همه" });
-  //  allDeps.map((dep) => {
-  //   return getAllDep.push({
-  //     value: dep.DeptCode,
-  //     label: dep.DeptName,
-  //   });
-  // });
+  let addAllDepartment = []
+  const objectAll = addAllDepartment.push({ label: "همه", value: "" })
 
-  // const {
-  //   gotoPage,
-  //   state: { pageIndex, pageSize, sortBy },
-  // } = useTable();
+  const mapDeps = allDeps.map((dep) => addAllDepartment.push({ label: dep.label, value: dep.value }))
 
   const fildsSection = () => {
     if (name === "applicant") {
@@ -252,7 +243,7 @@ const Fields = ({ name, type, lable, key, onchecked, ...allProps }) => {
           {...allProps}
           className="mb-4"
           value={dep}
-          options={allDeps}
+          options={addAllDepartment}
           onChange={(e) => {
             dispatch(RsetDepartmantCheckoutTable(e));
             if (onchecked) {

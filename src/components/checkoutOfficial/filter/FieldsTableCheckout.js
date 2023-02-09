@@ -19,10 +19,10 @@ import {
   selectLeavingWorkCause,
 } from "../../slices/CheckoutOfficialSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { handleReqsList, RsetIsLoadingCheckout } from "../../slices/mainSlices";
+import { handleReqsList, RsetRealFilter, selectRealFilter } from "../../slices/mainSlices";
 
 const FieldsTableCheckout = () => {
-  const [isChecked, setIsChecked] = useState(false);
+
   const dispatch = useDispatch();
   const dep = useSelector(selectDep);
   const company = useSelector(selectCompany);
@@ -31,6 +31,8 @@ const FieldsTableCheckout = () => {
   const toDateTime = useSelector(selectToDate);
   const valueStatus = useSelector(selectValueStatus);
   const leavingWorkCause = useSelector(selectLeavingWorkCause);
+  const realFilter = useSelector(selectRealFilter);
+
 
   const filterValues = {
     applicant_id: localStorage.getItem("id"),
@@ -76,7 +78,7 @@ const FieldsTableCheckout = () => {
                 key={input.id}
               >
                 <Fields
-                  onchecked={isChecked}
+                  onchecked={realFilter}
                   type={input.type}
                   name={input.name}
                   {...input}
@@ -86,22 +88,24 @@ const FieldsTableCheckout = () => {
             );
           })}
           <Col md="4" lg="3" xxl="2">
-            <label className="d-flex justify-content-end">
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={() => setIsChecked(!isChecked)}
-                className="mx-2"
-              />
-              جستجو لحظه ای
-            </label>
+            <Form.Group className="d-flex align-items-center mb-3 justify-content-end">
+              <input className="" type='checkbox' name='realFilter'
+                value={realFilter}
+                checked={realFilter}
+                onChange={() => { dispatch(RsetRealFilter(!realFilter)) }} />
+              <Form.Label className='ms-2 font12 mb-0'> جستجو لحظه ای </Form.Label>
+            </Form.Group>
             <div className="d-flex justify-content-end mt-2">
-              <Button className="text-center" variant="success" type="submit">
+              <Button
+                className="font12 text-center"
+                variant="success"
+                type="submit"
+              >
                 اعمال فیلتر
               </Button>
               <Button
                 onClick={cancelFilter}
-                className="text-center ms-1"
+                className="font12 text-center ms-1"
                 variant="secondary"
               >
                 لغو فیلتر

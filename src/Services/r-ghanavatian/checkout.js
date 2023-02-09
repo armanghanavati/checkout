@@ -28,3 +28,10 @@ export const getUser = (values) => {
 export const patchEditCheckout = (reqId, values) => {
   return http.patch(`${config.localapi}/settlement/${reqId}`, values);
 };
+
+//  دریافت کاربران مستعفی
+export const getAcceptanceAccess = (requestId, userId) => {
+  return http.get(`${config.localapi}/settlement/acceptanceAccess/${requestId}/${userId}`);
+}
+
+//ip/settlement/acceptanceAccess/{request id}/{user id} --> get

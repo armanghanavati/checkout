@@ -131,7 +131,7 @@ const TableCheckOutItems = ({
               />{" "}
             </div>
             <div className="col-12 col-md-2">
-              صفحه
+              صفحه{" "}
               <strong>
                 {pageIndex + 1} از {pageOptions.length}
               </strong>
@@ -145,6 +145,7 @@ const TableCheckOutItems = ({
               >
                 <FontAwesomeIcon icon={faAngleDoubleRight} />
               </Button>
+              {" "}
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"
@@ -153,6 +154,7 @@ const TableCheckOutItems = ({
               >
                 <FontAwesomeIcon icon={faAngleRight} />
               </Button>
+              {" "}
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"
@@ -160,7 +162,7 @@ const TableCheckOutItems = ({
                 disabled={!canNextPage}
               >
                 <FontAwesomeIcon icon={faAngleLeft} />
-              </Button>
+              </Button>{" "}
               <Button
                 variant="outline-secondary"
                 className="fw-bold py-0"

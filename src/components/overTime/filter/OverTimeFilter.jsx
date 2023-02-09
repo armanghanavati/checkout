@@ -1,49 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker2";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
-import { handleReqsList, selectAllDeps } from "../../slices/mainSlices";
+import {
+  handleDepartments,
+  handleReqsList,
+  RsetRealFilter,
+  selectAllDeps,
+  selectRealFilter,
+  selectRequestMemb,
+} from "../../slices/mainSlices";
 import {
   RsetToDate,
   RsetFromDate,
   RsetUserListValue,
   selectDepartmant,
   selectEndDate,
-  selectRequestMembs,
   selectStartDate,
   selectStatus,
   selectUserRequestFilter,
   RsetDepartemant,
   RsetStatus,
+  handleResetOverTimeFilter,
 } from "../../slices/OverTimeSlice";
 import { selectAllStatus } from "../../slices/CheckoutOfficialSlice";
 
 const OverTimeFilter = () => {
-  const [isChecked, setIsChecked] = useState(false);
+  const realFilter = useSelector(selectRealFilter);
   const allDeps = useSelector(selectAllDeps);
-  const requestMembs = useSelector(selectRequestMembs);
+  const requestMembs = useSelector(selectRequestMemb);
   const allStatuses = useSelector(selectAllStatus);
   const fromDate = useSelector(selectStartDate);
   const toDate = useSelector(selectEndDate);
   const status = useSelector(selectStatus);
   const dep = useSelector(selectDepartmant);
-  const reqLists = useSelector(selectUserRequestFilter);
+  const members = useSelector(selectUserRequestFilter);
   const dispatch = useDispatch();
 
-  const cancelFilter = () => {
-    dispatch(RsetFromDate(null));
-    dispatch(RsetToDate(null));
-    dispatch(RsetStatus(""));
-    dispatch(RsetDepartemant(""));
-    dispatch(RsetUserListValue(""));
-  };
+  // let getAllDep = [];
+  // getAllDep.push({ value: "", label: "همه" });
 
-  const filterHandler = (e) => {
-    e.preventDefault();
-    console.log(fromDate);
-    dispatch(handleReqsList());
-  };
+  //  allDeps.map((dep) => {
+  //   return getAllDep.push({
+  //     value: dep.DeptCode,
+  //     label: dep.DeptName,
+  //   });
+  // });
+
+  // const {
+  //   gotoPage,
+  //   state: { pageIndex, pageSize, sortBy },
+  // } = useTable();
+
+  let addAllDepsValue = []
+  addAllDepsValue.push({ label: 'همه', value: "", coId: "" })
+
+  const addValue = allDeps.map((dep) => {
+    console.log(dep);
+    return addAllDepsValue.push({ label: dep.label, value: dep.value, coId: dep.coId })
+  })
 
   return (
     <section>
@@ -52,16 +68,57 @@ const OverTimeFilter = () => {
           <Col lg="3">
             <Form.Label> درخواست کننده: </Form.Label>
             <Select
+              options={requestMembs}
               className="mb-3"
-              value={reqLists}
+              value={members}
               onChange={(e) => {
                 dispatch(RsetUserListValue(e));
-                if (isChecked) {
-                  dispatch(handleReqsList());
+                if (realFilter) {
+                  const filterValues = {
+                    applicant_id: localStorage.getItem("id"),
+                    memberId: e !== "" ? e.value : e,
+                    mDep: dep !== "" ? dep.value : dep,
+                    status: status !== "" ? status.value : status,
+                    fromDate:
+                      fromDate !== null
+                        ? fromDate.format("YYYY/MM/DD")
+                        : "null",
+                    toDate:
+                      toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
+                    type: 14,
+                  };
+                  dispatch(handleReqsList(filterValues));
                 }
               }}
-              options={requestMembs}
               placeholder="انتخاب"
+            />
+          </Col>
+          <Col lg="3">
+            <Form.Label> واحد: </Form.Label>
+            <Select
+              className="mb-3"
+              value={dep}
+              onChange={(e) => {
+                dispatch(RsetDepartemant(e));
+                if (realFilter) {
+                  const filterValues = {
+                    applicant_id: localStorage.getItem("id"),
+                    memberId: members !== "" ? members.value : members,
+                    mDep: e !== "" ? e.value : e,
+                    status: status !== "" ? status.value : status,
+                    fromDate:
+                      fromDate !== null
+                        ? fromDate.format("YYYY/MM/DD")
+                        : "null",
+                    toDate:
+                      toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
+                    type: 14,
+                  };
+                  dispatch(handleReqsList(filterValues));
+                }
+              }}
+              options={addAllDepsValue}
+              placeholder="جستجو . . ."
             />
           </Col>
           <Col lg="3">
@@ -71,8 +128,21 @@ const OverTimeFilter = () => {
               value={status}
               onChange={(e) => {
                 dispatch(RsetStatus(e));
-                if (isChecked) {
-                  dispatch(handleReqsList());
+                if (realFilter) {
+                  const filterValues = {
+                    applicant_id: localStorage.getItem("id"),
+                    memberId: members !== "" ? members.value : members,
+                    mDep: dep !== "" ? dep.value : dep,
+                    status: e !== "" ? e.value : e,
+                    fromDate:
+                      fromDate !== null
+                        ? fromDate.format("YYYY/MM/DD")
+                        : "null",
+                    toDate:
+                      toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
+                    type: 14,
+                  };
+                  dispatch(handleReqsList(filterValues));
                 }
               }}
               options={allStatuses}
@@ -88,8 +158,18 @@ const OverTimeFilter = () => {
               value={fromDate}
               onChange={(e) => {
                 dispatch(RsetFromDate(e));
-                if (isChecked) {
-                  dispatch(handleReqsList());
+                if (realFilter) {
+                  const filterValues = {
+                    applicant_id: localStorage.getItem("id"),
+                    memberId: members !== "" ? members.value : members,
+                    mDep: dep !== "" ? dep.value : dep,
+                    status: status !== "" ? status.value : status,
+                    fromDate: e !== null ? e.format("YYYY/MM/DD") : "null",
+                    toDate:
+                      toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
+                    type: 14,
+                  };
+                  dispatch(handleReqsList(filterValues));
                 }
               }}
               className="form-control mb-3"
@@ -101,8 +181,20 @@ const OverTimeFilter = () => {
               value={toDate}
               onChange={(e) => {
                 dispatch(RsetToDate(e));
-                if (isChecked) {
-                  dispatch(handleReqsList());
+                if (realFilter) {
+                  const filterValues = {
+                    applicant_id: localStorage.getItem("id"),
+                    memberId: members !== "" ? members.value : members,
+                    mDep: dep !== "" ? dep.value : dep,
+                    status: status !== "" ? status.value : status,
+                    fromDate:
+                      fromDate !== null
+                        ? fromDate.format("YYYY/MM/DD")
+                        : "null",
+                    toDate: e !== null ? e.format("YYYY/MM/DD") : "null",
+                    type: 14,
+                  };
+                  dispatch(handleReqsList(filterValues));
                 }
               }}
               persianDigits={false}
@@ -111,35 +203,43 @@ const OverTimeFilter = () => {
               className="form-control mb-3"
             />
           </Col>
-          <Col lg="3">
-            <Form.Label> واحد: </Form.Label>
-            <Select
-              className="mb-3"
-              value={dep}
-              onChange={(e) => {
-                dispatch(RsetDepartemant(e));
-                if (isChecked) {
-                  dispatch(handleReqsList());
-                }
+          <Col className="text-end" lg="3">
+            <Form.Group className="d-flex align-items-center mb-3 justify-content-end">
+              <input className="" type='checkbox' name='realFilter'
+                value={realFilter}
+                checked={realFilter}
+                onChange={() => { dispatch(RsetRealFilter(!realFilter)) }} />
+              <Form.Label className='ms-2 font12 mb-0'> جستجو لحظه ای </Form.Label>
+            </Form.Group>
+            <Button
+              onClick={(e) => {
+                const filterValues = {
+                  applicant_id: localStorage.getItem("id"),
+                  memberId: members !== "" ? members.value : members,
+                  mDep: dep !== "" ? dep.value : dep,
+                  status: status !== "" ? status.value : status,
+                  fromDate:
+                    fromDate !== null ? fromDate.format("YYYY/MM/DD") : "null",
+                  toDate:
+                    toDate !== null ? toDate.format("YYYY/MM/DD") : "null",
+                  type: 14,
+                };
+                e.preventDefault();
+                console.log(fromDate);
+                dispatch(handleReqsList(filterValues));
               }}
-              options={allDeps}
-              placeholder="جستجو . . ."
-            />
-          </Col>
-          <Col className="text-center" lg="4">
-            <Form.Label className="justify-content-center mx-4 mb-3 d-flex">
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={() => setIsChecked(!isChecked)}
-                className="mx-3"
-              />
-              جستجو لحظه ای
-            </Form.Label>
-            <Button onClick={filterHandler} className="me-1" variant="success">
+              className="me-1 font12"
+              variant="success"
+            >
               اعمال فیلتر
             </Button>
-            <Button onClick={cancelFilter} variant="secondary">
+            <Button
+              className="font12"
+              onClick={() => {
+                dispatch(handleResetOverTimeFilter());
+              }}
+              variant="secondary"
+            >
               لغو فیلتر
             </Button>
           </Col>

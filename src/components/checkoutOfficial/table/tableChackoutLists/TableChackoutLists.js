@@ -56,10 +56,13 @@ import {
   handleCurrentReqInfo,
   selectReqsList,
   handleReqsList,
+  RsetFullToPerson,
+  selectFullToPerson,
 } from "../../../slices/mainSlices";
 import Loading from "../../../Common/Loading";
 import { errorMessage } from "../../../../utils/message";
 import FieldsTableCheckout from "../../filter/FieldsTableCheckout";
+import { useEffect } from "react";
 
 const CheckoutList = () => {
   const dispatch = useDispatch();
@@ -75,7 +78,6 @@ const CheckoutList = () => {
   const editModal = useSelector(selectEditCheckoutModal);
   const infoModal = useSelector(selectHistoriesCheckoutModal);
   const isLoading = useSelector(selectIsLoadingCheckout);
-
   const leaver = useSelector(selectUserMemb);
   const status = useSelector(selectValueStatus);
   const fromDate = useSelector(selectFromDate);
@@ -83,8 +85,10 @@ const CheckoutList = () => {
   const leavingWorkCause = useSelector(selectLeavingWorkCause);
   const company = useSelector(selectCompany);
   const department = useSelector(selectDep);
-
   const userInfo = useSelector(selectUserInfoModal);
+  const fullToPerson = useSelector(selectFullToPerson);
+
+  console.log(userCheckoutList);
 
   const columns = useMemo(() => [
     {
@@ -143,6 +147,7 @@ const CheckoutList = () => {
       role: "",
       type: 10,
     };
+
     dispatch(RsetLeavingWork(""));
     dispatch(RsetUserCheckoutTable(""));
     dispatch(RsetStatusTable(""));
@@ -152,8 +157,22 @@ const CheckoutList = () => {
     dispatch(RsetCompanyCheckout(""));
     dispatch(handleReqsList(filterValues));
   };
+
   const buttons = (request) => {
-    
+    const findActionCode43 = request.process.filter(
+      (item) => item.action_code === 43
+    );
+
+    const objFunc = () => {
+      if (findActionCode43.length !== 0) {
+        const mapProcces = findActionCode43[0].toPersons.map((item) => item);
+        const getIdUser = mapProcces.some(
+          (item) => item === localStorage.getItem("id")
+        );
+        return getIdUser;
+      }
+    };
+
     if (request.process[0].toPersons === undefined) {
       return (
         <Fragment>
@@ -218,8 +237,11 @@ const CheckoutList = () => {
         </Fragment>
       );
     } else if (
-      request.process[request.process.length - 1].toPersons ===
-      localStorage.getItem("id")
+      (request.process[request.process.length - 1].toPersons !== undefined &&
+        request.process[request.process.length - 1].toPersons.some(
+          (item) => item === localStorage.getItem("id")
+        )) ||
+      objFunc() === true
     ) {
       return (
         <Fragment>

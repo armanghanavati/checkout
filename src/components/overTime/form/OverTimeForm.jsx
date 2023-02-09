@@ -19,6 +19,8 @@ import {
   RsetShowSendManagerModal,
   handleApplyUserOverTime,
   selectShowFields,
+  handleResetOverTimeFilter,
+  handleResetOverTimeForm,
 } from "../../slices/OverTimeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { errorMessage } from "../../../utils/message";
@@ -68,12 +70,7 @@ const OverTimeForm = () => {
   };
 
   const clearHandler = () => {
-    dispatch(RsetDisable(false));
-    dispatch(RsetOverTimeReasonValue(""));
-    dispatch(RsetFromDate(null));
-    dispatch(RsetToDate(null));
-    dispatch(RsetDescriptions(""));
-    dispatch(RsetFormErrors(""));
+    dispatch(handleResetOverTimeForm())
   };
 
   const validation = ({ overTimeReasonValue, startDate, endDate }) => {
@@ -105,7 +102,7 @@ const OverTimeForm = () => {
         <Row>
           <Col className="mb-4" md="12" lg="6" xl="3">
             <Form.Label className="required-field form-label">
-              نوع اضافه کار:
+              نوع اضافه کار:{" "}
             </Form.Label>
             <Select
               value={overTimeReasonValue}
@@ -113,11 +110,10 @@ const OverTimeForm = () => {
               onChange={(e) => dispatch(RsetOverTimeReasonValue(e))}
               options={overTimeReasons}
               placeholder="انتخاب"
-              className={`${
-                formErrors.overTimeReasonValue && !overTimeReasonValue.value
-                  ? "rounded col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                  : "rounded col-12 col-sm-12 col-md-12 col-md-4"
-              } `}
+              className={`${formErrors.overTimeReasonValue && !overTimeReasonValue.value
+                ? "rounded col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                : "rounded col-12 col-sm-12 col-md-12 col-md-4"
+                } `}
             />
             {!overTimeReasonValue.value && (
               <p className="font12 text-danger mb-0 mt-1">
@@ -127,7 +123,7 @@ const OverTimeForm = () => {
           </Col>
           <Col className="mb-4" md="12" lg="6" xl="3">
             <Form.Label className="required-field mx-2 form-label">
-              تاریخ و زمان شروع:
+              تاریخ و زمان شروع: {" "}
             </Form.Label>
             <DatePicker
               // onBlur={dispatch(handleUsersOvertime())}
@@ -139,11 +135,10 @@ const OverTimeForm = () => {
               pick12HourFormat={false}
               isGregorian={false}
               timePicker={true}
-              className={`${
-                formErrors.startDate && !startDate
-                  ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                  : "form-control col-12 col-sm-12 col-md-12 col-md-4"
-              } `}
+              className={`${formErrors.startDate && !startDate
+                ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                : "form-control col-12 col-sm-12 col-md-12 col-md-4"
+                } `}
             />
             {!startDate && (
               <p className="font12 text-danger mt-1">{formErrors.startDate}</p>
@@ -151,7 +146,7 @@ const OverTimeForm = () => {
           </Col>
           <Col className="mb-4" md="12" lg="6" xl="3">
             <Form.Label className="col-6 required-field col-lg-6 mx-2 form-label">
-              تاریخ و زمان پایان:
+              تاریخ و زمان پایان:{" "}
             </Form.Label>
             <DatePicker
               onChange={(e) => dispatch(RsetToDate(e))}
@@ -161,11 +156,10 @@ const OverTimeForm = () => {
               pick12HourFormat={false}
               isGregorian={false}
               timePicker={true}
-              className={`${
-                formErrors.endDate && !endDate
-                  ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
-                  : "form-control col-12 col-sm-12 col-md-12 col-md-4"
-              } `}
+              className={`${formErrors.endDate && !endDate
+                ? "form-control col-12 col-sm-12 col-md-12 col-md-4 border border-danger"
+                : "form-control col-12 col-sm-12 col-md-12 col-md-4"
+                } `}
             />
             {!endDate && (
               <p className="font12 text-danger mb-0 mt-1">

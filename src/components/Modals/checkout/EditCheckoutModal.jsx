@@ -33,8 +33,6 @@ const EditCheckoutModal = () => {
   const reasonLeavingWork = useSelector(selectReasonLeavingModal);
   const des = useSelector(selectDescriptionModals);
 
-  // console.log(reasonLeavingWork, dateTitle.format("jYYYY/jM/jD"));
-
   const reasonChanger = details.leavingWorkCause;
   const desChanger = details.description;
   const [descriptionTitle, setDescriptionTitle] = useState(desChanger);
@@ -69,7 +67,7 @@ const EditCheckoutModal = () => {
       onHide={() => dispatch(RsetEditCheckoutModal(false))}
       backdrop="static"
       role="dialog"
-      dialogClassName="cont_modal"
+      dialogClassName="modal-90w"
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
@@ -91,37 +89,31 @@ const EditCheckoutModal = () => {
             <span>
               {details.process !== undefined
                 ? moment(details.process[0].date, "YYYY/MM/DD")
-                    .locale("fa")
-                    .format("jYYYY/jMM/jDD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
                 : ""}
             </span>
           </div>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="show-grid">
-        <Row>
-          <Col xs={12} md={8} xl={12}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">نام و نام خانوادگی: </span>
-              <span>
-                {`${
-                  details.leaver !== undefined ? details.leaver.first_name : ""
-                } ${
-                  details.leaver !== undefined ? details.leaver.last_name : ""
+        <ul className="list-unstyled">
+          <li className="mb-3">
+            <span className="fw-bold">نام و نام خانوادگی: </span>
+            <span>
+              {`${details.leaver !== undefined ? details.leaver.first_name : ""
+                } ${details.leaver !== undefined ? details.leaver.last_name : ""
                 }`}
-              </span>
-            </p>
-          </Col>
-          <p className="mb-3 me-1">
+            </span>
+          </li>
+          <li className="mb-3">
             <span className="fw-bold">شرکت: </span>
             <span>{currentReqCo}</span>
-          </p>
-          <Col xs={6} md={4}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">واحد سازمانی: </span>
-              <span>{currentReqDepartment}</span>
-            </p>
-          </Col>
+          </li>
+          <li className="mb-3">
+            <span className="fw-bold">واحد سازمانی: </span>
+            <span>{currentReqDepartment}</span>
+          </li>
           <span className=" fw-bold">علت ترک خدمت: </span>
           <Select
             className="mb-3"
@@ -130,7 +122,7 @@ const EditCheckoutModal = () => {
             defaultValue={reasonChanger}
             onChange={(e) => dispatch(RsetReasonLeavingModal(e))}
           />
-          <div className=" mb-3">
+          <div className="mb-3">
             <span className="fw-bold">تاریخ ترک خدمت: </span>
             <DatePicker
               id="item6"
@@ -140,11 +132,11 @@ const EditCheckoutModal = () => {
               onChange={(e) => dispatch(RsetLeavingWorkDate(e))}
               isGregorian={false}
               timePicker={false}
-              inputFormat="YYYY/MM/DD"
-              inputJalaaliFormat="jYYYY/jM/jD"
+              inputFormat="YYYY-MM-DD"
+              inputJalaaliFormat="jYYYY-jM-jD"
             />
           </div>
-          <p className="font-weight-bold mb-3">
+          <li className="mb-3">
             <span className="fw-bold">توضیحات: </span>
             <textarea
               type="textArea"
@@ -152,8 +144,8 @@ const EditCheckoutModal = () => {
               onChange={(e) => dispatch(RsetDescriptionModals(e.target.value))}
               className="form-control"
             />
-          </p>
-        </Row>
+          </li>
+        </ul>
       </Modal.Body>
       <Modal.Footer className="justify-content-between">
         <div className="d-flex">

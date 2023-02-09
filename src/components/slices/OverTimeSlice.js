@@ -35,23 +35,24 @@ const initialState = {
   userManager: "",
 };
 
+//  ->  Overtime reason list
 export const handleReasonOvertime = createAsyncThunk(
   "overTime/handleReasonOvertime",
   async () => {
     try {
       const overTimeRes = await getOverTimeReason();
-      console.log(overTimeRes.data.leangth !== 0);
-      if (overTimeRes.data.leangth !== 0) {
+      if (overTimeRes.data.length !== undefined && overTimeRes.data.length !== 0) {
         return overTimeRes.data;
       } else {
-        errorMessage("اطلاعات یافت نشد. لطفا دوباره امتحان کنید.");
+        errorMessage("لیست اضافه کار یافت نشد.");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
+//  -> Apply overtime request
 export const handleApplyUserOverTime = createAsyncThunk(
   "overTime/handleApplyUserOverTime",
   async (obj, { dispatch, getState }) => {
@@ -79,12 +80,13 @@ export const handleApplyUserOverTime = createAsyncThunk(
         console.log(applyActionsRes);
         return applyActionsRes.data;
       }
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
+//  -> Send overtime to manager
 export const handleUsersOvertime = createAsyncThunk(
   "overTime/handleUsersOvertime",
   async (obj, { dispatch, getState }) => {
@@ -107,12 +109,42 @@ export const handleUsersOvertime = createAsyncThunk(
         dispatch(RsetDescriptions(""));
         dispatch(RsetOverTimeReasonValue(""));
       }
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
+//  -> Reset overtime filter
+export const handleResetOverTimeFilter = createAsyncThunk(
+  "overTime/handleResetOverTimeFilter",
+  (obj, { dispatch }) => {
+    dispatch(RsetFromDate(null));
+    dispatch(RsetToDate(null));
+    dispatch(RsetStatus(""));
+    dispatch(RsetDepartemant(""));
+    dispatch(RsetUserListValue(""));
+  }
+);
+
+//  -> Reset overtime form
+export const handleResetOverTimeForm = createAsyncThunk(
+  "overTime/handleResetOverTimeForm",
+  (obj, { dispatch }) => {
+    dispatch(RsetDisable(false));
+    dispatch(RsetOverTimeReasonValue(""));
+    dispatch(RsetFromDate(null));
+    dispatch(RsetToDate(null));
+    dispatch(RsetDescriptions(""));
+    dispatch(RsetFormErrors(""));
+  }
+);
+
+
+
+
+
+//  -> Slice overtime
 const OverTimeSlice = createSlice({
   name: "overTime",
   initialState,
@@ -182,6 +214,8 @@ const OverTimeSlice = createSlice({
   },
 });
 
+
+
 export const {
   RsetFromDate,
   RsetToDate,
@@ -220,7 +254,6 @@ export const selectStatus = (state) => state.overTime.status;
 
 export const selectUserRequestFilter = (state) =>
   state.overTime.userRequestFilter;
-export const selectRequestMembs = (state) => state.overTime.requestMembs;
 export const selectRequestLists = (state) => state.overTime.requestLists;
 export const selectCurrentReqInfo = (state) => state.overTime.currentReqInfo;
 

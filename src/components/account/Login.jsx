@@ -20,7 +20,7 @@ const Login = () => {
       <Container fluid>
         <Form>
           <Col xl="6">
-            <label> نام کاربری: </label>
+            <Form.Label> نام کاربری: </Form.Label>
             <Form.Control
               type="text"
               value={userName}
@@ -28,7 +28,7 @@ const Login = () => {
                 dispatch(RsetUsername(e.target.value));
               }}
             />
-            <label> رمز عبور: </label>
+            <Form.Label> رمز عبور: </Form.Label>
             <Form.Control
               type="password"
               value={userPassword}
@@ -38,7 +38,7 @@ const Login = () => {
             />
           </Col>
           <Col>
-            <Button onClick={() => dispatch(handleLogin(history))}>ورود</Button>
+            <Button className="mt-2" onClick={() => dispatch(handleLogin(history))}>ورود</Button>
           </Col>
         </Form>
       </Container>

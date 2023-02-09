@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { handleReasonLeavingWork } from "../../slices/CheckoutOfficialSlice";
-import { handleDepartments, handleReqsList } from "../../slices/mainSlices";
+import { handleDepartments, handleReqsList, selectReqsList, selectUserLogin } from "../../slices/mainSlices";
 import {
   handleCompaniesCheckout,
   selectDep,
@@ -15,7 +15,6 @@ import {
   selectLeavingWorkCause,
 } from "../../slices/CheckoutOfficialSlice";
 import TableChackoutLists from "../table/tableChackoutLists/TableChackoutLists";
-import Header from "../../../layout/Header/Header";
 
 const CheckoutTable = () => {
   const dispatch = useDispatch();
@@ -26,6 +25,25 @@ const CheckoutTable = () => {
   const leavingWorkCause = useSelector(selectLeavingWorkCause);
   const company = useSelector(selectCompany);
   const department = useSelector(selectDep);
+  const userCheckoutList = useSelector(selectReqsList);
+  const userLogin = useSelector(selectUserLogin);
+  console.log(userCheckoutList);
+
+  useEffect(() => {
+    dispatch(handleReasonLeavingWork());
+    dispatch(handleCompaniesCheckout());
+    dispatch(handlStatusesCheckout());
+  }, [dispatch]);
+
+  useEffect(() => {
+    function departmentListReturn() {
+      if (userLogin.first_name !== undefined && userLogin.length !== 0) {
+        return dispatch(handleDepartments());
+      }
+    }
+    departmentListReturn()
+
+  }, [userLogin])
 
   useEffect(() => {
     const filterValues = {
@@ -40,19 +58,13 @@ const CheckoutTable = () => {
       department: department !== "" ? department.value : "",
       role: "",
       type: 10,
-    };
-    console.log(filterValues);
+    }
     dispatch(handleReqsList(filterValues));
-    dispatch(handleReasonLeavingWork());
-    dispatch(handleCompaniesCheckout());
-    dispatch(handleDepartments());
-    dispatch(handlStatusesCheckout());
-  }, [dispatch]);
+  }, [])
 
   return (
     <main>
       <Container fluid>
-        <Header />
         <TableChackoutLists />
       </Container>
     </main>

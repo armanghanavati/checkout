@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getAcceptanceAccess } from "../../Services/r-ghanavatian/checkout";
 import {
   checkPassCompleted,
   getAllDepartment,
@@ -9,6 +10,7 @@ import {
   permisionChanged,
   permisionPresent,
   postAction,
+  userData,
   userInfo,
 } from "../../Services/r-ghanavatian/mainApi";
 import {
@@ -46,9 +48,15 @@ const initialState = {
   menu: [],
   userInfoChanged: {},
   loginPage: false,
+  fullToPerson: false,
+  ticket: false,
+  messageTicket: "",
+  allMessage: [],
+  loginAllPage: {},
+  realFilter: false,
 };
 
-//  Department
+// -> Department
 export const handleDepartments = createAsyncThunk(
   "mainHome/handleDepartments",
   async (obj, { getState }) => {
@@ -61,24 +69,34 @@ export const handleDepartments = createAsyncThunk(
       );
       console.log(allDep);
       return allDep.data;
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-// export const handleUserLogin = createAsyncThunk(
-//   "mainHome/handleUserLogin",
-//   async () => {
-//     const resUserInfo = await userInfo();
-//     localStorage.setItem("id", resUserInfo.data._id);
-//     localStorage.setItem("personalCode", resUserInfo.data.personelCode);
-//     console.log(resUserInfo.data);
-//     return resUserInfo.data;
-//   }
-// );
+// -> User info as all pages
+export const handleUserInfoAllPage = createAsyncThunk(
+  "mainHome/handleUserInfoAllPage",
+  async () => {
+    const resUserInfo = await userData(localStorage.getItem("id"));
+    console.log(resUserInfo.data);
+    return resUserInfo.data;
+  }
+);
 
-// ->  Handle menu //
+export const handleLogin = createAsyncThunk(
+  "mainHome/handleLogin",
+  async () => {
+    const resUserInfo = await userInfo();
+    localStorage.setItem("id", resUserInfo.data._id);
+    localStorage.setItem("personalCode", resUserInfo.data.personelCode);
+    console.log(resUserInfo.data);
+    return resUserInfo.data;
+  }
+);
+
+// ->  Handle menu
 export const handleMenu = createAsyncThunk(
   "mainHome/handleMenu",
   async (obj, { dispatch }) => {
@@ -91,91 +109,91 @@ export const handleMenu = createAsyncThunk(
   }
 );
 
-// ->  Login info //
-export const handleLogin = createAsyncThunk(
-  "mainHome/handleLogin",
-  async (history, { getState, dispatch }) => {
-    // event.preventDefault();
-    console.log(history);
-    const { userName, password } = getState().mainHome;
-    const user = { username: userName.replace(/ /g, ""), password };
-    dispatch(RsetLocationCheckout(true));
-    try {
-      const { data, status } = await userInfo(user);
-      console.log(data);
-      if (status === 200) {
-        if (data.approved === true) {
-          const checkUserInfoCompletedRes = await checkPassCompleted(
-            data._id,
-            "all"
-          );
-          console.log(checkUserInfoCompletedRes);
-          const loginProcess = async () => {
-            localStorage.setItem("id", data._id);
-            localStorage.setItem("dep", data.dep.dep_code);
-            localStorage.setItem("role", data.role);
-            localStorage.setItem("personalCode", data.personelCode);
-            const ActionValues = {
-              action_code: 18,
-              user_id: localStorage.getItem("id"),
-              type: 7,
-            };
-            const postActionRes = await postAction(ActionValues);
-            dispatch(RsetLocationCheckout(false));
-            console.log(postActionRes);
-            handleMenu();
-            //handleLastNewReqs();
-            if (data.changedPer === true) {
-              //console.log(getCookie(localStorage.getItem('personalCode')))
-              if (getCookie(localStorage.getItem("personalCode")) !== null) {
-                //console.log('in')
-                setCookie(localStorage.getItem("personalCode"), "expired", 0);
-              }
-            }
-            successMessage("ورود موفقیت آمیز بود.");
-            dispatch(RsetLoginPage(true));
-            history("/dashboard");
-            return data;
-          };
-          dispatch(RsetUserInfoChanged(checkUserInfoCompletedRes.data));
+// ->  Login info
+// export const handleLogin = createAsyncThunk(
+//   "mainHome/handleLogin",
+//   async (history, { getState, dispatch }) => {
+//     // event.preventDefault();
+//     console.log(history);
+//     const { userName, password } = getState().mainHome;
+//     const user = { username: userName.replace(/ /g, ""), password };
+//     dispatch(RsetLocationCheckout(true));
+//     try {
+//       const { data, status } = await userInfo(user);
+//       console.log(data);
+//       if (status === 200) {
+//         if (data.approved === true) {
+//           const checkUserInfoCompletedRes = await checkPassCompleted(
+//             data._id,
+//             "all"
+//           );
 
-          if (checkUserInfoCompletedRes.data === true) {
-            loginProcess();
-            //handleGetNSeenCounters();
-          } else if (checkUserInfoCompletedRes.data === false) {
-            loginProcess();
-            errorMessage("اطلاعات کاربری خود را تغییر دهید!");
-          }
-        } else if (data.approved === false) {
-          dispatch(RsetLocationCheckout(false));
-          errorMessage("حساب کاربری شما تایید نشده است!");
-        } else if (data.code === 408) {
-          dispatch(RsetLocationCheckout(false));
-          errorMessage("شرکت یا واحد کاربر یافت نشد!");
-        } else if (data.code === 409) {
-          dispatch(RsetLocationCheckout(false));
-          errorMessage("رمز عبور نادرست است!");
-        } else if (data.code === 410) {
-          dispatch(RsetLocationCheckout(false));
-          errorMessage("کدملی مورد نظر یافت نشد!");
-        } else {
-          dispatch(RsetLocationCheckout(false));
-          errorMessage("خطایی رخ داده است!");
-        }
-      } else {
-        dispatch(RsetLocationCheckout(false));
-        errorMessage("نام کاربری یا رمزعبور صحیح نمی باشد!");
-      }
-    } catch (ex) {
-      console.log(ex);
-      dispatch(RsetLocationCheckout(false));
-      errorMessage("ورود به حساب کاربری با خطا مواجه شد!");
-    }
-  }
-);
+//           console.log(checkUserInfoCompletedRes);
+//           const loginProcess = async () => {
+//             localStorage.setItem("id", data._id);
+//             localStorage.setItem("dep", data.dep.dep_code);
+//             localStorage.setItem("role", data.role);
+//             localStorage.setItem("personalCode", data.personelCode);
+//             const ActionValues = {
+//               action_code: 18,
+//               user_id: localStorage.getItem("id"),
+//               type: 7,
+//             };
+//             const postActionRes = await postAction(ActionValues);
+//             dispatch(RsetLocationCheckout(false));
+//             console.log(postActionRes);
+//             handleMenu();
+//             //handleLastNewReqs();
+//             if (data.changedPer === true) {
+//               //console.log(getCookie(localStorage.getItem('personalCode')))
+//               if (getCookie(localStorage.getItem("personalCode")) !== null) {
+//                 //console.log('in')
+//                 setCookie(localStorage.getItem("personalCode"), "expired", 0);
+//               }
+//             }
+//             successMessage("ورود موفقیت آمیز بود.");
+//             dispatch(RsetLoginPage(true));
+//             history("/checkout");
+//             return data;
+//           };
+//           dispatch(RsetUserInfoChanged(checkUserInfoCompletedRes.data));
 
-// Patch permission
+//           if (checkUserInfoCompletedRes.data === true) {
+//             loginProcess();
+//             //handleGetNSeenCounters();
+//           } else if (checkUserInfoCompletedRes.data === false) {
+//             loginProcess();
+//             errorMessage("اطلاعات کاربری خود را تغییر دهید!");
+//           }
+//         } else if (data.approved === false) {
+//           dispatch(RsetLocationCheckout(false));
+//           errorMessage("حساب کاربری شما تایید نشده است!");
+//         } else if (data.code === 408) {
+//           dispatch(RsetLocationCheckout(false));
+//           errorMessage("شرکت یا واحد کاربر یافت نشد!");
+//         } else if (data.code === 409) {
+//           dispatch(RsetLocationCheckout(false));
+//           errorMessage("رمز عبور نادرست است!");
+//         } else if (data.code === 410) {
+//           dispatch(RsetLocationCheckout(false));
+//           errorMessage("کدملی مورد نظر یافت نشد!");
+//         } else {
+//           dispatch(RsetLocationCheckout(false));
+//           errorMessage("خطایی رخ داده است!");
+//         }
+//       } else {
+//         dispatch(RsetLocationCheckout(false));
+//         errorMessage("نام کاربری یا رمزعبور صحیح نمی باشد!");
+//       }
+//     } catch (ex) {
+//       console.log(ex);
+//       dispatch(RsetLocationCheckout(false));
+//       errorMessage("ورود به حساب کاربری با خطا مواجه شد!");
+//     }
+//   }
+// );
 
+// -> Patch permision
 export const patchPermisionChanged = createAsyncThunk(
   "mainHome/patchPermisionChanged",
   async () => {
@@ -183,12 +201,11 @@ export const patchPermisionChanged = createAsyncThunk(
       const permisionChangedRes = await permisionChanged();
       console.log(permisionChangedRes);
       return permisionChangedRes.data;
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
-
 const setCookie = (name, value, days) => {
   var expires = "";
   if (days) {
@@ -198,7 +215,6 @@ const setCookie = (name, value, days) => {
   }
   document.cookie = name + "=" + (value || "") + expires + "; path=/";
 };
-
 const getCookie = (name) => {
   var nameEQ = name + "=";
   var ca = document.cookie.split(";");
@@ -210,8 +226,7 @@ const getCookie = (name) => {
   return null;
 };
 
-// Permision present
-
+// -> Permision present
 export const handlePermisionPresent = createAsyncThunk(
   "mainHome/handlePermisionPresent",
   async () => {
@@ -228,14 +243,13 @@ export const handlePermisionPresent = createAsyncThunk(
         console.log(permissions);
         setCookie(localStorage.getItem("personalCode"), permissions, 365);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-// Info user
-
+// -> Info user
 export const handleUserInformation = createAsyncThunk(
   "mainHome/handleUserInformation",
   async (userId) => {
@@ -243,14 +257,13 @@ export const handleUserInformation = createAsyncThunk(
       const getUserInfoRes = await getUserInfo(userId);
       console.log(getUserInfoRes.data);
       return getUserInfoRes.data;
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-// Picture user
-
+// -> Picture user
 export const handleUserPicture = createAsyncThunk(
   "mainHome/handleUserPicture",
   async (userId) => {
@@ -258,28 +271,25 @@ export const handleUserPicture = createAsyncThunk(
       const getUserPhotoRes = await getUserPhoto(userId);
       console.log(getUserPhotoRes);
       return getUserPhotoRes.data;
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-//  Request details
+// -> Request details
 export const handleCurrentReqInfo = createAsyncThunk(
   "mainHome/handleCurrentReqInfo",
   async ({ reqId, reqType, objCompany, objDepartment }, { dispatch }) => {
-    console.log(reqId, reqType, objCompany, objDepartment);
-    console.log(reqId, reqType, objCompany, objDepartment);
     dispatch(RsetCurrentReqCompany(objCompany));
     dispatch(RsetCurrentReqDepCheckout(objDepartment));
     dispatch(RsetCurrentReqType(reqType));
     const detailsRes = await getCurrentReqInfo(reqId, reqType);
-    console.log(detailsRes.data);
     return detailsRes.data;
   }
 );
 
-//  --> View post //
+// -> View post //
 export const handlePostComment = createAsyncThunk(
   "mainHome/handlePostComment",
   async (type, { dispatch, getState }) => {
@@ -305,7 +315,7 @@ export const handlePostComment = createAsyncThunk(
   }
 );
 
-//  All history info
+// -> All history info
 export const handleHistories = createAsyncThunk(
   "mainHome/handleHistories",
   async ({ serial, type }) => {
@@ -316,55 +326,120 @@ export const handleHistories = createAsyncThunk(
   }
 );
 
-// --> Accept post
+// -> Accept post
 export const handlePostAccept = createAsyncThunk(
   "mainHome/handlePostAccept",
-  async (type, { dispatch, getState }) => {
-    const { userLogin, descriptionModals } = getState().mainHome;
-    const { currentReqInfo } = getState().tableCheckoutList;
+  async (type, { getState, dispatch }) => {
+    const { userLogin, descriptionModals, currentReqInfo } =
+      getState().mainHome;
+    const userId = localStorage.getItem("id")
     const getLastActionId =
       currentReqInfo.process[currentReqInfo.process.length - 1]._id;
+    console.log(currentReqInfo);
     const getReqId = currentReqInfo.reqInfo._id;
+    console.log(currentReqInfo)
     try {
-      const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
+      const postCheckDateRes = await getAcceptanceAccess(getReqId, userId);
       console.log(postCheckDateRes);
-      if (postCheckDateRes.data.type === "accepted") {
-        const valuesAcceptBtn = {
-          location: userLogin.location,
-          company: userLogin.company.CompanyCode,
-          role: [49, 50, 51, 52, 53],
-          existRole: true,
-        };
-        const postHandlerRes = await findToPerson(valuesAcceptBtn);
-        if (postHandlerRes.data.length !== 0) {
-          let getId = [];
-          postHandlerRes.data.map((item) => {
-            return getId.push(item._id);
+
+      if (postCheckDateRes.data.message === "accepted") {
+        var actionValue = {};
+        var toPerson = {};
+        let getId = [];
+        console.log(currentReqInfo.process, currentReqInfo.process[currentReqInfo.process.length - 1].action_code === 43 || (currentReqInfo.process[currentReqInfo.process.length - 1].action_code === 44) && currentReqInfo.process.length < 7)
+        if (currentReqInfo.process[0].toPersons.some((itme) => itme === localStorage.getItem("id"))) {
+          toPerson = {
+            location: userLogin.location,
+            company: userLogin.company.CompanyCode,
+            role: [49, 50, 51, 52, 53],
+            existRole: true,
+          };
+          const resInGroup = await findToPerson(toPerson);
+          console.log(resInGroup);
+          resInGroup.data.map((item) => {
+            return getId.push(item.value);
           });
-          const actionValue = {
+          actionValue = {
             action_id: currentReqInfo.reqInfo._id,
-            action_code: 0,
+            action_code: 43,
             user_id: localStorage.getItem("id"),
             toPersons: getId,
             type: type,
             comment: descriptionModals,
           };
-          console.log(actionValue);
-          const postActionRes = await postAction(actionValue);
-          console.log(postActionRes.data);
-          if (postActionRes.data.type === 415) {
-          } else {
-            errorMessage("دریافت کننده مورد نظر یافت نشد!");
-          }
+
+        } else if ((currentReqInfo.process[currentReqInfo.process.length - 1].action_code === 43 || (currentReqInfo.process[currentReqInfo.process.length - 1].action_code === 44) && currentReqInfo.process.length < 7)) {
+          console.log(currentReqInfo.process);
+          actionValue = {
+            action_id: currentReqInfo.reqInfo._id,
+            action_code: 44,
+            user_id: localStorage.getItem("id"),
+            type: type,
+            comment: descriptionModals,
+          };
+        } else if (currentReqInfo.process.length === 7) {
+          console.log("end formatting");
+          toPerson = {
+            location: userLogin.location,
+            company: userLogin.company.CompanyCode,
+            role: [66],
+            existRole: true,
+          };
+          console.log(toPerson);
+          const resInGroup = await findToPerson(toPerson);
+          console.log(resInGroup);
+          resInGroup.data.map((item) => {
+            return getId.push(item.value);
+          });
+          actionValue = {
+            action_id: currentReqInfo.reqInfo._id,
+            action_code: 44,
+            user_id: localStorage.getItem("id"),
+            type: type,
+            toPersons: getId,
+            comment: descriptionModals,
+          };
+        } else if (currentReqInfo.process[currentReqInfo.process.length - 1].action_code === 44 && currentReqInfo.process[currentReqInfo.process.length - 1].toPersons.some((item) => item === localStorage.getItem("id")) && currentReqInfo.process[currentReqInfo.process.length - 1].toPersons !== undefined) {
+          actionValue = {
+            action_id: currentReqInfo.reqInfo._id,
+            action_code: 30,
+            user_id: localStorage.getItem("id"),
+            type: type,
+            comment: descriptionModals,
+          };
         }
+        // console.log(actionValue.action_id, actionValue.comment);
+        console.log(actionValue);
+        const postActionRes = await postAction(actionValue);
+        console.log(postActionRes);
+        if (postActionRes.data.code === 415) {
+          successMessage("درخواست با موفقیت تایید شد.");
+          const filterValues = {
+            applicant_id: localStorage.getItem("id"),
+            leaver: "",
+            status: "",
+            fromDate: "null",
+            toDate: "null",
+            leavingWorkCause: "",
+            company: "",
+            department: "",
+            role: "",
+            type: 10,
+          };
+
+          dispatch(handleReqsList(filterValues));
+          dispatch(RsetDescriptionModals(""));
+        }
+      } else {
+        errorMessage('این درخواست توسط شما تایید شده است.')
       }
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-//  Cancel post
+// -> Cancel post
 export const handlePostCancelModal = createAsyncThunk(
   "mainHome/handlePostCancelModal",
   async (type, { getState }) => {
@@ -386,12 +461,14 @@ export const handlePostCancelModal = createAsyncThunk(
       };
       console.log(actionValue);
       const postActionRes = await postAction(actionValue);
-      successMessage("درخواست شما با موفقیت کنسل شد.");
+      successMessage("درخواست با موفقیت کنسل شد.");
+      console.log(postActionRes);
       return postActionRes;
     }
   }
 );
 
+//  -> UUid
 export const generateRanHex = createAsyncThunk(
   "mainHome/generateRanHex",
   async (size) => {
@@ -421,11 +498,10 @@ export const generateRanHex = createAsyncThunk(
   }
 );
 
-// Requests List
+// -> Requests List
 export const handleReqsList = createAsyncThunk(
   "mainHome/handleReqsList",
   async (filterValues, { dispatch }) => {
-    //true
     dispatch(RsetIsLoadingCheckout(true));
     try {
       const reqsListRes = await getRequestsList(filterValues);
@@ -439,14 +515,14 @@ export const handleReqsList = createAsyncThunk(
         errorMessage("اطلاعات یافت نشد!");
         dispatch(RsetIsLoadingCheckout(false));
       }
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      console.log(ex);
       dispatch(RsetIsLoadingCheckout(false));
     }
   }
 );
 
-// Slice
+// -> Main slice
 const mainSlices = createSlice({
   name: "mainHome",
   initialState,
@@ -482,6 +558,21 @@ const mainSlices = createSlice({
     RsetLoginPage: (state, { payload }) => {
       return { ...state, loginPage: payload };
     },
+    RsetFullToPerson: (state, { payload }) => {
+      return { ...state, fullToPerson: payload };
+    },
+    RsetTicket: (state, { payload }) => {
+      return { ...state, ticket: payload };
+    },
+    RsetMessageTicket: (state, { payload }) => {
+      return { ...state, messageTicket: payload };
+    },
+    RsetAllMessage: (state, { payload }) => {
+      return { ...state, allMessage: payload };
+    },
+    RsetRealFilter: (state, { payload }) => {
+      return { ...state, realFilter: payload };
+    },
   },
   extraReducers: {
     [handleUserInformation.fulfilled]: (state, { payload }) => {
@@ -500,10 +591,10 @@ const mainSlices = createSlice({
       return { ...state, histories: payload };
     },
     [handleLogin.fulfilled]: (state, { payload }) => {
+      console.log(payload);
       return { ...state, userLogin: payload };
     },
     [handleDepartments.fulfilled]: (state, { payload }) => {
-      console.log(payload);
       return { ...state, allDepartment: payload };
     },
     [handleCurrentReqInfo.fulfilled]: (state, { payload }) => {
@@ -517,6 +608,10 @@ const mainSlices = createSlice({
         reqsList: payload.list,
       };
     },
+    [handleUserInfoAllPage.fulfilled]: (state, { payload }) => {
+      return { ...state, loginAllPage: payload };
+    },
+
   },
 });
 
@@ -530,7 +625,11 @@ export const {
   RsetMenu,
   RsetUserInfoChanged,
   RsetLoginPage,
+  RsetFullToPerson, RsetTicket, RsetMessageTicket, RsetAllMessage, RsetRealFilter,
 } = mainSlices.actions;
+
+export const selectUserAllPage = (state) => state.mainHome.loginAllPage;
+
 export const selectUserName = (state) => state.mainHome.userName;
 export const selectPassword = (state) => state.mainHome.password;
 export const selectLoginPage = (state) => state.mainHome.loginPage;
@@ -545,6 +644,12 @@ export const selectAllDeps = (state) => state.mainHome.allDepartment;
 export const selectCurrentReqInfo = (state) => state.mainHome.currentReqInfo;
 export const selectReqsList = (state) => state.mainHome.reqsList;
 export const selectRequestMemb = (state) => state.mainHome.requestMembs;
+export const selectFullToPerson = (state) => state.mainHome.fullToPerson;
+export const selectTicket = (state) => state.mainHome.ticket;
+export const selectMessageTicket = (state) => state.mainHome.messageTicket;
+export const selectAllMessage = (state) => state.mainHome.allMessage;
+
+export const selectRealFilter = (state) => state.mainHome.realFilter;
 
 export const selectDescriptionModals = (state) =>
   state.mainHome.descriptionModals;

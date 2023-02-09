@@ -4,9 +4,9 @@ import ExpenseAccountForm from "../../../components/expensesAccount/form/Expense
 import Header from "../../../layout/Header/Header";
 
 const ExpenseAccount = () => {
+
   return (
     <Container fluid>
-      <Header />
       <ExpenseAccountForm />
     </Container>
   );

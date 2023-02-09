@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { selectCurrentComp } from "../../slices/CheckoutOfficialSlice";
 import moment from "moment-jalaali";
 import {
-  RsetDescriptions,
   RsetViewOverTimeModal,
   selectViewOverTime,
 } from "../../slices/OverTimeSlice";
@@ -39,7 +37,7 @@ const ViewOverTime = () => {
       onHide={() => dispatch(RsetViewOverTimeModal(false))}
       backdrop="static"
       role="dialog"
-      dialogClassName="cont_modal"
+      dialogClassName="modal-90w"
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
@@ -61,42 +59,42 @@ const ViewOverTime = () => {
             <span>
               {details.process !== undefined
                 ? moment(details.process[0].date, "YYYY/MM/DD")
-                    .locale("fa")
-                    .format("jYYYY/jMM/jDD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
                 : ""}
             </span>
           </div>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="show-grid">
-        <Row>
-          <Col xs={12} md={8} xl={12}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">نام و نام خانوادگی: </span>
-              <span>
-                {details.process !== undefined
-                  ? `${details.process[0].userInfo.first_name} ${details.process[0].userInfo.last_name}`
-                  : ""}
-              </span>
-            </p>
-          </Col>
-          <p className="mb-3 me-1">
-            <span className="fw-bold">تاریخ و ساعت شروع: </span>
-            <span>{details.reqInfo !== undefined ? fromDate : ""}</span>
-          </p>
-          <Col xs={6} md={4}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">تاریخ و ساعت پایان: </span>
-              <span>{details.reqInfo !== undefined ? toDate : ""}</span>
-            </p>
-          </Col>
-          <p className=" mb-3">
+        <ul className="list-unstyled" >
+          <li className="mb-3">
+            <span className="fw-bold">نام و نام خانوادگی: </span>
+            <span>
+              {details.process !== undefined
+                ? `${details.process[0].userInfo.first_name} ${details.process[0].userInfo.last_name}`
+                : ""}
+            </span>
+          </li>
+          <li className="mb-3">
             <span className="fw-bold"> نوع اضافه کار: </span>
             <span>
-              {details.reqInfo !== undefined ? details.reqInfo.reason.name : ""}
+              {details.reqInfo !== undefined ? details.reqInfo.reason.label : ""}
             </span>
-          </p>
-        </Row>
+          </li>
+          <li className="mb-3">
+            <span className="fw-bold">تاریخ و ساعت شروع: </span>
+            <span>{details.reqInfo !== undefined ? fromDate : ""}</span>
+          </li>
+          <li className="mb-3">
+            <span className="fw-bold">تاریخ و ساعت پایان: </span>
+            <span>{details.reqInfo !== undefined ? toDate : ""}</span>
+          </li>
+          <li className="mb-3">
+            <span className="fw-bold">توضیحات: </span>
+            <span>{details.reqInfo !== undefined ? details.reqInfo.description : ""}</span>
+          </li>
+        </ul>
       </Modal.Body>
       <Modal.Footer className="justify-content-between">
         <div className="d-flex">
@@ -132,7 +130,7 @@ const ViewOverTime = () => {
           </Button>
         </div>
       </Modal.Footer>
-    </Modal>
+    </Modal >
   );
 };
 

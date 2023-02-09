@@ -59,6 +59,7 @@ const initialState = {
   leavingWorkCause: "",
 };
 
+// -> Leaving work reason
 export const handleReasonLeavingWork = createAsyncThunk(
   "checkout/handleReasonLeavingWork",
   async () => {
@@ -71,6 +72,7 @@ export const handleReasonLeavingWork = createAsyncThunk(
   }
 );
 
+// -> Checkout user
 export const handleUsersCheckout = createAsyncThunk(
   "checkout/handleUsersCheckout",
   async (obj, { getState }) => {
@@ -82,12 +84,13 @@ export const handleUsersCheckout = createAsyncThunk(
       );
       console.log(resAllUsers.data);
       return resAllUsers.data;
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
+// -> Post Edit
 export const handlePostEdit = createAsyncThunk(
   "checkout/handlePostEdit",
   async (type, { getState, dispatch }) => {
@@ -99,13 +102,13 @@ export const handlePostEdit = createAsyncThunk(
     const getReqId = currentReqInfo.reqInfo._id;
     const postCheckDateRes = await checkDate(getLastActionId, getReqId, type);
     console.log(postCheckDateRes.data);
-
+    console.log(leavingWorkDate.format("jYYYY/jM/jD"));
     if (postCheckDateRes.data.type === "accepted") {
       const reqId = currentReqInfo.reqInfo._id;
       const values = {
         description: descriptionModals,
         leavingWorkDate:
-          leavingWorkDate !== null ? leavingWorkDate.format("YYYY/MM/DD") : "",
+          leavingWorkDate !== null ? leavingWorkDate.format("YYYY-MM-DD") : "",
         leavingWorkCause:
           reasonLeavingModal !== "" ? reasonLeavingModal.value : "",
       };
@@ -121,20 +124,20 @@ export const handlePostEdit = createAsyncThunk(
   }
 );
 
-// Companies
+// -> Companies
 export const handleCompaniesCheckout = createAsyncThunk(
   "tableCheckoutList/fetchGetAllCompany",
   async () => {
     try {
       const resCompanyName = await getAllCompany();
       return resCompanyName.data;
-    } catch (error) {
-      console.log(error);
+    } catch (ex) {
+      console.log(ex);
     }
   }
 );
 
-//  Statuses
+// -> Statuses
 export const handlStatusesCheckout = createAsyncThunk(
   "tableCheckoutList/handlStatusesCheckout",
   async () => {
@@ -144,6 +147,7 @@ export const handlStatusesCheckout = createAsyncThunk(
   }
 );
 
+//  -> Checkout slice
 const CheckoutOfficialSlice = createSlice({
   name: "checkout",
   initialState,

@@ -24,6 +24,7 @@ import {
   RsetStatus,
   RsetUserListValue,
   RsetAcceptOverTimeModal,
+  handleResetOverTimeFilter,
 } from "../../slices/OverTimeSlice";
 import {
   faArrowsRotate,
@@ -44,9 +45,9 @@ import {
   handleUserPicture,
   handleHistories,
   RsetCurrentReqInfo,
-  handleReqsList,
   selectReqsList,
   selectIsLoadingCheckout,
+  handleReqsList,
 } from "../../slices/mainSlices";
 import Loading from "../../Common/Loading";
 import { errorMessage } from "../../../utils/message";
@@ -101,42 +102,64 @@ const OverTimeTableList = () => {
   const columns = useMemo(() => [
     {
       Header: "سریال درخواست",
-      accessor: "col9",
+      accessor: "reqSerial",
+      sortType: "basic",
+    },
+    {
+      Header: " تاریخ",
+      accessor: "reqDate",
       sortType: "basic",
     },
     {
       Header: "درخواست کننده",
-      accessor: "col1",
-      sortType: "basic",
-    },
-    {
-      Header: "تاریخ",
-      accessor: "col2",
-      sortType: "basic",
-    },
-    {
-      Header: "وضعیت",
-      accessor: "col5",
+      accessor: "reqUser",
       sortType: "basic",
     },
     {
       Header: "واحد",
-      accessor: "col6",
+      accessor: "reqDep",
       sortType: "basic",
     },
     {
-      Header: "تایید کننده",
-      accessor: "col7",
+      Header: "وضعیت",
+      accessor: "reqStatus",
       sortType: "basic",
     },
     {
       Header: "عملیات",
-      accessor: "col8",
+      accessor: "reqOperation",
       sortType: "basic",
     },
   ]);
-
-  const buttons = (request) => {
+  const link = (request) => {
+    return (
+      <span
+        onClick={() => {
+          console.log(request);
+          dispatch(RsetCurrentReqInfo(request));
+          dispatch(RsetViewOverTimeModal(true));
+        }}
+        className="cursorPointer"
+      >
+        {request.reqInfo.serial_number}
+      </span>
+    );
+  };
+  const userInfo = (request) => {
+    return (
+      <span
+        className="cursorPointer"
+        onClick={() => (
+          dispatch(RsetUserInfoModals(true)),
+          dispatch(handleUserInformation(request.process[0].userInfo._id)),
+          dispatch(handleUserPicture(request.process[0].userInfo._id))
+        )}
+      >
+        {`${request.process[0].userInfo.first_name} ${request.process[0].userInfo.last_name}`}
+      </span>
+    );
+  };
+  const operation = (request) => {
     if (
       (request.process[0].toPerson || request.process[0].toPersons) ===
       undefined
@@ -284,58 +307,25 @@ const OverTimeTableList = () => {
       );
     }
   };
-
-  const linkUserInfo = (request) => {
-    return (
-      <span
-        className="cursorPointer"
-        onClick={() => (
-          dispatch(RsetUserInfoModals(true)),
-          dispatch(handleUserInformation(request.process[0].userInfo._id)),
-          dispatch(handleUserPicture(request.process[0].userInfo._id))
-        )}
-      >
-        {`${request.process[0].userInfo.first_name} ${request.process[0].userInfo.last_name}`}
-      </span>
-    );
-  };
-
-  const userSeries = (request) => {
-    return (
-      <span
-        onClick={() => {
-          console.log(request);
-          dispatch(RsetCurrentReqInfo(request));
-          dispatch(RsetViewOverTimeModal(true));
-        }}
-        className="cursorPointer"
-      >
-        {request.reqInfo.serial_number}
-      </span>
-    );
-  };
-
   const fetchData = useCallback(({ pageSize, pageIndex, requests }) => {
     var tableItems = [];
     if (requests.length !== 0) {
       for (var i = 0; i < requests.length; i++) {
         var tableItem = {
-          col1: linkUserInfo(requests[i]),
-          col2: moment(requests[i].process[0].date, "YYYY/MM/DD ")
+          reqSerial: link(requests[i]),
+          reqDate: moment(requests[i].process[0].date, "YYYY/MM/DD ")
             .locale("fa")
             .format("jYYYY/jMM/jDD"),
-          col4: requests[i].reqInfo.reason,
-          col5: requests[i].status.name,
-          col6: requests[i].department.name,
-          col7: "",
-          col8: buttons(requests[i]),
-          col9: userSeries(requests[i]),
+          reqUser: userInfo(requests[i]),
+          reqDep: requests[i].department.name,
+          // col5: requests[i].reqInfo.reason,
+          reqStatus: requests[i].status.name,
+          reqOperation: operation(requests[i]),
         };
         tableItems.push(tableItem);
       }
     }
     const fetchId = ++fetchIdRef.current;
-
     setload(true);
     if (fetchId === fetchIdRef.current) {
       const startRow = pageSize * pageIndex;
@@ -351,16 +341,15 @@ const OverTimeTableList = () => {
       if (requests.length !== 0) {
         for (var i = 0; i < requests.length; i++) {
           var tableItem = {
-            col1: linkUserInfo(requests[i]),
-            col2: moment(requests[i].process[0].date, "YYYY/MM/DD ")
+            reqSerial: link(requests[i]),
+            reqDate: moment(requests[i].process[0].date, "YYYY/MM/DD ")
               .locale("fa")
               .format("jYYYY/jMM/jDD"),
-            col4: requests[i].reqInfo.reason,
-            col5: requests[i].status.name,
-            col6: requests[i].department.name,
-            col7: "",
-            col8: buttons(requests[i]),
-            col9: userSeries(requests[i]),
+            reqUser: userInfo(requests[i]),
+            reqDep: requests[i].department.name,
+            // col5: requests[i].reqInfo.reason,
+            reqStatus: requests[i].status.name,
+            reqOperation: operation(requests[i]),
           };
           tableItems.push(tableItem);
         }
@@ -390,18 +379,12 @@ const OverTimeTableList = () => {
   return (
     <div className="my-4">
       <section className="position-relative">
-        {!isLoading && <Loading />}
+        {isLoading && <Loading />}
         <div>
           <Button
             onClick={() => {
-              // dispatch(handleReqsList(filterValues));
-              dispatch(RsetOverTimeReasonValue(""));
-              dispatch(RsetFromDate(null));
-              dispatch(RsetToDate(null));
-              dispatch(RsetDescriptions(""));
-              dispatch(RsetDepartemant(""));
-              dispatch(RsetStatus(""));
-              dispatch(RsetUserListValue(""));
+              dispatch(handleReqsList(filterValues));
+              dispatch(handleResetOverTimeFilter());
             }}
             className="my-2"
           >

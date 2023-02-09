@@ -38,31 +38,13 @@ const EditOverTime = () => {
 
   const overTimeReas = useSelector(selectOverTimeReason);
 
-  const reasonChanger = details.reqInfo;
-  let getReasonValue = [];
-
-  // const test = reasonChanger.replice({
-  //   name: label,
-  //   code: value,
-  // });
-
-  // reasonChanger.map((reason) => {
-  //   getReasonValue.push({
-  //     label: reason.name,
-  //     value: reason.code,
-  //   });
-  // });
-
-  console.log(getReasonValue);
-  console.log(reasonChanger);
-
   const statusObj = details.status;
   const desChanger = details.reqInfo;
   console.log(desChanger);
   const [FromDateTitle, setFromDateTitle] = useState(null);
   const [toDateTitle, setToDateTitle] = useState(null);
   const [descriptionTitle, setDescriptionTitle] = useState(desChanger);
-  const [overTimeReason, setOverTimeReason] = useState(details.reqInfo);
+  const [overTimeReason, setOverTimeReason] = useState(details.reqInfo.reason);
 
   useEffect(() => {
     console.log(details);
@@ -103,7 +85,7 @@ const EditOverTime = () => {
       onHide={() => dispatch(RsetEditOverTimeModal(false))}
       backdrop="static"
       role="dialog"
-      dialogClassName="cont_modal"
+      dialogClassName="modal-90w"
       // size="lg"
       aria-labelledby="contained-modal-title-vcenter"
     >
@@ -125,71 +107,57 @@ const EditOverTime = () => {
             <span>
               {details.process !== undefined
                 ? moment(details.process[0].date, "YYYY/MM/DD")
-                    .locale("fa")
-                    .format("jYYYY/jMM/jDD")
+                  .locale("fa")
+                  .format("jYYYY/jMM/jDD")
                 : ""}
             </span>
           </div>
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="show-grid">
-        <Row>
-          <Col xs={12} md={8} xl={12}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold">نام و نام خانوادگی: </span>
-              <span>
-                {`${
-                  details.process !== undefined
-                    ? details.process[0].userInfo.first_name
-                    : ""
-                } ${
-                  details.process !== undefined
-                    ? details.process[0].userInfo.last_name
-                    : ""
+        <ul className="list-unstyled" >
+          <li className="mb-3" >
+            <span className="fw-bold">نام و نام خانوادگی: </span>
+            <span>
+              {`${details.process !== undefined
+                ? details.process[0].userInfo.first_name
+                : ""
+                } ${details.process !== undefined
+                  ? details.process[0].userInfo.last_name
+                  : ""
                 }`}
-              </span>
-            </p>
-          </Col>
-          <div className=" mb-3">
-            <span className="fw-bold">نوع اضافه کار: </span>
-            <Select
-              className="mb-3 mt-1 "
-              placeholder="انتخاب"
-              options={overTimeReas}
-              // defaultValue={testJSon}
-              onChange={(e) => setOverTimeReason(e)}
-            />
-          </div>
-
-          <div>
-            <p className="font-weight-bold mb-3">
-              <span className="fw-bold">توضیحات: </span>
-              <textarea
-                type="textArea"
-                value={descriptionTitle}
-                onChange={(e) => setDescriptionTitle(e.target.value)}
-                className="form-control mt-1 "
-              />
-            </p>
-          </div>
-          <Col xs={6} md={4}>
-            <p className="mb-3 me-1">
-              <span className="fw-bold ">تاریخ و ساعت شروع: </span>
-              <DatePicker
-                className="form-control mt-1"
-                type="date"
-                v-model="dateWhichShouldShow"
-                inputFormat="YYYY-MM-DD"
-                pick12HourFormat={false}
-                isGregorian={false}
-                timePicker={true}
-                value={FromDateTitle}
-              />
-            </p>
-          </Col>
-          <Col xs={6} md={4}>
-            <div>
-              <p className="mb-3 me-1">
+            </span>
+          </li>
+          <Row className="d-flex" >
+            <Col md="4" lg="3" >
+              <li className="mb-3">
+                <span className="fw-bold">نوع اضافه کار: </span>
+                <Select
+                  className="mb-3 mt-1 "
+                  placeholder="انتخاب"
+                  options={overTimeReas}
+                  defaultValue={overTimeReason}
+                  onChange={(e) => setOverTimeReason(e)}
+                />
+              </li>
+            </Col>
+            <Col md="4" lg="3">
+              <li className="mb-3">
+                <span className="fw-bold ">تاریخ و ساعت شروع: </span>
+                <DatePicker
+                  className="form-control mt-1"
+                  type="date"
+                  v-model="dateWhichShouldShow"
+                  inputFormat="YYYY-MM-DD"
+                  pick12HourFormat={false}
+                  isGregorian={false}
+                  timePicker={true}
+                  value={FromDateTitle}
+                />
+              </li>
+            </Col>
+            <Col md="4" lg="3">
+              <li className="mb-3">
                 <span className="fw-bold ">تاریخ و ساعت پایان: </span>
                 <DatePicker
                   value={toDateTitle}
@@ -201,11 +169,23 @@ const EditOverTime = () => {
                   isGregorian={false}
                   timePicker={true}
                 />
-              </p>
-            </div>
-          </Col>
-        </Row>
-      </Modal.Body>
+              </li>
+            </Col>
+            <Col md="12" >
+              <li className="mb-3">
+                <span className="fw-bold">توضیحات: </span>
+                <textarea
+                  type="textArea"
+                  rows={5}
+                  value={descriptionTitle}
+                  onChange={(e) => setDescriptionTitle(e.target.value)}
+                  className="form-control mt-1 "
+                />
+              </li>
+            </Col>
+          </Row>
+        </ul >
+      </Modal.Body >
       <Modal.Footer className="justify-content-between">
         <div className="d-flex">
           <Button onClick={editHandler} className=" " variant="primary">
@@ -224,7 +204,7 @@ const EditOverTime = () => {
           </Button>
         </div>
       </Modal.Footer>
-    </Modal>
+    </Modal >
   );
 };
 
